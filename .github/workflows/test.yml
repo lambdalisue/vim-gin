@@ -1,0 +1,137 @@
+name: test
+
+env:
+  DENOPS_PATH: "../denops.vim"
+
+on:
+  schedule:
+    - cron: "0 7 * * 0"
+  push:
+    branches:
+      - main
+    paths:
+      - "**/*.md"
+      - "**/*.ts"
+      - "**/*.vim"
+      - ".github/workflows/test.yml"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "**/*.md"
+      - "**/*.ts"
+      - "**/*.vim"
+      - ".github/workflows/test.yml"
+
+defaults:
+  run:
+    shell: bash --noprofile --norc -eo pipefail {0}
+
+jobs:
+  check:
+    strategy:
+      matrix:
+        runner:
+          - ubuntu-latest
+        version:
+          - "1.11.0"
+          - "1.x"
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - run: git config --global core.autocrlf false
+        if: runner.os == 'Windows'
+      - uses: actions/checkout@v2
+      - uses: denoland/setup-deno@main
+        with:
+          deno-version: "${{ matrix.version }}"
+      - name: Lint check
+        run: make lint
+      - name: Format check
+        run: make fmt-check
+      - name: Type check
+        run: make type-check
+
+  test:
+    strategy:
+      matrix:
+        runner:
+          - windows-latest
+          - macos-latest
+          - ubuntu-latest
+        version:
+          - "1.11.0"
+          - "1.x"
+        host_version:
+          - vim: "v8.2.0662"
+            nvim: "v0.4.4"
+          - vim: "v8.2.3081"
+            nvim: "v0.5.0"
+        include:
+          - runner: windows-latest
+            version: 1.11.0
+            host_version:
+              vim: v8.2.0671 # Instead of v8.2.0662
+              nvim: v0.4.4
+          - runner: windows-latest
+            version: 1.x
+            host_version:
+              vim: v8.2.0671 # Instead of v8.2.0662
+              nvim: v0.4.4
+        exclude:
+          - runner: windows-latest
+            version: 1.11.0
+            host_version:
+              vim: v8.2.0662 # Not found on vim-win32-installer
+              nvim: v0.4.4
+          - runner: windows-latest
+            version: 1.x
+            host_version:
+              vim: v8.2.0662 # Not found on vim-win32-installer
+              nvim: v0.4.4
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - run: git config --global init.defaultBranch main
+      - run: git config --global core.autocrlf false
+        if: runner.os == 'Windows'
+      - uses: actions/checkout@v2
+        with:
+          path: "./repo"
+      - uses: actions/checkout@v2
+        with:
+          repository: "vim-denops/denops.vim"
+          path: "./denops.vim"
+      - uses: denoland/setup-deno@main
+        with:
+          deno-version: "${{ matrix.version }}"
+      - uses: rhysd/action-setup-vim@v1
+        id: vim
+        with:
+          version: "${{ matrix.host_version.vim }}"
+        if: matrix.host_version.vim != ''
+      - name: Check Vim
+        run: |
+          echo ${DENOPS_TEST_VIM}
+          ${DENOPS_TEST_VIM} --version
+        env:
+          DENOPS_TEST_VIM: ${{ steps.vim.outputs.executable }}
+        if: matrix.host_version.vim != ''
+      - uses: rhysd/action-setup-vim@v1
+        id: nvim
+        with:
+          neovim: true
+          version: "${{ matrix.host_version.nvim }}"
+        if: matrix.host_version.nvim != ''
+      - name: Check Neovim
+        run: |
+          echo ${DENOPS_TEST_NVIM}
+          ${DENOPS_TEST_NVIM} --version
+        env:
+          DENOPS_TEST_NVIM: ${{ steps.nvim.outputs.executable }}
+        if: matrix.host_version.nvim != ''
+      - name: Test
+        working-directory: ./repo
+        run: make test
+        env:
+          DENOPS_TEST_VIM: ${{ steps.vim.outputs.executable }}
+          DENOPS_TEST_NVIM: ${{ steps.nvim.outputs.executable }}
+        timeout-minutes: 5
