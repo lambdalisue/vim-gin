@@ -13,6 +13,7 @@ import { find } from "../../git/finder.ts";
 import { BufnameParams, format, parse } from "../../core/bufname.ts";
 import { initActions as initIndexActions } from "../../action/index.ts";
 import { initActions as initPathActions } from "../../action/path.ts";
+import { bind } from "../native/command.ts";
 
 export async function command(
   denops: Denops,
@@ -46,6 +47,7 @@ export async function read(denops: Denops): Promise<void> {
   const result = await execStatus({ ...options, cwd: path });
   const content = render(result);
   await batch.batch(denops, async (denops) => {
+    await bind(denops, bufnr);
     await option.filetype.setLocal(denops, "gin-status");
     await option.modifiable.setLocal(denops, false);
     await vars.b.set(denops, "gin_status_result", result);

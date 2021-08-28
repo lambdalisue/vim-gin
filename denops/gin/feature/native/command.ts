@@ -34,3 +34,18 @@ export async function command(
     nomodeline: true,
   });
 }
+
+export async function bind(denops: Denops, bufnr: number): Promise<void> {
+  await helper.load(denops, new URL("./command.vim", import.meta.url));
+  await autocmd.group(denops, `gin_native_command_bind_${bufnr}`, (helper) => {
+    helper.remove();
+    helper.define(
+      "User",
+      "GinNativeCommandPost",
+      `call GinFeatureNativeCommandReload(${bufnr})`,
+      {
+        nested: true,
+      },
+    );
+  });
+}
