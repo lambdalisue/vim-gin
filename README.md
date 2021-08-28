@@ -15,15 +15,15 @@ Gin (_gin.vim_) is a plugin to handle git repository from Vim/Neovim.
 
 Gin is written in denops thus users need to install denops.vim
 
-- [vim-denops/denops.vim][vim-denops/denops.vim]<br. An ecosystem for writing
+- [vim-denops/denops.vim][vim-denops/denops.vim]<br> An ecosystem for writing
   Vim/Neovim plugin in Deno.
 
 Additionally, the following Vim/Neovim plugins are highly recommended to use:
 
-- [lambdalisue/guise.vim][lambdalisue/guise.vim]<br> To open a new |tabpage| to
-  edit a commit message on "Gin commit".
+- [lambdalisue/guise.vim][lambdalisue/guise.vim]<br> To open a new tabpage to
+  edit a commit message on `Gin commit`.
 - [lambdalisue/askpass.vim][lambdalisue/askpass.vim]<br> To input SSH key
-  passphrase on "Gin push" or so on.
+  passphrase on `Gin push` or so on.
 
 [vim-denops/denops.vim]: https://github.com/vim-denops/denops.vim
 [lambdalisue/guise.vim]: https://github.com/lambdalisue/guise.vim
