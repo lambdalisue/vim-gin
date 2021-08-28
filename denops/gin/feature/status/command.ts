@@ -1,13 +1,18 @@
-import { batch, Denops, flags, fn, option, vars } from "../../deps.ts";
-import { normCmdArgs } from "../../core/cmd.ts";
+import { batch, Denops, flags, fn, helper, option, vars } from "../../deps.ts";
+import * as action from "../../core/action.ts";
 import * as buffer from "../../core/buffer.ts";
+import { normCmdArgs } from "../../core/cmd.ts";
 import {
+  Entry,
   execStatus,
+  GitStatusResult,
   render,
   StatusOptions,
 } from "../../git/command/status/mod.ts";
 import { find } from "../../git/finder.ts";
 import { BufnameParams, format, parse } from "../../core/bufname.ts";
+import { initActions as initIndexActions } from "../../action/index.ts";
+import { initActions as initPathActions } from "../../action/path.ts";
 
 export async function command(
   denops: Denops,
@@ -44,6 +49,8 @@ export async function read(denops: Denops): Promise<void> {
     await option.filetype.setLocal(denops, "gin-status");
     await option.modifiable.setLocal(denops, false);
     await vars.b.set(denops, "gin_status_result", result);
+    await action.init(denops);
+    await initActions(denops);
   });
   await buffer.replace(denops, bufnr, content);
   await buffer.concrete(denops, bufnr);
@@ -51,4 +58,28 @@ export async function read(denops: Denops): Promise<void> {
 
 function fromBufnameParams(params: BufnameParams): StatusOptions {
   return { ...params } as unknown as StatusOptions;
+}
+
+async function getCandidates(
+  denops: Denops,
+  [start, end]: [number, number],
+): Promise<Entry[]> {
+  const result = await vars.b.get(denops, "gin_status_result") as
+    | GitStatusResult
+    | null;
+  if (!result) {
+    return [];
+  }
+  return result.entries.slice(start - 2, end - 2 + 1);
+}
+
+async function initActions(denops: Denops): Promise<void> {
+  await initPathActions(denops, getCandidates);
+  await initIndexActions(denops, getCandidates);
+  await action.register(denops, {
+    echo: async (denops, range) => {
+      const cs = await getCandidates(denops, range);
+      await helper.echo(denops, JSON.stringify(cs, undefined, 2));
+    },
+  });
 }
