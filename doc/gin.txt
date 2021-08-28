@@ -1,0 +1,76 @@
+*gin.txt*					Gin makes you drunk with Git
+
+Author:  Alisue <lambdalisue@hashnote.net>
+License: MIT License (See LICENSE)
+
+
+=============================================================================
+CONTENTS					*gin-contents*
+
+INTRODUCTION			|gin-introduction|
+REQUIREMENTS			|gin-requirements|
+INTERFACE			|gin-interface|
+  COMMANDS			  |gin-commands|
+
+
+=============================================================================
+INTRODUCTION					*gin-introduction*
+
+Gin ( *gin.vim* ) is a plugin to handle git repository from Vim/Neovim.
+
+
+=============================================================================
+REQUIREMENTS					*gin-requirements*
+
+Gin is written in denops thus users need to install denops.vim
+
+denops.vim~
+	An ecosystem for writing Vim/Neovim plugin in Deno.
+	https://github.com/vim-denops/denops.vim
+
+Additionally, the following Vim/Neovim plugins are highly recommended to use:
+
+guise.vim~
+	To open a new |tabpage| to edit a commit message on "Gin commit".
+	https://github.com/lambdalisue/guise.vim~
+
+askpass.vim~
+	To input SSH key passphrase on "Gin push" or so on.
+	https://github.com/lambdalisue/askpass.vim
+  
+
+=============================================================================
+INTERFACE					*gin-interface*
+
+-----------------------------------------------------------------------------
+COMMANDS					*gin-commands*
+
+								*:Gin*
+:Gin {command} [{args}]
+	Call a git raw {command} with {args} asynchronously and echo result.
+	For example, "Gin add %" on "hello.txt" invokes "git add hello.txt".
+
+	Note that users need to install lambdalisue/guise.vim to open a
+	|tabpage| to edit a commit message on "Gin commit" or so on.
+
+	Note that users need to install lambdalisue/askpass.vim to open a
+	prompt to input passphrase on "Gin push" or so on.
+
+								*:GinStatus*
+:GinStatus [{options}] [{path}]
+	Open a "gin-status" buffer to show a status of a repository of {path}.
+	If {path} is omitted, the current working directory is used.
+
+	The following options are available:
+
+	--untracked-files[=no/normal/all]
+	--ignore-submodules[=none/untracked/dirty/all]
+	--ignored[=traditional/no/matching]
+	--renames
+	--find-renames[=N]
+		
+	See ":man git-status(1)" for detail about options.
+
+
+=============================================================================
+vim:tw=78:fo=tcq2mM:ts=8:ft=help:norl
