@@ -5,4 +5,4 @@ export { using } from "https://deno.land/x/disposable@v0.2.0/mod.ts";
 
 export { sandbox } from "https://deno.land/x/sandbox@v0.2.0/mod.ts";
 
-export * from "https://deno.land/x/denops_std@v1.8.1/test/mod.ts";
+export * from "https://deno.land/x/denops_std@v1.9.0/test/mod.ts";
