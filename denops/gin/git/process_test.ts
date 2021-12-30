@@ -1,4 +1,4 @@
-import { assert, assertThrowsAsync } from "../deps_test.ts";
+import { assert, assertRejects } from "../deps_test.ts";
 import { decodeUtf8 } from "../text.ts";
 import { execute, ExecuteError, run } from "./process.ts";
 
@@ -35,7 +35,7 @@ Deno.test("execute() runs 'git' and return a stdout on success", async () => {
 });
 
 Deno.test("execute() runs 'git' and throw ExecuteError on fail", async () => {
-  await assertThrowsAsync(async () => {
+  await assertRejects(async () => {
     await execute(["no-such-command"]);
   }, ExecuteError);
 });
