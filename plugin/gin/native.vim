@@ -9,13 +9,18 @@ augroup gin_plugin_native_internal
   autocmd User GinNativeCommandPost :
 augroup END
 
-function! s:command(...) abort
-  let l:Callback = function('denops#notify', [
-        \ 'gin',
-        \ 'native:command',
-        \ a:000,
-        \])
-  call denops#plugin#wait_async('gin', l:Callback)
+function! s:command(bang, ...) abort
+  if a:bang ==# '!'
+    call denops#plugin#wait('gin')
+    call denops#request('gin', 'native:command', a:000)
+  else
+    let l:Callback = function('denops#notify', [
+          \ 'gin',
+          \ 'native:command',
+          \ a:000,
+          \])
+    call denops#plugin#wait_async('gin', l:Callback)
+  endif
 endfunction
 
-command! -bar -nargs=* Gin call s:command(<f-args>)
+command! -bang -bar -nargs=* Gin call s:command(<q-bang>, <f-args>)
