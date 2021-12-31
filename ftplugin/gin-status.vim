@@ -10,6 +10,6 @@ setlocal nowrap nofoldenable
 
 if !get(g:, 'gin_ginstatus_disable_default_mappings')
   map <buffer> <Return>  <Plug>(gin-action-open)
-  map <buffer> <<        <Plug>(gin-action-stage)
-  map <buffer> >>        <Plug>(gin-action-unstage)
+  map <buffer> <<        <Plug>(gin-action-stage:intent-to-add)
+  map <buffer> >>        <Plug>(gin-action-unstage:intent-to-add)
 endif
