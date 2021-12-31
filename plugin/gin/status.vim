@@ -9,12 +9,8 @@ augroup gin_plugin_status_internal
 augroup END
 
 function! s:command(...) abort
-  let l:Callback = function('denops#notify', [
-        \ 'gin',
-        \ 'status:command',
-        \ a:000,
-        \])
-  call denops#plugin#wait_async('gin', l:Callback)
+  call denops#plugin#wait('gin')
+  call denops#request('gin', 'status:command', a:000)
 endfunction
 
 command! -bar -nargs=* GinStatus call s:command(<f-args>)
