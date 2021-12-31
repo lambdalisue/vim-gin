@@ -21,7 +21,7 @@ export async function command(
 ): Promise<void> {
   const opts = flags.parse(await normCmdArgs(denops, args));
   const options: StatusOptions = {
-    untrackedFiles: opts["untracked-files"],
+    untrackedFiles: opts["untracked-files"] ?? "all",
     ignoreSubmodules: opts["ignore-submodules"],
     ignored: opts["ignored"],
     renames: opts["renames"],
