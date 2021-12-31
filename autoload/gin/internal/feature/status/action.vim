@@ -9,6 +9,28 @@ function! gin#internal#feature#status#action#register() abort
   map <buffer> <Plug>(gin-action-open:tabedit) <Plug>(gin-action-open=)tabedit<CR>
   map <buffer> <Plug>(gin-action-open) <Plug>(gin-action-open:edit)
 
+  noremap <buffer> <Plug>(gin-action-diff=)
+        \ <Cmd>call gin#action#fn({ xs -> <SID>diff('', xs) })<CR>
+  noremap <buffer> <Plug>(gin-action-diff:cached=)
+        \ <Cmd>call gin#action#fn({ xs -> <SID>diff('--cached', xs) })<CR>
+  noremap <buffer> <Plug>(gin-action-diff:previous=)
+        \ <Cmd>call gin#action#fn({ xs -> <SID>diff('HEAD^', xs) })<CR>
+  map <buffer> <Plug>(gin-action-diff:edit) <Plug>(gin-action-diff=)edit<CR>
+  map <buffer> <Plug>(gin-action-diff:split) <Plug>(gin-action-diff=)split<CR>
+  map <buffer> <Plug>(gin-action-diff:vsplit) <Plug>(gin-action-diff=)vsplit<CR>
+  map <buffer> <Plug>(gin-action-diff:tabedit) <Plug>(gin-action-diff=)tabedit<CR>
+  map <buffer> <Plug>(gin-action-diff) <Plug>(gin-action-diff:edit)
+  map <buffer> <Plug>(gin-action-diff:cached:edit) <Plug>(gin-action-diff:cached=)edit<CR>
+  map <buffer> <Plug>(gin-action-diff:cached:split) <Plug>(gin-action-diff:cached=)split<CR>
+  map <buffer> <Plug>(gin-action-diff:cached:vsplit) <Plug>(gin-action-diff:cached=)vsplit<CR>
+  map <buffer> <Plug>(gin-action-diff:cached:tabedit) <Plug>(gin-action-diff:cached=)tabedit<CR>
+  map <buffer> <Plug>(gin-action-diff:cached) <Plug>(gin-action-diff:cached:edit)
+  map <buffer> <Plug>(gin-action-diff:previous:edit) <Plug>(gin-action-diff:previous=)edit<CR>
+  map <buffer> <Plug>(gin-action-diff:previous:split) <Plug>(gin-action-diff:previous=)split<CR>
+  map <buffer> <Plug>(gin-action-diff:previous:vsplit) <Plug>(gin-action-diff:previous=)vsplit<CR>
+  map <buffer> <Plug>(gin-action-diff:previous:tabedit) <Plug>(gin-action-diff:previous=)tabedit<CR>
+  map <buffer> <Plug>(gin-action-diff:previous) <Plug>(gin-action-diff:previous:edit)
+
   noremap <buffer> <Plug>(gin-action-add)
         \ <Cmd>call gin#action#fn({ xs -> <SID>add('', xs) })<CR>
   noremap <buffer> <Plug>(gin-action-add:intent-to-add)
@@ -57,6 +79,19 @@ function! s:open(xs) abort
   endif
   call s:norm_xs(a:xs)
   call map(a:xs, { _, v -> execute(printf('%s %s', opener, v), '') })
+endfunction
+
+function! s:diff(suffix, xs) abort
+  let opener = input('Open with: ')
+  redraw | echo ''
+  if empty(opener)
+    echohl WarningMsg
+    echo 'Cancelled'
+    echohl None
+    return
+  endif
+  call s:norm_xs(a:xs)
+  call map(a:xs, { _, v -> execute(printf('%s | GinDiff %s -- %s', opener, a:suffix, v), '') })
 endfunction
 
 function! s:add(suffix, xs) abort
