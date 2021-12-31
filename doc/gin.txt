@@ -46,9 +46,10 @@ INTERFACE					*gin-interface*
 COMMANDS					*gin-commands*
 
 								*:Gin*
-:Gin {command} [{args}]
+:Gin[!] {command} [{args}]
 	Call a git raw {command} with {args} asynchronously and echo result.
 	For example, "Gin add %" on "hello.txt" invokes "git add hello.txt".
+	If a bang (!) is specified, it calls command synchronously instead.
 
 	Note that users need to install lambdalisue/guise.vim to open a
 	|tabpage| to edit a commit message on "Gin commit" or so on.
