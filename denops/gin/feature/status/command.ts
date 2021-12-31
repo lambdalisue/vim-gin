@@ -1,5 +1,4 @@
-import { batch, Denops, flags, fn, helper, option, vars } from "../../deps.ts";
-import * as action from "../../core/action.ts";
+import { batch, Denops, flags, fn, option, vars } from "../../deps.ts";
 import * as buffer from "../../core/buffer.ts";
 import { normCmdArgs } from "../../core/cmd.ts";
 import {
@@ -11,9 +10,14 @@ import {
 } from "../../git/command/status/mod.ts";
 import { find } from "../../git/finder.ts";
 import { BufnameParams, format, parse } from "../../core/bufname.ts";
-import { initActions as initIndexActions } from "../../action/index.ts";
-import { initActions as initPathActions } from "../../action/path.ts";
 import { bind } from "../native/command.ts";
+import {
+  Candidate as CandidateBase,
+  Range,
+  register as registerGatherer,
+} from "../action/registry.ts";
+
+type Candidate = Entry & CandidateBase;
 
 export async function command(
   denops: Denops,
@@ -46,13 +50,13 @@ export async function read(denops: Denops): Promise<void> {
   const options = fromBufnameParams(params ?? {});
   const result = await execStatus({ ...options, cwd: path });
   const content = render(result);
+  await registerGatherer(denops, getCandidates);
   await batch.batch(denops, async (denops) => {
     await bind(denops, bufnr);
     await option.filetype.setLocal(denops, "gin-status");
     await option.modifiable.setLocal(denops, false);
     await vars.b.set(denops, "gin_status_result", result);
-    await action.init(denops);
-    await initActions(denops);
+    await denops.call("gin#internal#feature#status#action#register");
   });
   await buffer.replace(denops, bufnr, content);
   await buffer.concrete(denops, bufnr);
@@ -64,24 +68,18 @@ function fromBufnameParams(params: BufnameParams): StatusOptions {
 
 async function getCandidates(
   denops: Denops,
-  [start, end]: [number, number],
-): Promise<Entry[]> {
+  [start, end]: Range,
+): Promise<Candidate[]> {
   const result = await vars.b.get(denops, "gin_status_result") as
     | GitStatusResult
     | null;
   if (!result) {
     return [];
   }
-  return result.entries.slice(start - 2, end - 2 + 1);
-}
-
-async function initActions(denops: Denops): Promise<void> {
-  await initPathActions(denops, getCandidates);
-  await initIndexActions(denops, getCandidates);
-  await action.register(denops, {
-    echo: async (denops, range) => {
-      const cs = await getCandidates(denops, range);
-      await helper.echo(denops, JSON.stringify(cs, undefined, 2));
-    },
-  });
+  start = Math.max(start, 2);
+  end = Math.max(end, 2);
+  return result.entries.slice(start - 2, end - 2 + 1).map((entry) => ({
+    ...entry,
+    value: entry.path,
+  }));
 }
