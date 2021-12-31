@@ -72,6 +72,45 @@ COMMANDS					*gin-commands*
 		
 	See ":man git-status(1)" for detail about options.
 
+-----------------------------------------------------------------------------
+FUNCTIONS					*gin-functions*
+
+						*gin#action#fn()*
+gin#action#fn({callback})
+	A wrapper function to make an action mapping.
+	The wrapped function is called with {xs} which is a candidate |List|
+	when the action is invoked.
+	Note that users MUST use <Cmd> pseudokey to define mappings like:
+>
+	function! s:my_custom(xs) abort
+	  echo string(a:xs)
+	endfunction
+
+	noremap <buffer> <Plug>(gin-action-my-custom)
+	      \ <Cmd>call gin#action#fn({ xs -> <SID>my_custom(xs) })<CR>
+<
+	WARNING: This API is unstable yet
+
+						*gin#action#call()*
+gin#action#call({name}, {range})
+	Invoke an action {name} with {range}. The {name} is |String| name and
+	the {range} is "[firstline, lastline]" |List|.
+	Note that this function uses |feedkeys()| internally.
+>
+	call gin#action#call('my-custom', [1, 1])
+<
+	WARNING: This API is unstable yet
+
+	       				*gin#action#list_action()*
+gin#action#list_actions()
+	List all available actions of the current buffer.
+	WARNING: This API is unstable yet
+
+	       				*gin#action#gather_candidates()*
+gin#action#gather_candidates({range})
+	Gather and return candidates of the current buffer in {range}.
+	WARNING: This API is unstable yet
+
 
 =============================================================================
 vim:tw=78:fo=tcq2mM:ts=8:ft=help:norl
