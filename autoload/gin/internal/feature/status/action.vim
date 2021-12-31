@@ -36,6 +36,11 @@ function! gin#internal#feature#status#action#register() abort
   noremap <buffer> <Plug>(gin-action-stage)
         \ <Cmd>call gin#action#fn({ xs -> <SID>stage(xs) })<CR>
   map <buffer> <Plug>(gin-action-unstage) <Plug>(gin-action-reset)
+
+  noremap <buffer> <Plug>(gin-action-stage:intent-to-add)
+        \ <Cmd>call gin#action#fn({ xs -> <SID>stage_intent_to_add(xs) })<CR>
+  noremap <buffer> <Plug>(gin-action-unstage:intent-to-add)
+        \ <Cmd>call gin#action#fn({ xs -> <SID>unstage_intent_to_add(xs) })<CR>
 endfunction
 
 function! s:norm_xs(xs) abort
@@ -77,6 +82,40 @@ function! s:stage(xs) abort
   let xs_others = filter(a:xs, { _, v -> v.XY[1] !=# 'D' })
   if !empty(xs_others)
     noautocmd call s:add('', xs_others)
+  endif
+
+  doautocmd <nomodeline> User GinNativeCommandPost
+endfunction
+
+function! s:stage_intent_to_add(xs) abort
+  let xs_unknown = filter(copy(a:xs), { _, v -> v.XY ==# '??' })
+  if !empty(xs_unknown)
+    noautocmd call s:add('--intent-to-add', xs_unknown)
+  endif
+
+  let xs_removed = filter(copy(a:xs), { _, v -> v.XY[1] ==# 'D' })
+  if !empty(xs_removed)
+    noautocmd call s:rm('', xs_removed)
+  endif
+
+  let xs_others = filter(a:xs, { _, v -> v.XY !=# '??' && v.XY[1] !=# 'D' })
+  if !empty(xs_others)
+    noautocmd call s:add('', xs_others)
+  endif
+
+  doautocmd <nomodeline> User GinNativeCommandPost
+endfunction
+
+function! s:unstage_intent_to_add(xs) abort
+  let xs_added = filter(copy(a:xs), { _, v -> v.XY ==# 'A.' })
+  if !empty(xs_added)
+    noautocmd call s:reset(copy(xs_added))
+    noautocmd call s:add('--intent-to-add', xs_added)
+  endif
+
+  let xs_others = filter(a:xs, { _, v -> v.XY !=# 'A.' })
+  if !empty(xs_others)
+    noautocmd call s:reset(xs_others)
   endif
 
   doautocmd <nomodeline> User GinNativeCommandPost
