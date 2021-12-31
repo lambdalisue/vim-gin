@@ -49,6 +49,8 @@ export async function read(denops: Denops): Promise<void> {
   const { path, params } = parse(bufname);
   const options = fromBufnameParams(params ?? {});
   const result = await execStatus({ ...options, cwd: path });
+  // Sort entries by its path
+  result.entries.sort((a, b) => a.path == b.path ? 0 : a.path > b.path ? 1 : -1);
   const content = render(result);
   await registerGatherer(denops, getCandidates);
   await batch.batch(denops, async (denops) => {
