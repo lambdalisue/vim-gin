@@ -5,8 +5,8 @@ import { main as mainReload } from "./feature/reload/main.ts";
 import { main as mainStatus } from "./feature/status/main.ts";
 
 export async function main(denops: Denops): Promise<void> {
-  await mainDiff(denops);
-  await mainNative(denops);
-  await mainReload(denops);
-  await mainStatus(denops);
+  mainDiff(denops);
+  mainNative(denops);
+  mainReload(denops);
+  mainStatus(denops);
 }
