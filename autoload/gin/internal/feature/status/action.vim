@@ -1,14 +1,12 @@
 function! gin#internal#feature#status#action#register() abort
   call gin#internal#feature#action#action#register()
 
-  noremap <buffer> <Plug>(gin-action-open:edit)
-        \ <Cmd>call gin#action#fn({ xs -> <SID>open('edit', xs) })<CR>
-  noremap <buffer> <Plug>(gin-action-open:split)
-        \ <Cmd>call gin#action#fn({ xs -> <SID>open('split', xs) })<CR>
-  noremap <buffer> <Plug>(gin-action-open:vsplit)
-        \ <Cmd>call gin#action#fn({ xs -> <SID>open('vsplit', xs) })<CR>
-  noremap <buffer> <Plug>(gin-action-open:tabedit)
-        \ <Cmd>call gin#action#fn({ xs -> <SID>open('tabedit', xs) })<CR>
+  noremap <buffer> <Plug>(gin-action-open=)
+        \ <Cmd>call gin#action#fn({ xs -> <SID>open(xs) })<CR>
+  map <buffer> <Plug>(gin-action-open:edit) <Plug>(gin-action-open=)edit<CR>
+  map <buffer> <Plug>(gin-action-open:split) <Plug>(gin-action-open=)split<CR>
+  map <buffer> <Plug>(gin-action-open:vsplit) <Plug>(gin-action-open=)vsplit<CR>
+  map <buffer> <Plug>(gin-action-open:tabedit) <Plug>(gin-action-open=)tabedit<CR>
   map <buffer> <Plug>(gin-action-open) <Plug>(gin-action-open:edit)
 
   noremap <buffer> <Plug>(gin-action-add)
@@ -48,9 +46,17 @@ function! s:norm_xs(xs) abort
   call map(a:xs, { _, v -> escape(v, ' \\') })
 endfunction
 
-function! s:open(opener, xs) abort
+function! s:open(xs) abort
+  let opener = input('Open with: ')
+  redraw | echo ''
+  if empty(opener)
+    echohl WarningMsg
+    echo 'Cancelled'
+    echohl None
+    return
+  endif
   call s:norm_xs(a:xs)
-  call map(a:xs, { _, v -> execute(printf('%s %s', a:opener, v), '') })
+  call map(a:xs, { _, v -> execute(printf('%s %s', opener, v), '') })
 endfunction
 
 function! s:add(suffix, xs) abort
