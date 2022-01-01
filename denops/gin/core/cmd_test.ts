@@ -2,10 +2,16 @@ import { assertEquals, test } from "../deps_test.ts";
 import { batch, deadline, fn, path } from "../deps.ts";
 import { normCmdArgs } from "./cmd.ts";
 
-test(
-  "any",
-  "normCmdArgs does nothing on args without '%' or '#'",
-  async (denops) => {
+const runtimepath = path.resolve(
+  path.fromFileUrl(`${import.meta.url}/../../../..`),
+);
+
+console.log("runtimepath", runtimepath);
+
+test({
+  mode: "any",
+  name: "normCmdArgs does nothing on args without '%' or '#'",
+  fn: async (denops) => {
     await batch.batch(denops, async (denops) => {
       await denops.cmd("edit dummy1");
       await denops.cmd("file dummy2");
@@ -15,11 +21,12 @@ test(
     const exp = src;
     assertEquals(dst, exp);
   },
-);
-test(
-  "any",
-  "normCmdArgs does not expand arg starts from '\%' or '\#'",
-  async (denops) => {
+  prelude: [`set runtimepath^=${runtimepath}`],
+});
+test({
+  mode: "any",
+  name: "normCmdArgs does not expand arg starts from '\%' or '\#'",
+  fn: async (denops) => {
     await batch.batch(denops, async (denops) => {
       await denops.cmd("edit dummy1");
       await denops.cmd("file dummy2");
@@ -36,11 +43,12 @@ test(
     ];
     assertEquals(dst, exp);
   },
-);
-test(
-  "all",
-  "normCmdArgs expands arg starts from '%' or '#'",
-  async (denops) => {
+  prelude: [`set runtimepath^=${runtimepath}`],
+});
+test({
+  mode: "all",
+  name: "normCmdArgs expands arg starts from '%' or '#'",
+  fn: async (denops) => {
     await batch.batch(denops, async (denops) => {
       await denops.cmd("edit dummy1");
       await denops.cmd("file dummy2");
@@ -58,11 +66,12 @@ test(
     ];
     assertEquals(dst, exp);
   },
-);
-test(
-  "all",
-  "normCmdArgs expands massive args starts from '%' or '#'",
-  async (denops) => {
+  prelude: [`set runtimepath^=${runtimepath}`],
+});
+test({
+  mode: "all",
+  name: "normCmdArgs expands massive args starts from '%' or '#'",
+  fn: async (denops) => {
     await batch.batch(denops, async (denops) => {
       await denops.cmd("edit dummy1");
       await denops.cmd("file dummy2");
@@ -78,4 +87,5 @@ test(
     ];
     assertEquals(dst, exp);
   },
-);
+  prelude: [`set runtimepath^=${runtimepath}`],
+});

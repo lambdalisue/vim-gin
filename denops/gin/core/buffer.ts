@@ -1,4 +1,4 @@
-import { autocmd, batch, Denops, fn, helper } from "../deps.ts";
+import { autocmd, batch, Denops, fn } from "../deps.ts";
 
 /**
  * Open a buffer
@@ -11,10 +11,12 @@ export async function open(denops: Denops, bufname: string): Promise<void> {
  * Edit a buffer
  */
 export async function reload(denops: Denops, bufnr: number): Promise<void> {
-  await helper.load(denops, new URL("./buffer.vim", import.meta.url));
-  await denops.cmd("call timer_start(0, { -> GinCoreBufferReload(bufnr) })", {
-    bufnr,
-  });
+  await denops.cmd(
+    "call timer_start(0, { -> gin#internal#core#buffer#reload(bufnr) })",
+    {
+      bufnr,
+    },
+  );
 }
 
 /**
@@ -25,8 +27,7 @@ export async function replace(
   bufnr: number,
   repl: string[],
 ): Promise<void> {
-  await helper.load(denops, new URL("./buffer.vim", import.meta.url));
-  await denops.call("GinCoreBufferReplace", bufnr, repl);
+  await denops.call("gin#internal#core#buffer#replace", bufnr, repl);
 }
 
 /**
@@ -41,7 +42,6 @@ export async function concrete(
   denops: Denops,
   bufnr: number,
 ): Promise<void> {
-  await helper.load(denops, new URL("./buffer.vim", import.meta.url));
   await batch.batch(denops, async (denops) => {
     await fn.setbufvar(denops, bufnr, "&buftype", "nofile");
     await fn.setbufvar(denops, bufnr, "&swapfile", 0);
@@ -49,10 +49,15 @@ export async function concrete(
     await autocmd.group(denops, "gin_core_buffer_concrete", (helper) => {
       const pat = `<buffer=${bufnr}>`;
       helper.remove("*", pat);
-      helper.define("BufReadCmd", pat, "call GinCoreBufferConcreteRestore()", {
-        nested: true,
-      });
+      helper.define(
+        "BufReadCmd",
+        pat,
+        "call gin#internal#core#buffer#concreate_restore()",
+        {
+          nested: true,
+        },
+      );
     });
-    await denops.call("GinCoreBufferConcreteStore");
+    await denops.call("gin#internal#core#buffer#concreate_store");
   });
 }

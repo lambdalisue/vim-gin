@@ -1,10 +1,9 @@
-import { Denops, helper } from "../deps.ts";
+import { Denops } from "../deps.ts";
 
 export async function normCmdArgs(
   denops: Denops,
   args: string[],
 ): Promise<string[]> {
-  await helper.load(denops, new URL("./cmd.vim", import.meta.url));
   // To reduce RPC, cache result of an arg which starts from '%' or '#'
   const cache: Map<string, Promise<string>> = new Map();
   return await Promise.all(args.map((arg) => normCmdArg(denops, arg, cache)));
@@ -19,7 +18,9 @@ async function normCmdArg(
     return await cache.get(arg)!;
   }
   if (arg.startsWith("%") || arg.startsWith("#")) {
-    const p = denops.call("GinExpand", arg) as Promise<string>;
+    const p = denops.call("gin#internal#core#cmd#expand", arg) as Promise<
+      string
+    >;
     cache.set(arg, p);
     return await p;
   }
