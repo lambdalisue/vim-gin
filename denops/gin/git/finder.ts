@@ -1,6 +1,6 @@
 import { Cache, path } from "../deps.ts";
 import { execute } from "./process.ts";
-import { decodeUtf8 } from "../text.ts";
+import { decodeUtf8 } from "../core/text.ts";
 
 const ttl = 30000; // seconds
 const cache = new Cache<string, string | Error>(ttl);

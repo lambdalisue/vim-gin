@@ -1,4 +1,4 @@
-import { assertEquals } from "./deps_test.ts";
+import { assertEquals } from "../deps_test.ts";
 import { decodeUtf8, encodeUtf8, NUL, partition } from "./text.ts";
 
 Deno.test("encodeUtf8() encodes a string into an UTF8 Uint8Array", () => {

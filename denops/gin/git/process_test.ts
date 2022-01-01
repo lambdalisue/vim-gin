@@ -1,5 +1,5 @@
 import { assert, assertRejects } from "../deps_test.ts";
-import { decodeUtf8 } from "../text.ts";
+import { decodeUtf8 } from "../core/text.ts";
 import { execute, ExecuteError, run } from "./process.ts";
 
 Deno.test("run() runs 'git' and return a process", async () => {
