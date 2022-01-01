@@ -42,7 +42,7 @@ export async function bind(denops: Denops, bufnr: number): Promise<void> {
     helper.define(
       "User",
       "GinNativeCommandPost",
-      `GinReload ${bufnr}`,
+      `call denops#request('gin', 'reload:command', [${bufnr}])`,
       {
         nested: true,
       },
