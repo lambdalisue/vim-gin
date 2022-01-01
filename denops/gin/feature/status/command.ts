@@ -1,4 +1,4 @@
-import { batch, Denops, flags, fn, option, vars } from "../../deps.ts";
+import { batch, bufname, Denops, flags, fn, option, vars } from "../../deps.ts";
 import * as buffer from "../../core/buffer.ts";
 import { normCmdArgs } from "../../core/cmd.ts";
 import {
@@ -9,7 +9,6 @@ import {
   StatusOptions,
 } from "../../git/command/status/mod.ts";
 import { find } from "../../git/finder.ts";
-import { BufnameParams, format, parse } from "../../core/bufname.ts";
 import { bind } from "../native/command.ts";
 import {
   Candidate as CandidateBase,
@@ -33,24 +32,26 @@ export async function command(
   };
   const cwd = (opts._[0] ?? await fn.getcwd(denops, 0)) as string;
   const worktree = await find(cwd);
-  const bufname = format({
+  const bname = bufname.format({
     scheme: "ginstatus",
-    path: worktree,
-    params: options,
+    expr: worktree,
+    params: toBufnameParams(options),
   });
-  await buffer.open(denops, bufname.toString());
+  await buffer.open(denops, bname.toString());
 }
 
 export async function read(denops: Denops): Promise<void> {
-  const [bufnr, bufname] = await batch.gather(denops, async (denops) => {
+  const [bufnr, bname] = await batch.gather(denops, async (denops) => {
     await fn.bufnr(denops, "%");
     await fn.bufname(denops, "%");
   }) as [number, string];
-  const { path, params } = parse(bufname);
+  const { expr, params } = bufname.parse(bname);
   const options = fromBufnameParams(params ?? {});
-  const result = await execStatus({ ...options, cwd: path });
+  const result = await execStatus({ ...options, cwd: expr });
   // Sort entries by its path
-  result.entries.sort((a, b) => a.path == b.path ? 0 : a.path > b.path ? 1 : -1);
+  result.entries.sort((a, b) =>
+    a.path == b.path ? 0 : a.path > b.path ? 1 : -1
+  );
   const content = render(result);
   await registerGatherer(denops, getCandidates);
   await batch.batch(denops, async (denops) => {
@@ -64,7 +65,20 @@ export async function read(denops: Denops): Promise<void> {
   await buffer.concrete(denops, bufnr);
 }
 
-function fromBufnameParams(params: BufnameParams): StatusOptions {
+function toBufnameParams(options: StatusOptions): bufname.BufnameParams {
+  return Object.fromEntries(
+    Object.entries(options).map(([k, v]) => {
+      if (typeof v === "boolean") {
+        return v ? [k, ""] : [k, undefined];
+      } else if (typeof v === "number") {
+        return [k, v.toString()];
+      }
+      return [k, v];
+    }),
+  );
+}
+
+function fromBufnameParams(params: bufname.BufnameParams): StatusOptions {
   return { ...params } as unknown as StatusOptions;
 }
 

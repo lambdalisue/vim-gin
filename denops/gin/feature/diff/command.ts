@@ -1,8 +1,7 @@
-import { batch, Denops, fn, helper, option } from "../../deps.ts";
+import { batch, bufname, Denops, fn, helper, option } from "../../deps.ts";
 import * as buffer from "../../core/buffer.ts";
 import { normCmdArgs } from "../../core/cmd.ts";
 import { find } from "../../git/finder.ts";
-import { format, parse } from "../../core/bufname.ts";
 import { run } from "../../git/process.ts";
 import { decodeUtf8 } from "../../text.ts";
 
@@ -12,29 +11,29 @@ export async function command(
 ): Promise<void> {
   const cwd = await fn.getcwd(denops, 0) as string;
   const worktree = await find(cwd);
-  const bufname = format({
+  const bname = bufname.format({
     scheme: "gindiff",
-    path: worktree,
+    expr: worktree,
     params: {
       args: await normCmdArgs(denops, args),
     },
   });
-  await buffer.open(denops, bufname.toString());
+  await buffer.open(denops, bname.toString());
 }
 
 export async function read(denops: Denops): Promise<void> {
-  const [bufnr, bufname] = await batch.gather(denops, async (denops) => {
+  const [bufnr, bname] = await batch.gather(denops, async (denops) => {
     await fn.bufnr(denops, "%");
     await fn.bufname(denops, "%");
   }) as [number, string];
-  const { path, params } = parse(bufname);
+  const { expr, params } = bufname.parse(bname);
   const env = await fn.environ(denops) as Record<string, string>;
   const proc = run(["diff", ...params!.args as string[]], {
     stdin: "null",
     stdout: "piped",
     stderr: "piped",
     noOptionalLocks: true,
-    cwd: path,
+    cwd: expr,
     env,
   });
   const [status, stdout, stderr] = await Promise.all([
