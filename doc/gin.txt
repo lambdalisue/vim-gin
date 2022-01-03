@@ -58,19 +58,20 @@ COMMANDS					*gin-commands*
 	prompt to input passphrase on "Gin push" or so on.
 
 								*:GinStatus*
-:GinStatus [{options}] [{path}]
-	Open a "gin-status" buffer to show a status of a repository of {path}.
-	If {path} is omitted, the current working directory is used.
+:GinStatus [--worktree={worktree}] [{options}] [-- {pathspec}...]
+	Open a "gin-status" buffer to show a status of a {worktree}.
+	If no {worktree} is specified, gin will find the one from the current
+	working directory.
 
-	The following options are available:
+	The following {options} are available:
 
-	--untracked-files[=no/normal/all] (default: all)
+	--untracked-files[=no/normal/all]
 	--ignore-submodules[=none/untracked/dirty/all]
 	--ignored[=traditional/no/matching]
 	--renames
-	--find-renames[=N]
+	--find-renames[={n}]
 		
-	See ":man git-status(1)" for detail about options.
+	See ":man git-status(1)" for detail about {options} and {pathspec}.
 
 -----------------------------------------------------------------------------
 FUNCTIONS					*gin-functions*
