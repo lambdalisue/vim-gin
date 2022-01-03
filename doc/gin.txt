@@ -80,10 +80,13 @@ INTERFACE					*gin-interface*
 COMMANDS					*gin-commands*
 
 								*:Gin*
-:Gin[!] {command} [{args}]
-	Call a git raw {command} with {args} asynchronously and echo result.
+:Gin[!] [---worktree={worktree}] {command} [{args}]
+	Call a git raw {command} with {args} asynchronously and echo result on
+	a {worktree}.
 	For example, "Gin add %" on "hello.txt" invokes "git add hello.txt".
 	If a bang (!) is specified, it calls command synchronously instead.
+	If no {worktree} is specified, gin will find the one from the current
+	working directory.
 
 	Note that users need to install guise.vim (|gin-guise|) to open a
 	|tabpage| to edit a commit message on "Gin commit" or so on.
