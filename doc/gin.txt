@@ -11,6 +11,7 @@ INTRODUCTION			|gin-introduction|
 REQUIREMENTS			|gin-requirements|
 INTERFACE			|gin-interface|
   COMMANDS			  |gin-commands|
+  FUNCTIONS			  |gin-functions|
 
 
 =============================================================================
