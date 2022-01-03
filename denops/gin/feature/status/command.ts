@@ -28,7 +28,7 @@ export async function command(
   });
   let worktree: string;
   if (opts.worktree) {
-    worktree = opts.worktree;
+    worktree = await fn.fnamemodify(denops, opts.worktree, ":p");
   } else {
     const cwd = await fn.getcwd(denops) as string;
     worktree = await find(cwd);
