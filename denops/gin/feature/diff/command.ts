@@ -28,8 +28,13 @@ export async function command(
     },
     "--": true,
   });
-  const cwd = await fn.getcwd(denops, 0) as string;
-  const worktree = await find(cwd);
+  let worktree: string;
+  if (opts.worktree) {
+    worktree = opts.worktree;
+  } else {
+    const cwd = await fn.getcwd(denops) as string;
+    worktree = await find(cwd);
+  }
   const bname = bufname.format({
     scheme: "gindiff",
     expr: worktree,
