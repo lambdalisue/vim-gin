@@ -29,35 +29,6 @@ Additionally, the following Vim/Neovim plugins are highly recommended to use:
 [lambdalisue/guise.vim]: https://github.com/lambdalisue/guise.vim
 [lambdalisue/askpass.vim]: https://github.com/lambdalisue/askpass.vim
 
-## Usage
-
-### :Gin {command} [{args}]
-
-Call a git raw `{command}` with `{args}` asynchronously and echo result. For
-example, `Gin add %` on `hello.txt` invokes `git add hello.txt`.
-
-Note that users need to install [lambdalisue/guise.vim][lambdalisue/guise.vim]
-to open a tabpage to edit a commit message on `Gin commit` or so on.
-
-Note that users need to install
-[lambdalisue/askpass.vim][lambdalisue/askpass.vim] to open a prompt to input
-passphrase on `Gin push` or so on.
-
-### :GinStatus [{options}] [{path}]
-
-Open a `gin-status` buffer to show a status of a repository of `{path}`. If
-`{path}` is omitted, the current working directory is used.
-
-The following options are available:
-
-- `--untracked-files[=no/normal/all]`
-- `--ignore-submodules[=none/untracked/dirty/all]`
-- `--ignored[=traditional/no/matching]`
-- `--renames`
-- `--find-renames[=N]`
-
-See `:man git-status(1)` for detail about options.
-
 ## Similar projects
 
 - [lambdalisue/gina.vim](https://github.com/lambdalisue/gina.vim)
