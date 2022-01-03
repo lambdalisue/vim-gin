@@ -18,7 +18,7 @@ async function normCmdArg(
     return await cache.get(arg)!;
   }
   if (arg.startsWith("%") || arg.startsWith("#")) {
-    const p = denops.call("gin#internal#core#cmd#expand", arg) as Promise<
+    const p = denops.call("gin#internal#util#cmd#expand", arg) as Promise<
       string
     >;
     cache.set(arg, p);

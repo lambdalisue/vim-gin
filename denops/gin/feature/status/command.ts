@@ -1,6 +1,6 @@
 import { batch, bufname, Denops, flags, fn, option, vars } from "../../deps.ts";
-import * as buffer from "../../core/buffer.ts";
-import { normCmdArgs } from "../../core/cmd.ts";
+import * as buffer from "../../util/buffer.ts";
+import { normCmdArgs } from "../../util/cmd.ts";
 import {
   Entry,
   execStatus,

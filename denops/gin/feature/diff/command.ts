@@ -1,7 +1,7 @@
 import { batch, bufname, Denops, fn, helper, option } from "../../deps.ts";
-import * as buffer from "../../core/buffer.ts";
-import { normCmdArgs } from "../../core/cmd.ts";
-import { decodeUtf8 } from "../../core/text.ts";
+import * as buffer from "../../util/buffer.ts";
+import { normCmdArgs } from "../../util/cmd.ts";
+import { decodeUtf8 } from "../../util/text.ts";
 import { find } from "../../git/finder.ts";
 import { run } from "../../git/process.ts";
 

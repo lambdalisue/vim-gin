@@ -1,4 +1,4 @@
-function! gin#internal#core#buffer#replace(bufnr, repl) abort
+function! gin#internal#util#buffer#replace(bufnr, repl) abort
   let modified = getbufvar(a:bufnr, '&modified')
   let modifiable = getbufvar(a:bufnr, '&modifiable')
   let foldmethod = getbufvar(a:bufnr, '&foldmethod')
@@ -11,7 +11,7 @@ function! gin#internal#core#buffer#replace(bufnr, repl) abort
   call setbufvar(a:bufnr, '&foldmethod', foldmethod)
 endfunction
 
-function! gin#internal#core#buffer#reload(bufnr) abort
+function! gin#internal#util#buffer#reload(bufnr) abort
   if bufnr('%') is# a:bufnr
     edit
     return
@@ -29,16 +29,16 @@ function! gin#internal#core#buffer#reload(bufnr) abort
   endtry
 endfunction
 
-function! gin#internal#core#buffer#concreate_restore() abort
-  if !exists('b:gin_core_buffer_concrete_cache')
+function! gin#internal#util#buffer#concreate_restore() abort
+  if !exists('b:gin_internal_util_buffer_concrete_cache')
     return
   endif
-  call gin#internal#core#buffer#replace(bufnr('%'), b:gin_core_buffer_concrete_cache.content)
-  let &filetype = b:gin_core_buffer_concrete_cache.filetype
+  call gin#internal#util#buffer#replace(bufnr('%'), b:gin_internal_util_buffer_concrete_cache.content)
+  let &filetype = b:gin_internal_util_buffer_concrete_cache.filetype
 endfunction
 
-function! gin#internal#core#buffer#concreate_store() abort
-  let b:gin_core_buffer_concrete_cache = {
+function! gin#internal#util#buffer#concreate_store() abort
+  let b:gin_internal_util_buffer_concrete_cache = {
         \ 'filetype': &filetype,
         \ 'content': getline(1, '$'),
         \}

@@ -1,4 +1,4 @@
-import { decodeUtf8, partition } from "../../../core/text.ts";
+import { decodeUtf8, partition } from "../../../util/text.ts";
 
 export class GitStatusParseError extends Error {
   constructor(message: string) {

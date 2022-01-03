@@ -12,7 +12,7 @@ export async function open(denops: Denops, bufname: string): Promise<void> {
  */
 export async function reload(denops: Denops, bufnr: number): Promise<void> {
   await denops.cmd(
-    "call timer_start(0, { -> gin#internal#core#buffer#reload(bufnr) })",
+    "call timer_start(0, { -> gin#internal#util#buffer#reload(bufnr) })",
     {
       bufnr,
     },
@@ -27,7 +27,7 @@ export async function replace(
   bufnr: number,
   repl: string[],
 ): Promise<void> {
-  await denops.call("gin#internal#core#buffer#replace", bufnr, repl);
+  await denops.call("gin#internal#util#buffer#replace", bufnr, repl);
 }
 
 /**
@@ -46,18 +46,22 @@ export async function concrete(
     await fn.setbufvar(denops, bufnr, "&buftype", "nofile");
     await fn.setbufvar(denops, bufnr, "&swapfile", 0);
     await fn.setbufvar(denops, bufnr, "&modifiable", 0);
-    await autocmd.group(denops, "gin_core_buffer_concrete", (helper) => {
-      const pat = `<buffer=${bufnr}>`;
-      helper.remove("*", pat);
-      helper.define(
-        "BufReadCmd",
-        pat,
-        "call gin#internal#core#buffer#concreate_restore()",
-        {
-          nested: true,
-        },
-      );
-    });
-    await denops.call("gin#internal#core#buffer#concreate_store");
+    await autocmd.group(
+      denops,
+      "gin_internal_util_buffer_concrete",
+      (helper) => {
+        const pat = `<buffer=${bufnr}>`;
+        helper.remove("*", pat);
+        helper.define(
+          "BufReadCmd",
+          pat,
+          "call gin#internal#util#buffer#concreate_restore()",
+          {
+            nested: true,
+          },
+        );
+      },
+    );
+    await denops.call("gin#internal#util#buffer#concreate_store");
   });
 }
