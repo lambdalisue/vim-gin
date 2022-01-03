@@ -80,6 +80,12 @@ COMMANDS					*gin-commands*
 	--ignore-submodules[=none/untracked/dirty/all]
 		
 	See ":man git-diff(1)" for detail about {options} and {pathspec}.
+
+								*:GinReload*
+:GinReload
+	Update and reload a content of gin buffer.
+	NOTE This command is defined only on gin buffer (|command-buffer|).
+
 								*:GinStatus*
 :GinStatus [--worktree={worktree}] [{options}] [-- {pathspec}...]
 	Open a "gin-status" buffer to show a status of a {worktree}.
