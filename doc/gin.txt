@@ -132,7 +132,7 @@ COMMANDS					*gin-commands*
 	--untracked-files[=no/normal/all]
 	--ignore-submodules[=none/untracked/dirty/all]
 	--ignored[=traditional/no/matching]
-	--renames
+	--renames/--no-renames
 	--find-renames[={n}]
 		
 	See ":man git-status(1)" for detail about {options} and {pathspec}.
