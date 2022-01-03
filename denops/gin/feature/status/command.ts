@@ -1,13 +1,10 @@
 import { batch, bufname, Denops, flags, fn, option, vars } from "../../deps.ts";
 import * as buffer from "../../util/buffer.ts";
+import { toArgs } from "../../util/arg.ts";
 import { normCmdArgs } from "../../util/cmd.ts";
-import {
-  Entry,
-  execStatus,
-  GitStatusResult,
-  render,
-  StatusOptions,
-} from "../../git/command/status/mod.ts";
+import { Entry, GitStatusResult, parse } from "./parser.ts";
+import { render } from "./render.ts";
+import { execute } from "../../git/process.ts";
 import { find } from "../../git/finder.ts";
 import { bind } from "../native/command.ts";
 import {
@@ -22,20 +19,26 @@ export async function command(
   denops: Denops,
   ...args: string[]
 ): Promise<void> {
-  const opts = flags.parse(await normCmdArgs(denops, args));
-  const options: StatusOptions = {
-    untrackedFiles: opts["untracked-files"] ?? "all",
-    ignoreSubmodules: opts["ignore-submodules"],
-    ignored: opts["ignored"],
-    renames: opts["renames"],
-    findRenames: opts["findRenames"],
-  };
+  const opts = flags.parse(await normCmdArgs(denops, args), {
+    boolean: true,
+    alias: {
+      "u": "untrackedFiles",
+    },
+    "--": true,
+  });
   const cwd = (opts._[0] ?? await fn.getcwd(denops, 0)) as string;
   const worktree = await find(cwd);
   const bname = bufname.format({
     scheme: "ginstatus",
     expr: worktree,
-    params: toBufnameParams(options),
+    params: {
+      untrackedFiles: opts["untrackedFiles"],
+      ignoreSubmodules: opts["ignoreSubmodules"],
+      ignored: opts["ignored"],
+      renames: opts["renames"],
+      findRenames: opts["findRenames"],
+    },
+    fragment: opts["--"] ? opts["--"].join(" ") : undefined,
   });
   await buffer.open(denops, bname.toString());
 }
@@ -45,9 +48,27 @@ export async function read(denops: Denops): Promise<void> {
     await fn.bufnr(denops, "%");
     await fn.bufname(denops, "%");
   }) as [number, string];
-  const { expr, params } = bufname.parse(bname);
-  const options = fromBufnameParams(params ?? {});
-  const result = await execStatus({ ...options, cwd: expr });
+  const { expr, params, fragment } = bufname.parse(bname);
+  const args = [
+    "status",
+    "--porcelain=v2",
+    "--branch",
+    "--ahead-behind",
+    "-z",
+    ...toArgs("--untracked-files", params?.untrackedFiles),
+    ...toArgs("--ignore-submodules", params?.ignoreSubmodules),
+    ...toArgs("--ignored", params?.ignored),
+    ...toArgs("--renames", params?.renames, {
+      flagForFalse: "--no-renames",
+    }),
+    ...toArgs("--find-renames", params?.findRenames),
+    ...(fragment ? ["--", fragment] : []),
+  ];
+  const stdout = await execute(args, {
+    noOptionalLocks: true,
+    cwd: expr,
+  });
+  const result = parse(stdout);
   // Sort entries by its path
   result.entries.sort((a, b) =>
     a.path == b.path ? 0 : a.path > b.path ? 1 : -1
@@ -63,23 +84,6 @@ export async function read(denops: Denops): Promise<void> {
   });
   await buffer.replace(denops, bufnr, content);
   await buffer.concrete(denops, bufnr);
-}
-
-function toBufnameParams(options: StatusOptions): bufname.BufnameParams {
-  return Object.fromEntries(
-    Object.entries(options).map(([k, v]) => {
-      if (typeof v === "boolean") {
-        return v ? [k, ""] : [k, undefined];
-      } else if (typeof v === "number") {
-        return [k, v.toString()];
-      }
-      return [k, v];
-    }),
-  );
-}
-
-function fromBufnameParams(params: bufname.BufnameParams): StatusOptions {
-  return { ...params } as unknown as StatusOptions;
 }
 
 async function getCandidates(

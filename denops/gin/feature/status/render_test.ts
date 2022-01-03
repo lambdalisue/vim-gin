@@ -1,4 +1,4 @@
-import { assertEquals } from "../../../deps_test.ts";
+import { assertEquals } from "../../deps_test.ts";
 import { GitStatusResult } from "./parser.ts";
 import { render } from "./render.ts";
 

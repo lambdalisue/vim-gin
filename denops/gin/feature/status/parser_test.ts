@@ -1,5 +1,5 @@
-import { assertEquals, bytes } from "../../../deps_test.ts";
-import { encodeUtf8 } from "../../../util/text.ts";
+import { assertEquals, bytes } from "../../deps_test.ts";
+import { encodeUtf8 } from "../../util/text.ts";
 import {
   parse,
   parseBranchHeaders,
