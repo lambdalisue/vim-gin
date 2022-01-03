@@ -107,22 +107,27 @@ jobs:
           ${DENOPS_TEST_VIM} --version
         env:
           DENOPS_TEST_VIM: ${{ steps.vim.outputs.executable_path }}
-      - uses: thinca/action-setup-vim@v1
+      # - uses: thinca/action-setup-vim@v1
+      #   id: nvim
+      #   with:
+      #     vim_type: "Neovim"
+      #     vim_version: "${{ matrix.host_version.nvim }}"
+      - uses: rhysd/action-setup-vim@v1
         id: nvim
         with:
-          vim_type: "Neovim"
-          vim_version: "${{ matrix.host_version.nvim }}"
+          neovim: true
+          version: "${{ matrix.host_version.nvim }}"
       - name: Check Neovim
         run: |
           echo ${DENOPS_TEST_NVIM}
           ${DENOPS_TEST_NVIM} --version
         env:
-          DENOPS_TEST_NVIM: ${{ steps.nvim.outputs.executable_path }}
+          DENOPS_TEST_NVIM: ${{ steps.nvim.outputs.executable }}
       - name: Test
         working-directory: ./repo
         run: make test
         env:
           DENO_DIR: ../.deno
           DENOPS_TEST_VIM: ${{ steps.vim.outputs.executable_path }}
-          DENOPS_TEST_NVIM: ${{ steps.nvim.outputs.executable_path }}
+          DENOPS_TEST_NVIM: ${{ steps.nvim.outputs.executable }}
         timeout-minutes: 5
