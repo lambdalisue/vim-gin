@@ -30,10 +30,12 @@ denops.vim~
 
 Additionally, the following Vim/Neovim plugins are highly recommended to use:
 
+							*gin-guise*
 guise.vim~
 	To open a new |tabpage| to edit a commit message on "Gin commit".
 	https://github.com/lambdalisue/guise.vim~
 
+							*gin-askpass*
 askpass.vim~
 	To input SSH key passphrase on "Gin push" or so on.
 	https://github.com/lambdalisue/askpass.vim
@@ -51,10 +53,10 @@ COMMANDS					*gin-commands*
 	For example, "Gin add %" on "hello.txt" invokes "git add hello.txt".
 	If a bang (!) is specified, it calls command synchronously instead.
 
-	Note that users need to install lambdalisue/guise.vim to open a
+	Note that users need to install guise.vim (|gin-guise|) to open a
 	|tabpage| to edit a commit message on "Gin commit" or so on.
 
-	Note that users need to install lambdalisue/askpass.vim to open a
+	Note that users need to install askpass.vim (|gin-askpass|) to open a
 	prompt to input passphrase on "Gin push" or so on.
 
 								*:GinStatus*
