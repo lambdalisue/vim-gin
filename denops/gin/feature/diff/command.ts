@@ -19,6 +19,9 @@ export async function command(
   ...args: string[]
 ): Promise<void> {
   const opts = flags.parse(await normCmdArgs(denops, args), {
+    string: [
+      "-worktree",
+    ],
     boolean: true,
     alias: {
       R: "reverse",
@@ -29,8 +32,8 @@ export async function command(
     "--": true,
   });
   let worktree: string;
-  if (opts.worktree) {
-    worktree = await fn.fnamemodify(denops, opts.worktree, ":p");
+  if (opts["-worktree"]) {
+    worktree = await fn.fnamemodify(denops, opts["-worktree"], ":p") as string;
   } else {
     const cwd = await fn.getcwd(denops) as string;
     worktree = await find(cwd);
