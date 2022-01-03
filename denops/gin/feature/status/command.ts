@@ -1,6 +1,6 @@
 import { batch, bufname, Denops, flags, fn, option, vars } from "../../deps.ts";
 import * as buffer from "../../util/buffer.ts";
-import { toArgs } from "../../util/arg.ts";
+import { toBooleanArgs, toStringArgs } from "../../util/arg.ts";
 import { normCmdArgs } from "../../util/cmd.ts";
 import { Entry, GitStatusResult, parse } from "./parser.ts";
 import { render } from "./render.ts";
@@ -63,13 +63,13 @@ export async function read(denops: Denops): Promise<void> {
     "--branch",
     "--ahead-behind",
     "-z",
-    ...toArgs("--untracked-files", params?.untrackedFiles),
-    ...toArgs("--ignore-submodules", params?.ignoreSubmodules),
-    ...toArgs("--ignored", params?.ignored),
-    ...toArgs("--renames", params?.renames, {
-      flagForFalse: "--no-renames",
+    ...toStringArgs("--untracked-files", params?.untrackedFiles),
+    ...toStringArgs("--ignore-submodules", params?.ignoreSubmodules),
+    ...toStringArgs("--ignored", params?.ignored),
+    ...toBooleanArgs("--renames", params?.renames, {
+      falseFlag: "--no-renames",
     }),
-    ...toArgs("--find-renames", params?.findRenames),
+    ...toStringArgs("--find-renames", params?.findRenames),
     ...(fragment ? ["--", fragment] : []),
   ];
   const stdout = await execute(args, {

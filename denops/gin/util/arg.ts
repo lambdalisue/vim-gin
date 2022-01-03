@@ -1,24 +1,32 @@
-export type ToArgsOptions = {
-  flagForFalse?: string;
+export type ToStringArgsOptions = {
+  useEqual?: boolean;
 };
 
-/**
- * Convert optional value to command arguments.
- */
-export function toArgs(
+export function toStringArgs(
   flag: string,
   value: unknown,
-  options: ToArgsOptions = {},
+  options: ToStringArgsOptions = {},
 ): string[] {
   if (value == null) {
     return [];
+  } else if (typeof value === "boolean") {
+    return value ? [flag] : [];
   }
-  if (typeof value === "boolean") {
-    return value ? [flag] : options.flagForFalse ? [options.flagForFalse] : [];
-  } else if (typeof value === "string") {
-    return [flag, value];
-  } else if (Array.isArray(value)) {
-    return value.map((v) => toArgs(flag, v)).flat();
+  return options.useEqual ? [`${flag}=${value}`] : [flag, `${value}`];
+}
+
+export type ToBooleanArgsOptions = {
+  falseFlag?: string;
+};
+
+export function toBooleanArgs(
+  flag: string,
+  value: unknown,
+  options: ToBooleanArgsOptions = {},
+): string[] {
+  if (value) {
+    return [flag];
+  } else {
+    return options.falseFlag ? [options.falseFlag] : [];
   }
-  throw new Error(`Unknown value is specified: ${JSON.stringify(value)}`);
 }

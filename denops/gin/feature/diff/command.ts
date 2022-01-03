@@ -8,7 +8,7 @@ import {
   option,
 } from "../../deps.ts";
 import * as buffer from "../../util/buffer.ts";
-import { toArgs } from "../../util/arg.ts";
+import { toBooleanArgs, toStringArgs } from "../../util/arg.ts";
 import { normCmdArgs } from "../../util/cmd.ts";
 import { decodeUtf8 } from "../../util/text.ts";
 import { find } from "../../git/finder.ts";
@@ -71,22 +71,22 @@ export async function read(denops: Denops): Promise<void> {
   const args = [
     "diff",
     "--no-color",
-    ...toArgs("--cached", params?.cached),
-    ...toArgs("--renames", params?.renames, {
-      flagForFalse: "--no-renames",
+    ...toBooleanArgs("--cached", params?.cached),
+    ...toBooleanArgs("--renames", params?.renames, {
+      falseFlag: "--no-renames",
     }),
-    ...toArgs("--diff-filter", params?.diffFilter),
-    ...toArgs("-R", params?.reverse),
-    ...toArgs("--ignore-cr-at-eol", params?.ignoreCrAtEol),
-    ...toArgs("--ignore-space-at-eol", params?.ignoreSpaceAtEol),
-    ...toArgs("--ignore-space-change", params?.ignoreSpaceChange),
-    ...toArgs("--ignore-all-space", params?.ignoreAllSpace),
-    ...toArgs("--ignore-blank-lines", params?.ignoreBlankLines),
-    ...toArgs("--ignore-matching-lines", params?.ignoreMatchingLines),
-    ...toArgs("--ignore-submodules", params?.ignoreSubmodules),
+    ...toStringArgs("--diff-filter", params?.diffFilter),
+    ...toBooleanArgs("-R", params?.reverse),
+    ...toBooleanArgs("--ignore-cr-at-eol", params?.ignoreCrAtEol),
+    ...toBooleanArgs("--ignore-space-at-eol", params?.ignoreSpaceAtEol),
+    ...toBooleanArgs("--ignore-space-change", params?.ignoreSpaceChange),
+    ...toBooleanArgs("--ignore-all-space", params?.ignoreAllSpace),
+    ...toBooleanArgs("--ignore-blank-lines", params?.ignoreBlankLines),
+    ...toStringArgs("--ignore-matching-lines", params?.ignoreMatchingLines),
+    ...toStringArgs("--ignore-submodules", params?.ignoreSubmodules),
     ...(commitish ? [commitish] : []),
     ...(path ? [path] : []),
-    ...toArgs("--", params?.["--"]),
+    ...(params?.["--"] ? params["--"] : []),
   ];
   const env = await fn.environ(denops) as Record<string, string>;
   const proc = run(args, {
