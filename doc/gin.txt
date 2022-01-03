@@ -95,7 +95,7 @@ COMMANDS					*gin-commands*
 	prompt to input passphrase on "Gin push" or so on.
 
 								*:GinDiff*
-:GinDiff [---worktree={worktree}] [{options}] [-- {pathspec}...]
+:GinDiff [---worktree={worktree}] [{options}] [{tree-ish}] [-- {pathspec}...]
 	Open a "gin-diff" buffer to show a diff status of a {worktree}.
 	If no {worktree} is specified, gin will find the one from the current
 	working directory.

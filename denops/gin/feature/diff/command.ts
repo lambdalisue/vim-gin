@@ -13,6 +13,7 @@ import { normCmdArgs } from "../../util/cmd.ts";
 import { decodeUtf8 } from "../../util/text.ts";
 import { find } from "../../git/finder.ts";
 import { run } from "../../git/process.ts";
+import { parseTreeish } from "../../git/treeish.ts";
 
 export async function command(
   denops: Denops,
@@ -53,9 +54,9 @@ export async function command(
       ignoreBlankLines: opts["ignoreBlankLines"],
       ignoreMatchingLines: opts["ignoreMatchingLines"],
       ignoreSubmodules: opts["ignoreSubmodules"],
-      commitish: opts._ ? opts._.map((v) => v.toString()) : undefined,
+      "--": opts["--"],
     },
-    fragment: opts["--"] ? opts["--"].join(" ") : undefined,
+    fragment: opts._ ? opts._.map((v) => v.toString()).join(" ") : undefined,
   });
   await buffer.open(denops, bname.toString());
 }
@@ -66,6 +67,7 @@ export async function read(denops: Denops): Promise<void> {
     await fn.bufname(denops, "%");
   }) as [number, string];
   const { expr, params, fragment } = bufname.parse(bname);
+  const [commitish, path] = parseTreeish(fragment ?? "");
   const args = [
     "diff",
     "--no-color",
@@ -82,8 +84,9 @@ export async function read(denops: Denops): Promise<void> {
     ...toArgs("--ignore-blank-lines", params?.ignoreBlankLines),
     ...toArgs("--ignore-matching-lines", params?.ignoreMatchingLines),
     ...toArgs("--ignore-submodules", params?.ignoreSubmodules),
-    ...(params?.commitish ? (params?.commitish as string[]) : []),
-    ...(fragment ? ["--", fragment] : []),
+    ...(commitish ? [commitish] : []),
+    ...(path ? [path] : []),
+    ...toArgs("--", params?.["--"]),
   ];
   const env = await fn.environ(denops) as Record<string, string>;
   const proc = run(args, {

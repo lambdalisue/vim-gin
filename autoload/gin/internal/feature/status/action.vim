@@ -12,9 +12,9 @@ function! gin#internal#feature#status#action#register() abort
   noremap <buffer> <Plug>(gin-action-diff=)
         \ <Cmd>call gin#action#fn({ xs -> <SID>diff('', xs) })<CR>
   noremap <buffer> <Plug>(gin-action-diff:cached=)
-        \ <Cmd>call gin#action#fn({ xs -> <SID>diff('--cached', xs) })<CR>
+        \ <Cmd>call gin#action#fn({ xs -> <SID>diff('--cached ', xs) })<CR>
   noremap <buffer> <Plug>(gin-action-diff:previous=)
-        \ <Cmd>call gin#action#fn({ xs -> <SID>diff('HEAD^', xs) })<CR>
+        \ <Cmd>call gin#action#fn({ xs -> <SID>diff('HEAD^:', xs) })<CR>
   map <buffer> <Plug>(gin-action-diff:edit) <Plug>(gin-action-diff=)edit<CR>
   map <buffer> <Plug>(gin-action-diff:split) <Plug>(gin-action-diff=)split<CR>
   map <buffer> <Plug>(gin-action-diff:vsplit) <Plug>(gin-action-diff=)vsplit<CR>
@@ -91,7 +91,7 @@ function! s:diff(suffix, xs) abort
     return
   endif
   call s:norm_xs(a:xs)
-  call map(a:xs, { _, v -> execute(printf('%s | GinDiff %s -- %s', opener, a:suffix, v), '') })
+  call map(a:xs, { _, v -> execute(printf('%s | GinDiff %s%s', opener, a:suffix, v), '') })
 endfunction
 
 function! s:add(suffix, xs) abort
