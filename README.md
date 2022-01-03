@@ -1,8 +1,8 @@
 # 🥃 gin.vim
 
-[![Deno 1.11.0 or above](https://img.shields.io/badge/Deno-Support%201.11.0-yellowgreen.svg?logo=deno)](https://github.com/denoland/deno/tree/v1.11.0)
-[![Vim 8.2.0662 or above](https://img.shields.io/badge/Vim-Support%208.2.0662-yellowgreen.svg?logo=vim)](https://github.com/vim/vim/tree/v8.2.0662)
-[![Neovim 0.4.4 or above](https://img.shields.io/badge/Neovim-Support%200.4.4-yellowgreen.svg?logo=neovim&logoColor=white)](https://github.com/neovim/neovim/tree/v0.4.4)
+[![Deno 1.17.0 or above](https://img.shields.io/badge/Deno-Support%201.17.0-yellowgreen.svg?logo=deno)](https://github.com/denoland/deno/tree/v1.17.0)
+[![Vim 8.2.3452 or above](https://img.shields.io/badge/Vim-Support%208.2.3452-yellowgreen.svg?logo=vim)](https://github.com/vim/vim/tree/v8.2.3452)
+[![Neovim 0.6.0 or above](https://img.shields.io/badge/Neovim-Support%200.6.0-yellowgreen.svg?logo=neovim&logoColor=white)](https://github.com/neovim/neovim/tree/v0.6.0)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![vim help](https://img.shields.io/badge/vim-%3Ah%20gin-orange.svg)](doc/gin.txt)
 [![test](https://github.com/lambdalisue/gin.vim/actions/workflows/test.yml/badge.svg)](https://github.com/lambdalisue/gin.vim/actions/workflows/test.yml)
@@ -28,35 +28,6 @@ Additionally, the following Vim/Neovim plugins are highly recommended to use:
 [vim-denops/denops.vim]: https://github.com/vim-denops/denops.vim
 [lambdalisue/guise.vim]: https://github.com/lambdalisue/guise.vim
 [lambdalisue/askpass.vim]: https://github.com/lambdalisue/askpass.vim
-
-## Usage
-
-### :Gin {command} [{args}]
-
-Call a git raw `{command}` with `{args}` asynchronously and echo result. For
-example, `Gin add %` on `hello.txt` invokes `git add hello.txt`.
-
-Note that users need to install [lambdalisue/guise.vim][lambdalisue/guise.vim]
-to open a tabpage to edit a commit message on `Gin commit` or so on.
-
-Note that users need to install
-[lambdalisue/askpass.vim][lambdalisue/askpass.vim] to open a prompt to input
-passphrase on `Gin push` or so on.
-
-### :GinStatus [{options}] [{path}]
-
-Open a `gin-status` buffer to show a status of a repository of `{path}`. If
-`{path}` is omitted, the current working directory is used.
-
-The following options are available:
-
-- `--untracked-files[=no/normal/all]`
-- `--ignore-submodules[=none/untracked/dirty/all]`
-- `--ignored[=traditional/no/matching]`
-- `--renames`
-- `--find-renames[=N]`
-
-See `:man git-status(1)` for detail about options.
 
 ## Similar projects
 

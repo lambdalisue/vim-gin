@@ -1,4 +1,4 @@
-import { decodeUtf8 } from "../text.ts";
+import { decodeUtf8 } from "../util/text.ts";
 
 export type RunOptions = Omit<Deno.RunOptions, "cmd"> & {
   noOptionalLocks?: boolean;

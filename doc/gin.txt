@@ -9,8 +9,13 @@ CONTENTS					*gin-contents*
 
 INTRODUCTION			|gin-introduction|
 REQUIREMENTS			|gin-requirements|
+USAGE				|gin-usage|
+  ACTION			  |gin-action|
 INTERFACE			|gin-interface|
   COMMANDS			  |gin-commands|
+  FUNCTIONS			  |gin-functions|
+  MAPPINGS			  |gin-mappings|
+  ACTIONS			  |gin-actions|
 
 
 =============================================================================
@@ -30,14 +35,43 @@ denops.vim~
 
 Additionally, the following Vim/Neovim plugins are highly recommended to use:
 
+							*gin-guise*
 guise.vim~
 	To open a new |tabpage| to edit a commit message on "Gin commit".
 	https://github.com/lambdalisue/guise.vim~
 
+							*gin-askpass*
 askpass.vim~
 	To input SSH key passphrase on "Gin push" or so on.
 	https://github.com/lambdalisue/askpass.vim
   
+
+=============================================================================
+USAGE						*gin-usage*
+
+-----------------------------------------------------------------------------
+ACTION						*gin-action*
+
+Action is a special mapping which is defined on a gin buffer and looks like:
+
+	<Plug>(gin-action-{name})
+
+where {name} is a name of the action.
+
+							*gin-action-mapping*
+Gin defines the following mappings for actions:
+
+	"?"	List mappings/actions available
+	"a"	Open a prompt to input action to execute
+	"."	Repeat previous action which has executed from a prompt
+
+Users have to define alternative mappings to disable default mappings like:
+>
+	" Use g? to show help instead of ?
+	nmap <buffer> g? <Plug>(gin-action-help)
+
+See |gin-actions| for all actions available.
+
 
 =============================================================================
 INTERFACE					*gin-interface*
@@ -46,31 +80,230 @@ INTERFACE					*gin-interface*
 COMMANDS					*gin-commands*
 
 								*:Gin*
-:Gin {command} [{args}]
-	Call a git raw {command} with {args} asynchronously and echo result.
+:Gin[!] [---worktree={worktree}] {command} [{args}]
+	Call a git raw {command} with {args} asynchronously and echo result on
+	a {worktree}.
 	For example, "Gin add %" on "hello.txt" invokes "git add hello.txt".
+	If a bang (!) is specified, it calls command synchronously instead.
+	If no {worktree} is specified, gin will find the one from the current
+	working directory.
 
-	Note that users need to install lambdalisue/guise.vim to open a
+	Note that users need to install guise.vim (|gin-guise|) to open a
 	|tabpage| to edit a commit message on "Gin commit" or so on.
 
-	Note that users need to install lambdalisue/askpass.vim to open a
+	Note that users need to install askpass.vim (|gin-askpass|) to open a
 	prompt to input passphrase on "Gin push" or so on.
 
-								*:GinStatus*
-:GinStatus [{options}] [{path}]
-	Open a "gin-status" buffer to show a status of a repository of {path}.
-	If {path} is omitted, the current working directory is used.
+								*:GinDiff*
+:GinDiff [---worktree={worktree}] [{options}] [{tree-ish}] [-- {pathspec}...]
+	Open a "gin-diff" buffer to show a diff status of a {worktree}.
+	If no {worktree} is specified, gin will find the one from the current
+	working directory.
 
-	The following options are available:
+	The following {options} are available:
+
+	--cached
+	--renames/--no-renames
+	--diff-filter={filter}
+	--reverse/-R
+	--ignore-cr-at-eol
+	--ignore-space-at-eol
+	--ignore-space-change/-b
+	--ignore-all-space/-w
+	--ignore-blank-lines
+	--ignore-matching-lines={regex}/-I={regex}
+	--ignore-submodules[=none/untracked/dirty/all]
+		
+	See ":man git-diff(1)" for detail about {options} and {pathspec}.
+
+								*:GinReload*
+:GinReload
+	Update and reload a content of gin buffer.
+	NOTE This command is defined only on gin buffer (|command-buffer|).
+
+								*:GinStatus*
+:GinStatus [---worktree={worktree}] [{options}] [-- {pathspec}...]
+	Open a "gin-status" buffer to show a status of a {worktree}.
+	If no {worktree} is specified, gin will find the one from the current
+	working directory.
+
+	The following {options} are available:
 
 	--untracked-files[=no/normal/all]
 	--ignore-submodules[=none/untracked/dirty/all]
 	--ignored[=traditional/no/matching]
-	--renames
-	--find-renames[=N]
+	--renames/--no-renames
+	--find-renames[={n}]
 		
-	See ":man git-status(1)" for detail about options.
+	See ":man git-status(1)" for detail about {options} and {pathspec}.
 
+-----------------------------------------------------------------------------
+FUNCTIONS					*gin-functions*
+
+						*gin#action#fn()*
+gin#action#fn({callback})
+	A wrapper function to make an action mapping.
+	The wrapped function is called with {xs} which is a candidate |List|
+	when the action is invoked.
+	Note that users MUST use <Cmd> pseudokey to define mappings like:
+>
+	function! s:my_custom(xs) abort
+	  echo string(a:xs)
+	endfunction
+
+	noremap <buffer> <Plug>(gin-action-my-custom)
+	      \ <Cmd>call gin#action#fn({ xs -> <SID>my_custom(xs) })<CR>
+<
+	WARNING: This API is unstable yet
+
+						*gin#action#call()*
+gin#action#call({name}, {range})
+	Invoke an action {name} with {range}. The {name} is |String| name and
+	the {range} is "[firstline, lastline]" |List|.
+	Note that this function uses |feedkeys()| internally.
+>
+	call gin#action#call('my-custom', [1, 1])
+<
+	WARNING: This API is unstable yet
+
+	       				*gin#action#list_action()*
+gin#action#list_actions()
+	List all available actions of the current buffer.
+	WARNING: This API is unstable yet
+
+	       				*gin#action#gather_candidates()*
+gin#action#gather_candidates({range})
+	Gather and return candidates of the current buffer in {range}.
+	WARNING: This API is unstable yet
+
+-----------------------------------------------------------------------------
+MAPPINGS					*gin-mappings*
+
+Note that all mappings listed in this documentation are |:map-local|.
+
+*<Plug>(gin-reload)*
+	Call |:GinReload| command then trigger |Ctrl-L|.
+	It is mapped to "<C-l>" in default when no mapping exists.
+
+-----------------------------------------------------------------------------
+ACTIONS						*gin-actions*
+
+*<Plug>(gin-action-echo)*
+	Echo active action candidates for debugging.
+
+*<Plug>(gin-action-choice)*
+	Open a prompt to select an action to invoke. It will invoke selected
+	action on active action candidates.
+	It is mapped to "a" in default when no mapping exists.
+
+*<Plug>(gin-action-repeat)*
+	Repeat a previous action triggered from |<Plug>(gin-action-choice)|.
+	Note that previous actions triggered from actual mappings are not
+	repeated.
+	It is mapped to "." in default when no mapping exists.
+
+*<Plug>(gin-action-help)*
+	Show action help.
+	It is mapped to "?" in default when no mapping exists.
+	NOTE: Not implemented yet.
+
+*<Plug>(gin-action-open=)*
+*<Plug>(gin-action-open:edit)*
+*<Plug>(gin-action-open:split)*
+*<Plug>(gin-action-open:vsplit)*
+*<Plug>(gin-action-open:tabedit)*
+*<Plug>(gin-action-open)*
+	Open active action candidates with given command.
+	The "=" mapping can be used to define custom actions like
+>
+	map <buffer>
+	      \ <Plug>(gin-action-open:top)
+	      \ <Plug>(gin-action-open=)topleft\ split<CR>
+<
+	This actions are enabled on the following buffer
+	|gin-status|
+
+*<Plug>(gin-action-diff=)*
+*<Plug>(gin-action-diff:edit)*
+*<Plug>(gin-action-diff:split)*
+*<Plug>(gin-action-diff:vsplit)*
+*<Plug>(gin-action-diff:tabedit)*
+*<Plug>(gin-action-diff)*
+	Open diff on active action candidates with given command.
+	See |<Plug>(gin-action-open=)| for customization.
+
+	This actions are enabled on the following buffer
+	|gin-status|
+
+*<Plug>(gin-action-diff:cached=)*
+*<Plug>(gin-action-diff:cached:edit)*
+*<Plug>(gin-action-diff:cached:split)*
+*<Plug>(gin-action-diff:cached:vsplit)*
+*<Plug>(gin-action-diff:cached:tabedit)*
+*<Plug>(gin-action-diff:cached)*
+	Open diff with cached on active action candidates with given command.
+	See |<Plug>(gin-action-open=)| for customization.
+
+	This actions are enabled on the following buffer
+	|gin-status|
+
+*<Plug>(gin-action-diff:previous=)*
+*<Plug>(gin-action-diff:previous:edit)*
+*<Plug>(gin-action-diff:previous:split)*
+*<Plug>(gin-action-diff:previous:vsplit)*
+*<Plug>(gin-action-diff:previous:tabedit)*
+*<Plug>(gin-action-diff:previous)*
+	Open diff with HEAD^ on active action candidates with given command.
+	See |<Plug>(gin-action-open=)| for customization.
+
+	This actions are enabled on the following buffer
+	|gin-status|
+
+*<Plug>(gin-action-add)*
+*<Plug>(gin-action-add:intent-to-add)*
+	Call "git add" on active action candidates.
+
+	This actions are enabled on the following buffer
+	|gin-status|
+
+*<Plug>(gin-action-rm)*
+*<Plug>(gin-action-rm:force)*
+	Call "git rm" on active action candidates.
+
+	This actions are enabled on the following buffer
+	|gin-status|
+
+*<Plug>(gin-action-reset)*
+	Call "git reset" on active action candidates.
+
+	This actions are enabled on the following buffer
+	|gin-status|
+
+*<Plug>(gin-action-restore)*
+*<Plug>(gin-action-restore:staged)*
+*<Plug>(gin-action-restore:ours)*
+*<Plug>(gin-action-restore:theirs)*
+	Call "git restore" on active action candidates.
+
+	This actions are enabled on the following buffer
+	|gin-status|
+
+*<Plug>(gin-action-stage)*
+*<Plug>(gin-action-stage:intent-to-add)*
+	Call "git add" or "git rm" on active action candidates. The command
+	will be determined from the status of candidates.
+
+	This actions are enabled on the following buffer
+	|gin-status|
+
+*<Plug>(gin-action-unstage)*
+*<Plug>(gin-action-unstage:intent-to-add)*
+	Call "git reset" on active action candidates. If ":intent-to-add"
+	variant is used, the result status on "A " (added) candidates will be
+	" A" (intent to add) instead of "??" (unknown).
+
+	This actions are enabled on the following buffer
+	|gin-status|
 
 =============================================================================
 vim:tw=78:fo=tcq2mM:ts=8:ft=help:norl

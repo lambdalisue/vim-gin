@@ -4,9 +4,9 @@ import { command } from "./command.ts";
 export function main(denops: Denops): void {
   denops.dispatcher = {
     ...denops.dispatcher,
-    "native:command": (...args: unknown[]) => {
-      unknownutil.ensureArray(args, unknownutil.isString);
-      return command(denops, ...args);
+    "reload:command": (bufnr) => {
+      unknownutil.ensureNumber(bufnr);
+      return command(denops, bufnr);
     },
   };
 }
