@@ -1,5 +1,14 @@
-import { batch, bufname, Denops, fn, helper, option } from "../../deps.ts";
+import {
+  batch,
+  bufname,
+  Denops,
+  flags,
+  fn,
+  helper,
+  option,
+} from "../../deps.ts";
 import * as buffer from "../../util/buffer.ts";
+import { toArgs } from "../../util/arg.ts";
 import { normCmdArgs } from "../../util/cmd.ts";
 import { decodeUtf8 } from "../../util/text.ts";
 import { find } from "../../git/finder.ts";
@@ -9,14 +18,36 @@ export async function command(
   denops: Denops,
   ...args: string[]
 ): Promise<void> {
+  const opts = flags.parse(await normCmdArgs(denops, args), {
+    boolean: true,
+    alias: {
+      R: "reverse",
+      b: "ignoreSpaceChange",
+      w: "ignoreAllSpace",
+      I: "ignoreMatchingLines",
+    },
+    "--": true,
+  });
   const cwd = await fn.getcwd(denops, 0) as string;
   const worktree = await find(cwd);
   const bname = bufname.format({
     scheme: "gindiff",
     expr: worktree,
     params: {
-      args: await normCmdArgs(denops, args),
+      cached: opts["cached"],
+      renames: opts["renames"],
+      diffFilter: opts["diffFilter"],
+      reverse: opts["reverse"],
+      ignoreCrAtEol: opts["ignoreCrAtEol"],
+      ignoreSpaceAtEol: opts["ignoreSpaceAtEol"],
+      ignoreSpaceChange: opts["ignoreSpaceChange"],
+      ignoreAllSpace: opts["ignoreAllSpace"],
+      ignoreBlankLines: opts["ignoreBlankLines"],
+      ignoreMatchingLines: opts["ignoreMatchingLines"],
+      ignoreSubmodules: opts["ignoreSubmodules"],
+      commitish: opts._ ? opts._.map((v) => v.toString()) : undefined,
     },
+    fragment: opts["--"] ? opts["--"].join(" ") : undefined,
   });
   await buffer.open(denops, bname.toString());
 }
@@ -26,9 +57,28 @@ export async function read(denops: Denops): Promise<void> {
     await fn.bufnr(denops, "%");
     await fn.bufname(denops, "%");
   }) as [number, string];
-  const { expr, params } = bufname.parse(bname);
+  const { expr, params, fragment } = bufname.parse(bname);
+  const args = [
+    "diff",
+    "--no-color",
+    ...toArgs("--cached", params?.cached),
+    ...toArgs("--renames", params?.renames, {
+      flagForFalse: "--no-renames",
+    }),
+    ...toArgs("--diff-filter", params?.diffFilter),
+    ...toArgs("-R", params?.reverse),
+    ...toArgs("--ignore-cr-at-eol", params?.ignoreCrAtEol),
+    ...toArgs("--ignore-space-at-eol", params?.ignoreSpaceAtEol),
+    ...toArgs("--ignore-space-change", params?.ignoreSpaceChange),
+    ...toArgs("--ignore-all-space", params?.ignoreAllSpace),
+    ...toArgs("--ignore-blank-lines", params?.ignoreBlankLines),
+    ...toArgs("--ignore-matching-lines", params?.ignoreMatchingLines),
+    ...toArgs("--ignore-submodules", params?.ignoreSubmodules),
+    ...(params?.commitish ? (params?.commitish as string[]) : []),
+    ...(fragment ? ["--", fragment] : []),
+  ];
   const env = await fn.environ(denops) as Record<string, string>;
-  const proc = run(["diff", ...params!.args as string[]], {
+  const proc = run(args, {
     stdin: "null",
     stdout: "piped",
     stderr: "piped",
