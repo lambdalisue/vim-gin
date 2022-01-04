@@ -1,4 +1,4 @@
-function! gin#internal#feature#status#action#register() abort
+function! gin#internal#feat#status#action#register() abort
   noremap <buffer> <Plug>(gin-action-open=)
         \ <Cmd>call gin#action#fn({ xs -> <SID>open(xs) })<CR>
   map <buffer> <Plug>(gin-action-open:edit) <Plug>(gin-action-open=)edit<CR>

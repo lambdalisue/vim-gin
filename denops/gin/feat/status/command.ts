@@ -68,7 +68,7 @@ export async function read(denops: Denops): Promise<void> {
     await option.filetype.setLocal(denops, "gin-status");
     await option.modifiable.setLocal(denops, false);
     await vars.b.set(denops, "gin_status_result", result);
-    await denops.call("gin#internal#feature#status#core#init");
+    await denops.call("gin#internal#feat#status#core#init");
   });
   await buffer.replace(denops, bufnr, content);
   await buffer.concrete(denops, bufnr);
