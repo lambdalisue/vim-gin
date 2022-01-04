@@ -13,4 +13,10 @@ function! s:command(...) abort
   call denops#request('gin', 'diff:command', a:000)
 endfunction
 
+function! s:command_file(...) abort
+  call denops#plugin#wait('gin')
+  call denops#request('gin', 'diff:command:file', a:000)
+endfunction
+
 command! -bar -nargs=* GinDiff call s:command(<f-args>)
+command! -bar -nargs=* GinDiffFile call s:command_file(<f-args>)

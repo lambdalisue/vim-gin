@@ -12,25 +12,16 @@ import { toBooleanArgs, toStringArgs } from "../../util/arg.ts";
 import { getOrFindWorktree, normCmdArgs } from "../../util/cmd.ts";
 import { decodeUtf8 } from "../../util/text.ts";
 import { run } from "../../git/process.ts";
-import { parseTreeish } from "../../git/treeish.ts";
 
 export async function command(
   denops: Denops,
   args: string[],
+  filemode: boolean,
 ): Promise<void> {
-  const opts = flags.parse(await normCmdArgs(denops, args), {
-    string: [
-      "-worktree",
-    ],
-    boolean: true,
-    alias: {
-      R: "reverse",
-      b: "ignoreSpaceChange",
-      w: "ignoreAllSpace",
-      I: "ignoreMatchingLines",
-    },
-    "--": true,
-  });
+  const [opts, commitish, path] = parseArgs(
+    await normCmdArgs(denops, args),
+    filemode,
+  );
   const worktree = await getOrFindWorktree(denops, opts);
   const bname = bufname.format({
     scheme: "gindiff",
@@ -47,9 +38,10 @@ export async function command(
       ignoreBlankLines: opts["ignoreBlankLines"],
       ignoreMatchingLines: opts["ignoreMatchingLines"],
       ignoreSubmodules: opts["ignoreSubmodules"],
+      commitish,
       "--": opts["--"],
     },
-    fragment: opts._ ? opts._.map((v) => v.toString()).join(" ") : undefined,
+    fragment: path,
   });
   await buffer.open(denops, bname.toString());
 }
@@ -60,7 +52,6 @@ export async function read(denops: Denops): Promise<void> {
     await fn.bufname(denops, "%");
   }) as [number, string];
   const { expr, params, fragment } = bufname.parse(bname);
-  const [commitish, path] = parseTreeish(fragment ?? "");
   const args = [
     "diff",
     "--no-color",
@@ -77,8 +68,8 @@ export async function read(denops: Denops): Promise<void> {
     ...toBooleanArgs("--ignore-blank-lines", params?.ignoreBlankLines),
     ...toStringArgs("--ignore-matching-lines", params?.ignoreMatchingLines),
     ...toStringArgs("--ignore-submodules", params?.ignoreSubmodules),
-    ...(commitish ? [commitish] : []),
-    ...(path ? [path] : []),
+    ...(params?.commitish ? [params.commitish as string] : []),
+    ...(fragment ? [fragment] : []),
     ...(params?.["--"] ? params["--"] : []),
   ];
   const env = await fn.environ(denops) as Record<string, string>;
@@ -109,4 +100,44 @@ export async function read(denops: Denops): Promise<void> {
   });
   await buffer.replace(denops, bufnr, content);
   await buffer.concrete(denops, bufnr);
+}
+
+function parseArgs(
+  args: string[],
+  filemode: boolean,
+): [flags.Args, string | undefined, string | undefined] {
+  const opts = flags.parse(args, {
+    string: [
+      "-worktree",
+    ],
+    boolean: true,
+    alias: {
+      R: "reverse",
+      b: "ignoreSpaceChange",
+      w: "ignoreAllSpace",
+      I: "ignoreMatchingLines",
+    },
+    "--": true,
+  });
+  if (filemode) {
+    // GinDiffFile [{options}] [{commitish}] {path}
+    switch (opts._.length) {
+      case 1:
+        return [opts, undefined, opts._[0].toString()];
+      case 2:
+        return [opts, opts._[0].toString(), opts._[1].toString()];
+      default:
+        throw new Error("Invalid number of arguments");
+    }
+  } else {
+    // GinDiff [{options}] [{commitish}]
+    switch (opts._.length) {
+      case 0:
+        return [opts, undefined, undefined];
+      case 1:
+        return [opts, opts._[0].toString(), ""];
+      default:
+        throw new Error("Invalid number of arguments");
+    }
+  }
 }
