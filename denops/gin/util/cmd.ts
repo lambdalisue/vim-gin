@@ -1,5 +1,6 @@
-import { Denops } from "../deps.ts";
+import { Denops, flags, fn } from "../deps.ts";
 import { parseTreeish } from "../git/treeish.ts";
+import { find } from "../git/finder.ts";
 
 export async function normCmdArgs(
   denops: Denops,
@@ -33,4 +34,16 @@ async function normCmdArg(
     }
   }
   return arg.replaceAll(/^\\(%|#)/g, "$1");
+}
+
+export async function getOrFindWorktree(
+  denops: Denops,
+  opts: flags.Args,
+): Promise<string> {
+  if (opts["-worktree"]) {
+    return await fn.fnamemodify(denops, opts["-worktree"], ":p") as string;
+  } else {
+    const cwd = await fn.getcwd(denops) as string;
+    return await find(cwd);
+  }
 }

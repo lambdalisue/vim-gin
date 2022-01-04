@@ -9,9 +9,8 @@ import {
 } from "../../deps.ts";
 import * as buffer from "../../util/buffer.ts";
 import { toBooleanArgs, toStringArgs } from "../../util/arg.ts";
-import { normCmdArgs } from "../../util/cmd.ts";
+import { getOrFindWorktree, normCmdArgs } from "../../util/cmd.ts";
 import { decodeUtf8 } from "../../util/text.ts";
-import { find } from "../../git/finder.ts";
 import { run } from "../../git/process.ts";
 import { parseTreeish } from "../../git/treeish.ts";
 
@@ -32,13 +31,7 @@ export async function command(
     },
     "--": true,
   });
-  let worktree: string;
-  if (opts["-worktree"]) {
-    worktree = await fn.fnamemodify(denops, opts["-worktree"], ":p") as string;
-  } else {
-    const cwd = await fn.getcwd(denops) as string;
-    worktree = await find(cwd);
-  }
+  const worktree = await getOrFindWorktree(denops, opts);
   const bname = bufname.format({
     scheme: "gindiff",
     expr: worktree,

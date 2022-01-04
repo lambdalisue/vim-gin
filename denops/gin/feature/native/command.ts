@@ -1,12 +1,11 @@
 import { autocmd, Denops, flags, fn, helper } from "../../deps.ts";
-import { normCmdArgs } from "../../util/cmd.ts";
+import { getOrFindWorktree, normCmdArgs } from "../../util/cmd.ts";
 import { decodeUtf8 } from "../../util/text.ts";
-import { find } from "../../git/finder.ts";
 import { run } from "../../git/process.ts";
 
 export async function command(
   denops: Denops,
-  args: string[]
+  args: string[],
 ): Promise<void> {
   await autocmd.emit(denops, "User", "GinNativeCommandPre", {
     nomodeline: true,
@@ -21,13 +20,7 @@ export async function command(
       return false;
     },
   });
-  let worktree: string;
-  if (opts["-worktree"]) {
-    worktree = await fn.fnamemodify(denops, opts["-worktree"], ":p") as string;
-  } else {
-    const cwd = await fn.getcwd(denops) as string;
-    worktree = await find(cwd);
-  }
+  const worktree = await getOrFindWorktree(denops, opts);
   const env = await fn.environ(denops) as Record<string, string>;
   const proc = run(await normCmdArgs(denops, raws), {
     stdin: "null",

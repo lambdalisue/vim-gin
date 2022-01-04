@@ -1,11 +1,10 @@
 import { batch, bufname, Denops, flags, fn, option, vars } from "../../deps.ts";
 import * as buffer from "../../util/buffer.ts";
 import { toBooleanArgs, toStringArgs } from "../../util/arg.ts";
-import { normCmdArgs } from "../../util/cmd.ts";
+import { getOrFindWorktree, normCmdArgs } from "../../util/cmd.ts";
 import { Entry, GitStatusResult, parse } from "./parser.ts";
 import { render } from "./render.ts";
 import { execute } from "../../git/process.ts";
-import { find } from "../../git/finder.ts";
 import { bind } from "../native/command.ts";
 import {
   Candidate as CandidateBase,
@@ -17,7 +16,7 @@ type Candidate = Entry & CandidateBase;
 
 export async function command(
   denops: Denops,
-  args: string[]
+  args: string[],
 ): Promise<void> {
   const opts = flags.parse(await normCmdArgs(denops, args), {
     string: [
@@ -29,13 +28,7 @@ export async function command(
     },
     "--": true,
   });
-  let worktree: string;
-  if (opts["-worktree"]) {
-    worktree = await fn.fnamemodify(denops, opts["-worktree"], ":p") as string;
-  } else {
-    const cwd = await fn.getcwd(denops) as string;
-    worktree = await find(cwd);
-  }
+  const worktree = await getOrFindWorktree(denops, opts);
   const bname = bufname.format({
     scheme: "ginstatus",
     expr: worktree,
