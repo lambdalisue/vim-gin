@@ -10,7 +10,7 @@ import {
   Candidate as CandidateBase,
   Range,
   register as registerGatherer,
-} from "../action/registry.ts";
+} from "../../core/action/registry.ts";
 
 type Candidate = Entry & CandidateBase;
 

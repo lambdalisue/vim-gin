@@ -1,5 +1,5 @@
-function! gin#internal#feature#action#core#init() abort
-  call gin#internal#feature#action#action#register()
+function! gin#internal#core#action#core#init() abort
+  call gin#internal#core#action#action#register()
   call s:define_default_mappings()
 endfunction
 

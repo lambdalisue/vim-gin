@@ -1,4 +1,4 @@
-function! gin#internal#feature#action#action#register() abort
+function! gin#internal#core#action#action#register() abort
   noremap <buffer> <Plug>(gin-action-echo)
         \ <Cmd>call gin#action#fn({ xs -> <SID>echo(xs) })<CR>
 
