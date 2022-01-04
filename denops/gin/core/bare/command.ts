@@ -12,6 +12,7 @@ export async function command(
   });
   const raws: string[] = [];
   const opts = flags.parse(await normCmdArgs(denops, args), {
+    "--": true,
     string: [
       "-worktree",
     ],
@@ -20,6 +21,9 @@ export async function command(
       return false;
     },
   });
+  if (opts["--"].length) {
+    raws.push("--", ...opts["--"]);
+  }
   const worktree = await getOrFindWorktree(denops, opts);
   const env = await fn.environ(denops) as Record<string, string>;
   const proc = run(await normCmdArgs(denops, raws), {
