@@ -3,7 +3,7 @@ import { Denops } from "./deps.ts";
 import { main as mainAction } from "./core/action/main.ts";
 import { main as mainBare } from "./core/bare/main.ts";
 import { main as mainDebug } from "./core/debug/main.ts";
-import { main as mainReload } from "./core/reload/main.ts";
+import { main as mainUtil } from "./core/util/main.ts";
 
 import { main as mainDiff } from "./feat/diff/main.ts";
 import { main as mainShow } from "./feat/show/main.ts";
@@ -13,7 +13,7 @@ export function main(denops: Denops): void {
   mainAction(denops);
   mainBare(denops);
   mainDebug(denops);
-  mainReload(denops);
+  mainUtil(denops);
 
   mainDiff(denops);
   mainShow(denops);

@@ -14,7 +14,6 @@ USAGE				|gin-usage|
 INTERFACE			|gin-interface|
   COMMANDS			  |gin-commands|
   FUNCTIONS			  |gin-functions|
-  MAPPINGS			  |gin-mappings|
   ACTIONS			  |gin-actions|
 
 
@@ -117,11 +116,6 @@ COMMANDS					*gin-commands*
 		
 	See ":man git-diff(1)" for detail about {options} and {pathspec}.
 
-								*:GinReload*
-:GinReload
-	Update and reload a content of gin buffer.
-	NOTE This command is defined only on gin buffer (|command-buffer|).
-
 								*:GinShow*
 :GinShow [---worktree={worktree}] [{options}] [{commitish}] [{object}...]
 :GinShowFile [---worktree={worktree}] [{options}] [{commitish}] {path}
@@ -152,6 +146,10 @@ COMMANDS					*gin-commands*
 
 -----------------------------------------------------------------------------
 FUNCTIONS					*gin-functions*
+
+						*gin#util#reload()*
+gin#util#reload([{bufnr}])
+	Reload a content of {bufnr} gin buffer.
 
 						*gin#debug#is_enabled()*
 gin#debug#is_enabled()
@@ -207,15 +205,6 @@ gin#action#list_actions()
 gin#action#gather_candidates({range})
 	Gather and return candidates of the current buffer in {range}.
 	WARNING: This API is unstable yet
-
------------------------------------------------------------------------------
-MAPPINGS					*gin-mappings*
-
-Note that all mappings listed in this documentation are |:map-local|.
-
-*<Plug>(gin-reload)*
-	Call |:GinReload| command then trigger |Ctrl-L|.
-	It is mapped to "<C-l>" in default when no mapping exists.
 
 -----------------------------------------------------------------------------
 ACTIONS						*gin-actions*

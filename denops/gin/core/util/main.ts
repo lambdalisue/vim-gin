@@ -1,12 +1,12 @@
 import { Denops, unknownutil } from "../../deps.ts";
-import { command } from "./command.ts";
+import * as buffer from "../../util/buffer.ts";
 
 export function main(denops: Denops): void {
   denops.dispatcher = {
     ...denops.dispatcher,
-    "reload:command": (bufnr) => {
+    "util:reload": (bufnr) => {
       unknownutil.ensureNumber(bufnr);
-      return command(denops, bufnr);
+      return buffer.reload(denops, bufnr);
     },
   };
 }
