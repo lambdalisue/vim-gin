@@ -1,4 +1,4 @@
-function! gin#internal#feature#reload#core#init() abort
+function! gin#internal#core#reload#core#init() abort
   call s:define_commands()
   call s:define_mappings()
   call s:define_default_mappings()
