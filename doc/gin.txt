@@ -153,6 +153,25 @@ COMMANDS					*gin-commands*
 -----------------------------------------------------------------------------
 FUNCTIONS					*gin-functions*
 
+						*gin#debug#is_enabled()*
+gin#debug#is_enabled()
+	Return whether debugging mode enabled or not.
+	In debugging mode, gin reports extra information to echo area with
+	"[DEBUG]" prefix.
+
+						*gin#debug#enable()*
+gin#debug#enable()
+	Enable debugging mode. See |gin#debug#is_enabled()| for details.
+
+						*gin#debug#disable()*
+gin#debug#disable()
+	Disable debugging mode. See |gin#debug#is_enabled()| for details.
+
+						*gin#debug#report()*
+gin#debug#report({message})
+	Report {message} with "[DEBUG]" prefix only when debugging mode is
+	enabled. It is mainly not for users but for plugin developers.
+
 						*gin#action#fn()*
 gin#action#fn({callback})
 	A wrapper function to make an action mapping.
