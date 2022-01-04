@@ -6,7 +6,7 @@ import { run } from "../../git/process.ts";
 
 export async function command(
   denops: Denops,
-  ...args: string[]
+  args: string[]
 ): Promise<void> {
   await autocmd.emit(denops, "User", "GinNativeCommandPre", {
     nomodeline: true,

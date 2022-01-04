@@ -6,7 +6,7 @@ export function main(denops: Denops): void {
     ...denops.dispatcher,
     "native:command": (...args: unknown[]) => {
       unknownutil.ensureArray(args, unknownutil.isString);
-      return command(denops, ...args);
+      return command(denops, args);
     },
   };
 }

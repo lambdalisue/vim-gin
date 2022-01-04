@@ -17,7 +17,7 @@ type Candidate = Entry & CandidateBase;
 
 export async function command(
   denops: Denops,
-  ...args: string[]
+  args: string[]
 ): Promise<void> {
   const opts = flags.parse(await normCmdArgs(denops, args), {
     string: [

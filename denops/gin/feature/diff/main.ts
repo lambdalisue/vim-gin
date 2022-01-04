@@ -6,7 +6,7 @@ export function main(denops: Denops): void {
     ...denops.dispatcher,
     "diff:command": (...args) => {
       unknownutil.ensureArray(args, unknownutil.isString);
-      return command(denops, ...args);
+      return command(denops, args);
     },
     "diff:read": () => read(denops),
   };
