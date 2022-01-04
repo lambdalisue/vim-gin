@@ -8,7 +8,7 @@ setlocal nobuflisted
 setlocal nolist nospell
 setlocal nowrap nofoldenable
 
-if !get(g:, 'gin_ginstatus_disable_default_mappings')
+if !get(g:, 'gin_status_disable_default_mappings')
   map <buffer> <Return>  <Plug>(gin-action-open)
   map <buffer> <<        <Plug>(gin-action-stage:intent-to-add)
   map <buffer> >>        <Plug>(gin-action-unstage:intent-to-add)
