@@ -7,7 +7,7 @@ export async function command(
   denops: Denops,
   args: string[],
 ): Promise<void> {
-  await autocmd.emit(denops, "User", "GinNativeCommandPre", {
+  await autocmd.emit(denops, "User", "GinCommandPre", {
     nomodeline: true,
   });
   const raws: string[] = [];
@@ -42,18 +42,18 @@ export async function command(
     await denops.cmd("echohl None");
   } else {
     await helper.echo(denops, decodeUtf8(stdout) + decodeUtf8(stderr));
-    await autocmd.emit(denops, "User", "GinNativeCommandPost", {
+    await autocmd.emit(denops, "User", "GinCommandPost", {
       nomodeline: true,
     });
   }
 }
 
 export async function bind(denops: Denops, bufnr: number): Promise<void> {
-  await autocmd.group(denops, `gin_native_command_bind_${bufnr}`, (helper) => {
+  await autocmd.group(denops, `gin_bare_command_bind_${bufnr}`, (helper) => {
     helper.remove();
     helper.define(
       "User",
-      "GinNativeCommandPost",
+      "GinCommandPost",
       `call denops#request('gin', 'reload:command', [${bufnr}])`,
       {
         nested: true,

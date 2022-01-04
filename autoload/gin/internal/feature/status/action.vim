@@ -123,7 +123,7 @@ function! s:stage(xs) abort
     noautocmd call s:add('', xs_others)
   endif
 
-  doautocmd <nomodeline> User GinNativeCommandPost
+  doautocmd <nomodeline> User GinCommandPost
 endfunction
 
 function! s:stage_intent_to_add(xs) abort
@@ -142,7 +142,7 @@ function! s:stage_intent_to_add(xs) abort
     noautocmd call s:add('', xs_others)
   endif
 
-  doautocmd <nomodeline> User GinNativeCommandPost
+  doautocmd <nomodeline> User GinCommandPost
 endfunction
 
 function! s:unstage_intent_to_add(xs) abort
@@ -157,5 +157,5 @@ function! s:unstage_intent_to_add(xs) abort
     noautocmd call s:reset(xs_others)
   endif
 
-  doautocmd <nomodeline> User GinNativeCommandPost
+  doautocmd <nomodeline> User GinCommandPost
 endfunction

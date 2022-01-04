@@ -5,7 +5,7 @@ import { getOrFindWorktree, normCmdArgs } from "../../util/cmd.ts";
 import { Entry, GitStatusResult, parse } from "./parser.ts";
 import { render } from "./render.ts";
 import { execute } from "../../git/process.ts";
-import { bind } from "../native/command.ts";
+import { bind } from "../../core/bare/command.ts";
 import {
   Candidate as CandidateBase,
   Range,
