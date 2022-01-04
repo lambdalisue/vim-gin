@@ -151,6 +151,11 @@ FUNCTIONS					*gin-functions*
 gin#util#reload([{bufnr}])
 	Reload a content of {bufnr} gin buffer.
 
+						*gin#util#expand()*
+gin#util#expand([{expr}])
+	Like |expand()| but it extract a target filename if the buffer is
+	gin's file-like buffer.
+
 						*gin#debug#is_enabled()*
 gin#debug#is_enabled()
 	Return whether debugging mode enabled or not.
