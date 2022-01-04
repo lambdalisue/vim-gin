@@ -122,6 +122,18 @@ COMMANDS					*gin-commands*
 	Update and reload a content of gin buffer.
 	NOTE This command is defined only on gin buffer (|command-buffer|).
 
+								*:GinShow*
+:GinShow [---worktree={worktree}] [{options}] [{commitish}] [{object}...]
+:GinShowFile [---worktree={worktree}] [{options}] [{commitish}] {path}
+	Open a "gin-show" buffer of a repository or a file in a {worktree}.
+	If no {worktree} is specified, gin will find the one from the current
+	working directory.
+
+	The following {options} are available:
+
+	--show-signature
+		
+	See ":man git-show(1)" for detail about {options}.
 								*:GinStatus*
 :GinStatus [---worktree={worktree}] [{options}] [-- {pathspec}...]
 	Open a "gin-status" buffer to show a status of a {worktree}.
