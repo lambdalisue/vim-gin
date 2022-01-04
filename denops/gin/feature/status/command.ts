@@ -24,7 +24,7 @@ export async function command(
     ],
     boolean: true,
     alias: {
-      "u": "untrackedFiles",
+      "u": "untracked-files",
     },
     "--": true,
   });
@@ -33,11 +33,11 @@ export async function command(
     scheme: "ginstatus",
     expr: worktree,
     params: {
-      untrackedFiles: opts["untrackedFiles"],
-      ignoreSubmodules: opts["ignoreSubmodules"],
+      untrackedFiles: opts["untracked-files"],
+      ignoreSubmodules: opts["ignore-submodules"],
       ignored: opts["ignored"],
       renames: opts["renames"],
-      findRenames: opts["findRenames"],
+      findRenames: opts["find-renames"],
     },
     fragment: opts["--"] ? opts["--"].join(" ") : undefined,
   });
