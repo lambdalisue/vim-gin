@@ -18,28 +18,15 @@ export async function command(
   denops: Denops,
   args: string[],
 ): Promise<void> {
-  const opts = flags.parse(await normCmdArgs(denops, args), {
-    string: [
-      "-worktree",
-    ],
-    boolean: true,
-    alias: {
-      "u": "untracked-files",
-    },
-    "--": true,
-  });
+  const opts = parseArgs(await normCmdArgs(denops, args));
   const worktree = await getOrFindWorktree(denops, opts);
   const bname = bufname.format({
     scheme: "ginstatus",
     expr: worktree,
     params: {
-      untrackedFiles: opts["untracked-files"],
-      ignoreSubmodules: opts["ignore-submodules"],
-      ignored: opts["ignored"],
-      renames: opts["renames"],
-      findRenames: opts["find-renames"],
+      ...opts,
+      _: undefined,
     },
-    fragment: opts["--"] ? opts["--"].join(" ") : undefined,
   });
   await buffer.open(denops, bname.toString());
 }
@@ -49,21 +36,21 @@ export async function read(denops: Denops): Promise<void> {
     await fn.bufnr(denops, "%");
     await fn.bufname(denops, "%");
   }) as [number, string];
-  const { expr, params, fragment } = bufname.parse(bname);
+  const { expr, params } = bufname.parse(bname);
   const args = [
     "status",
     "--porcelain=v2",
     "--branch",
     "--ahead-behind",
     "-z",
-    ...toStringArgs("--untracked-files", params?.untrackedFiles),
-    ...toStringArgs("--ignore-submodules", params?.ignoreSubmodules),
-    ...toStringArgs("--ignored", params?.ignored),
-    ...toBooleanArgs("--renames", params?.renames, {
-      falseFlag: "--no-renames",
+    ...toStringArgs(params, "untracked-files"),
+    ...toStringArgs(params, "ignore-submodules"),
+    ...toStringArgs(params, "ignored"),
+    ...toBooleanArgs(params, "renames", {
+      flagFalse: "--no-renames",
     }),
-    ...toStringArgs("--find-renames", params?.findRenames),
-    ...(fragment ? ["--", fragment] : []),
+    ...toStringArgs(params, "find-renames"),
+    ...toStringArgs(params, "--", { flag: "--" }),
   ];
   const stdout = await execute(args, {
     noOptionalLocks: true,
@@ -103,4 +90,19 @@ async function getCandidates(
     ...entry,
     value: entry.path,
   }));
+}
+
+function parseArgs(
+  args: string[],
+): flags.Args {
+  return flags.parse(args, {
+    "--": true,
+    string: [
+      "-worktree",
+    ],
+    boolean: true,
+    alias: {
+      "u": "untracked-files",
+    },
+  });
 }

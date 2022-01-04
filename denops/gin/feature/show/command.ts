@@ -9,7 +9,7 @@ import {
   unknownutil,
 } from "../../deps.ts";
 import * as buffer from "../../util/buffer.ts";
-import { toBooleanArgs } from "../../util/arg.ts";
+import { toBooleanArgs, toStringArgs } from "../../util/arg.ts";
 import { getOrFindWorktree, normCmdArgs } from "../../util/cmd.ts";
 import { decodeUtf8 } from "../../util/text.ts";
 import { run } from "../../git/process.ts";
@@ -28,7 +28,8 @@ export async function command(
     scheme: "ginshow",
     expr: worktree,
     params: {
-      showSignature: opts["show-signature"],
+      ...opts,
+      _: undefined,
       commitish,
     },
     fragment: path,
@@ -44,8 +45,10 @@ export async function read(denops: Denops): Promise<void> {
   const { expr, params, fragment } = bufname.parse(bname);
   const args = [
     "show",
-    ...toBooleanArgs("--show-signature", params?.showSignature),
+    ...toBooleanArgs(params, "show-signature"),
     ...formatTreeish(params?.commitish, fragment),
+    "--",
+    ...toStringArgs(params, "--", { flag: "--" }),
   ];
   const env = await fn.environ(denops) as Record<string, string>;
   const proc = run(args, {
@@ -86,6 +89,7 @@ function parseArgs(
   filemode: boolean,
 ): [flags.Args, string | undefined, string | undefined] {
   const opts = flags.parse(args, {
+    "--": true,
     string: [
       "-worktree",
     ],

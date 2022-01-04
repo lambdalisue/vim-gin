@@ -1,49 +1,59 @@
 import { assertEquals } from "../deps_test.ts";
 import { toBooleanArgs, toStringArgs } from "./arg.ts";
 
-Deno.test("toStringArgs returns `[]` when the `value` is undefined/null", () => {
-  assertEquals(toStringArgs("--test", undefined), []);
-  assertEquals(toStringArgs("--test", null), []);
+Deno.test("toStringArgs returns `[]` when the `test` is undefined", () => {
+  assertEquals(toStringArgs({ test: undefined }, "test"), []);
 });
-Deno.test("toStringArgs returns `['{flag}']` when the `value` is `true`", () => {
-  assertEquals(toStringArgs("--test", true), ["--test"]);
+Deno.test("toStringArgs returns `[]` when the `test` is []", () => {
+  assertEquals(toStringArgs({ test: [] }, "test"), []);
 });
-Deno.test("toStringArgs returns `[]` when the `value` is `false`", () => {
-  assertEquals(toStringArgs("--test", false), []);
+Deno.test("toStringArgs returns `['--test', '']` when the `test` is ''", () => {
+  assertEquals(toStringArgs({ test: "" }, "test"), ["--test", ""]);
 });
-Deno.test("toStringArgs returns `['{flag}', '{value}']` when the `value` is String", () => {
-  assertEquals(toStringArgs("--test", "test"), ["--test", "test"]);
+Deno.test("toStringArgs returns `['--test', 'foo']` when the `test` is 'foo'", () => {
+  assertEquals(toStringArgs({ test: "foo" }, "test"), ["--test", "foo"]);
 });
-Deno.test("toStringArgs returns `['{flag}', '']` when the `value` is String and empty", () => {
-  assertEquals(toStringArgs("--test", ""), ["--test", ""]);
-});
-Deno.test("toStringArgs returns `['{flag}={value}']` when the `value` is String with `useEqual` is specified", () => {
-  assertEquals(toStringArgs("--test", "test", { useEqual: true }), [
-    "--test=test",
+Deno.test("toStringArgs returns `['--test=foo']` when the `test` is 'foo' and `useEqual` is specified", () => {
+  assertEquals(toStringArgs({ test: "foo" }, "test", { useEqual: true }), [
+    "--test=foo",
   ]);
 });
-Deno.test("toStringArgs returns `['{flag}=']` when the `value` is String and empty", () => {
-  assertEquals(toStringArgs("--test", "", { useEqual: true }), ["--test="]);
+Deno.test("toStringArgs returns `['--test-test', 'foo']` when the `test` is 'foo' and `flag` is '--test-test'", () => {
+  assertEquals(toStringArgs({ test: "foo" }, "test", { flag: "--test-test" }), [
+    "--test-test",
+    "foo",
+  ]);
+});
+Deno.test("toStringArgs returns `['--test', 'foo', '--test', 'bar']` when the `test` is ['foo', 'bar']", () => {
+  assertEquals(toStringArgs({ test: ["foo", "bar"] }, "test"), [
+    "--test",
+    "foo",
+    "--test",
+    "bar",
+  ]);
 });
 
-Deno.test("toBooleanArgs returns `[]` when the `value` is undefined/null", () => {
-  assertEquals(toBooleanArgs("--test", undefined), []);
-  assertEquals(toBooleanArgs("--test", null), []);
+Deno.test("toBooleanArgs returns `[]` when the `test` is undefined", () => {
+  assertEquals(toBooleanArgs({ test: undefined }, "test"), []);
 });
-Deno.test("toBooleanArgs returns `['{flag}']` when the `value` is `true`", () => {
-  assertEquals(toBooleanArgs("--test", true), ["--test"]);
+Deno.test("toBooleanArgs returns `[]` when the `test` is []", () => {
+  assertEquals(toBooleanArgs({ test: [] }, "test"), []);
 });
-Deno.test("toBooleanArgs returns `[]` when the `value` is `false`", () => {
-  assertEquals(toBooleanArgs("--test", false), []);
+Deno.test("toBooleanArgs returns `[]` when the `test` is ''", () => {
+  assertEquals(toBooleanArgs({ test: "" }, "test"), []);
 });
-Deno.test("toBooleanArgs returns `[]` when the `value` is `false` but `falseFlag` is specified", () => {
-  assertEquals(toBooleanArgs("--test", false, { falseFlag: "--no-test" }), [
-    "--no-test",
+Deno.test("toBooleanArgs returns `['--test']` when the `test` is 'foo'", () => {
+  assertEquals(toBooleanArgs({ test: "foo" }, "test"), ["--test"]);
+});
+Deno.test("toBooleanArgs returns `['--test-test']` when the `test` is 'foo' and `flag` is '--test-test'", () => {
+  assertEquals(
+    toBooleanArgs({ test: "foo" }, "test", { flag: "--test-test" }),
+    ["--test-test"],
+  );
+});
+Deno.test("toBooleanArgs returns `['--test', '--test']` when the `test` is ['foo', 'bar']", () => {
+  assertEquals(toBooleanArgs({ test: ["foo", "bar"] }, "test"), [
+    "--test",
+    "--test",
   ]);
-});
-Deno.test("toBooleanArgs returns `['{flag}']` when the `value` is String", () => {
-  assertEquals(toBooleanArgs("--test", "test"), ["--test"]);
-});
-Deno.test("toBooleanArgs returns `[]` when the `value` is String and empty", () => {
-  assertEquals(toBooleanArgs("--test", ""), []);
 });

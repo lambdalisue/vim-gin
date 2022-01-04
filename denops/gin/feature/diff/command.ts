@@ -27,19 +27,9 @@ export async function command(
     scheme: "gindiff",
     expr: worktree,
     params: {
-      cached: opts["cached"],
-      renames: opts["renames"],
-      diffFilter: opts["diff-filter"],
-      reverse: opts["reverse"],
-      ignoreCrAtEol: opts["ignore-cr-at-eol"],
-      ignoreSpaceAtEol: opts["ignore-space-at-eol"],
-      ignoreSpaceChange: opts["ignore-space-change"],
-      ignoreAllSpace: opts["ignore-all-space"],
-      ignoreBlankLines: opts["ignore-blank-lines"],
-      ignoreMatchingLines: opts["ignore-matching-lines"],
-      ignoreSubmodules: opts["ignore-submodules"],
+      ...opts,
+      _: undefined,
       commitish,
-      "--": opts["--"],
     },
     fragment: path,
   });
@@ -55,22 +45,20 @@ export async function read(denops: Denops): Promise<void> {
   const args = [
     "diff",
     "--no-color",
-    ...toBooleanArgs("--cached", params?.cached),
-    ...toBooleanArgs("--renames", params?.renames, {
-      falseFlag: "--no-renames",
-    }),
-    ...toStringArgs("--diff-filter", params?.diffFilter),
-    ...toBooleanArgs("-R", params?.reverse),
-    ...toBooleanArgs("--ignore-cr-at-eol", params?.ignoreCrAtEol),
-    ...toBooleanArgs("--ignore-space-at-eol", params?.ignoreSpaceAtEol),
-    ...toBooleanArgs("--ignore-space-change", params?.ignoreSpaceChange),
-    ...toBooleanArgs("--ignore-all-space", params?.ignoreAllSpace),
-    ...toBooleanArgs("--ignore-blank-lines", params?.ignoreBlankLines),
-    ...toStringArgs("--ignore-matching-lines", params?.ignoreMatchingLines),
-    ...toStringArgs("--ignore-submodules", params?.ignoreSubmodules),
+    ...toBooleanArgs(params, "cached"),
+    ...toBooleanArgs(params, "renames"),
+    ...toStringArgs(params, "diff-filter"),
+    ...toBooleanArgs(params, "reverse", { flag: "-R" }),
+    ...toBooleanArgs(params, "ignore-cr-at-eol"),
+    ...toBooleanArgs(params, "ignore-space-at-eol"),
+    ...toBooleanArgs(params, "ignore-space-change"),
+    ...toBooleanArgs(params, "ignore-all-space"),
+    ...toBooleanArgs(params, "ignore-blank-lines"),
+    ...toStringArgs(params, "ignore-matching-lines"),
+    ...toStringArgs(params, "ignore-submodules"),
     ...(params?.commitish ? [params.commitish as string] : []),
     ...(fragment ? [fragment] : []),
-    ...(params?.["--"] ? params["--"] : []),
+    ...toStringArgs(params, "--", { flag: "--" }),
   ];
   const env = await fn.environ(denops) as Record<string, string>;
   const proc = run(args, {
@@ -107,6 +95,7 @@ function parseArgs(
   filemode: boolean,
 ): [flags.Args, string | undefined, string | undefined] {
   const opts = flags.parse(args, {
+    "--": true,
     string: [
       "-worktree",
     ],
@@ -117,7 +106,6 @@ function parseArgs(
       w: "ignore-all-space",
       I: "ignore-matching-lines",
     },
-    "--": true,
   });
   if (filemode) {
     // GinDiffFile [{options}] [{commitish}] {path}
