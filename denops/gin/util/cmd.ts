@@ -1,10 +1,5 @@
 import { bufname, Denops, flags, fn } from "../deps.ts";
-import { find } from "../git/finder.ts";
-
-const GIN_FILE_BUFFER_PROTOCOLS = [
-  "gindiff://",
-  "ginshow://",
-];
+import { GIN_FILE_BUFFER_PROTOCOLS } from "../global.ts";
 
 export async function normCmdArgs(
   denops: Denops,
@@ -36,11 +31,9 @@ export async function expand(denops: Denops, expr: string): Promise<string> {
     "gin#internal#util#cmd#expand",
     expr,
   ) as string;
-  for (const protocol of GIN_FILE_BUFFER_PROTOCOLS) {
-    if (bname.startsWith(protocol)) {
-      const { fragment } = bufname.parse(bname);
-      return fragment ?? bname;
-    }
+  const { scheme, fragment } = bufname.parse(bname);
+  if (GIN_FILE_BUFFER_PROTOCOLS.includes(scheme)) {
+    return fragment ?? bname;
   }
   return bname;
 }
