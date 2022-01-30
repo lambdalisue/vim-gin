@@ -44,8 +44,8 @@ export async function actionChoice(
   if (name == null) {
     return;
   }
-  await denops.call("gin#action#call", name, range);
   await vars.b.set(denops, "denops_action_previous", name);
+  await denops.call("gin#action#call", name, range);
 }
 
 export async function actionRepeat(
