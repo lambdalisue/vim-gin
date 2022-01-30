@@ -13,6 +13,8 @@ function! gin#internal#feat#status#action#register() abort
         \ <Cmd>call gin#action#fn({ xs -> <SID>diff({ -> <SID>opener() }, '--cached', xs) })<CR>
   noremap <buffer> <Plug>(gin-action-diff:previous=)
         \ <Cmd>call gin#action#fn({ xs -> <SID>diff({ -> <SID>opener() }, 'HEAD^', xs) })<CR>
+  noremap <buffer> <Plug>(gin-action-diff:smart=)
+        \ <Cmd>call gin#action#fn({ xs -> <SID>diff_smart({ -> <SID>opener() }, xs) })<CR>
   map <buffer> <Plug>(gin-action-diff:edit) <Plug>(gin-action-diff=)edit<CR>
   map <buffer> <Plug>(gin-action-diff:split) <Plug>(gin-action-diff=)split<CR>
   map <buffer> <Plug>(gin-action-diff:vsplit) <Plug>(gin-action-diff=)vsplit<CR>
@@ -28,6 +30,11 @@ function! gin#internal#feat#status#action#register() abort
   map <buffer> <Plug>(gin-action-diff:previous:vsplit) <Plug>(gin-action-diff:previous=)vsplit<CR>
   map <buffer> <Plug>(gin-action-diff:previous:tabedit) <Plug>(gin-action-diff:previous=)tabedit<CR>
   map <buffer> <Plug>(gin-action-diff:previous) <Plug>(gin-action-diff:previous:edit)
+  map <buffer> <Plug>(gin-action-diff:smart:edit) <Plug>(gin-action-diff:smart=)edit<CR>
+  map <buffer> <Plug>(gin-action-diff:smart:split) <Plug>(gin-action-diff:smart=)split<CR>
+  map <buffer> <Plug>(gin-action-diff:smart:vsplit) <Plug>(gin-action-diff:smart=)vsplit<CR>
+  map <buffer> <Plug>(gin-action-diff:smart:tabedit) <Plug>(gin-action-diff:smart=)tabedit<CR>
+  map <buffer> <Plug>(gin-action-diff:smart) <Plug>(gin-action-diff:smart:edit)
 
   noremap <buffer> <Plug>(gin-action-add)
         \ <Cmd>call gin#action#fn({ xs -> <SID>add('', xs) })<CR>
@@ -94,6 +101,23 @@ function! s:diff(opener, suffix, xs) abort
   endif
   call s:norm_xs(a:xs)
   call map(a:xs, { _, v -> execute(printf('%s | GinDiffFile %s %s', opener, a:suffix, v), '') })
+endfunction
+
+function! s:diff_smart(opener, xs) abort
+  let opener = a:opener()
+  if opener is# v:null
+    return
+  endif
+
+  let xs_local = filter(copy(a:xs), { _, v -> v.XY[0] ==# '.' })
+  if !empty(xs_local)
+    call s:diff({ -> opener }, '', xs_local)
+  endif
+
+  let xs_cached = filter(copy(a:xs), { _, v -> v.XY[0] !=# '.' })
+  if !empty(xs_cached)
+    call s:diff({ -> opener }, '--cached', xs_cached)
+  endif
 endfunction
 
 function! s:add(suffix, xs) abort
