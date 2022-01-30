@@ -72,6 +72,7 @@ export async function read(denops: Denops): Promise<void> {
     await option.modifiable.setLocal(denops, false);
     await vars.b.set(denops, "gin_status_result", result);
     await denops.call("gin#internal#feat#status#core#init");
+    await denops.cmd("execute printf('lcd %s', escape(cwd, ' '))", { cwd: expr })
   });
   await buffer.replace(denops, bufnr, content);
   await buffer.concrete(denops, bufnr);
