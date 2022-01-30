@@ -1,18 +1,18 @@
 function! gin#internal#feat#status#action#register() abort
   noremap <buffer> <Plug>(gin-action-open=)
-        \ <Cmd>call gin#action#fn({ xs -> <SID>open(xs) })<CR>
+        \ <Cmd>call gin#action#fn({ xs -> <SID>open({ -> <SID>opener() }, xs) })<CR>
   map <buffer> <Plug>(gin-action-open:edit) <Plug>(gin-action-open=)edit<CR>
   map <buffer> <Plug>(gin-action-open:split) <Plug>(gin-action-open=)split<CR>
   map <buffer> <Plug>(gin-action-open:vsplit) <Plug>(gin-action-open=)vsplit<CR>
   map <buffer> <Plug>(gin-action-open:tabedit) <Plug>(gin-action-open=)tabedit<CR>
   map <buffer> <Plug>(gin-action-open) <Plug>(gin-action-open:edit)
 
-  noremap <buffer> <Plug>(gin-action-diff=)
-        \ <Cmd>call gin#action#fn({ xs -> <SID>diff('', xs) })<CR>
+  noremap <buffer> <Plug>(gin-action-diff:local=)
+        \ <Cmd>call gin#action#fn({ xs -> <SID>diff({ -> <SID>opener() }, '', xs) })<CR>
   noremap <buffer> <Plug>(gin-action-diff:cached=)
-        \ <Cmd>call gin#action#fn({ xs -> <SID>diff('--cached', xs) })<CR>
+        \ <Cmd>call gin#action#fn({ xs -> <SID>diff({ -> <SID>opener() }, '--cached', xs) })<CR>
   noremap <buffer> <Plug>(gin-action-diff:previous=)
-        \ <Cmd>call gin#action#fn({ xs -> <SID>diff('HEAD^', xs) })<CR>
+        \ <Cmd>call gin#action#fn({ xs -> <SID>diff({ -> <SID>opener() }, 'HEAD^', xs) })<CR>
   map <buffer> <Plug>(gin-action-diff:edit) <Plug>(gin-action-diff=)edit<CR>
   map <buffer> <Plug>(gin-action-diff:split) <Plug>(gin-action-diff=)split<CR>
   map <buffer> <Plug>(gin-action-diff:vsplit) <Plug>(gin-action-diff=)vsplit<CR>
@@ -66,26 +66,30 @@ function! s:norm_xs(xs) abort
   call map(a:xs, { _, v -> escape(v, ' \\') })
 endfunction
 
-function! s:open(xs) abort
+function! s:opener() abort
   let opener = input('Open with: ')
   redraw | echo ''
   if empty(opener)
     echohl WarningMsg
     echo 'Cancelled'
     echohl None
+    return v:null
+  endif
+  return opener
+endfunction
+
+function! s:open(opener, xs) abort
+  let opener = a:opener()
+  if opener is# v:null
     return
   endif
   call s:norm_xs(a:xs)
   call map(a:xs, { _, v -> execute(printf('%s %s', opener, v), '') })
 endfunction
 
-function! s:diff(suffix, xs) abort
-  let opener = input('Open with: ')
-  redraw | echo ''
-  if empty(opener)
-    echohl WarningMsg
-    echo 'Cancelled'
-    echohl None
+function! s:diff(opener, suffix, xs) abort
+  let opener = a:opener()
+  if opener is# v:null
     return
   endif
   call s:norm_xs(a:xs)
