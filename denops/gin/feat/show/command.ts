@@ -125,9 +125,10 @@ function formatTreeish(
   commitish?: string | string[],
   path?: string,
 ): [] | [string] {
-  unknownutil.ensureString(commitish);
-  if (path == null) {
-    return commitish ? [commitish] : [];
+  if (commitish) {
+    unknownutil.ensureString(commitish);
+    return path ? [`${commitish}:${path}`] : [commitish]
+  } else {
+    return path ? [`:${path}`] : [];
   }
-  return [`${commitish ?? ""}:${path}`];
 }
