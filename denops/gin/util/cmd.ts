@@ -1,4 +1,4 @@
-import { bufname, Denops, flags, fn } from "../deps.ts";
+import { bufname, Denops } from "../deps.ts";
 import { GIN_FILE_BUFFER_PROTOCOLS } from "../global.ts";
 
 export async function normCmdArgs(
@@ -36,16 +36,4 @@ export async function expand(denops: Denops, expr: string): Promise<string> {
     return fragment ?? bname;
   }
   return bname;
-}
-
-export async function getOrFindWorktree(
-  denops: Denops,
-  opts: flags.Args,
-): Promise<string> {
-  if (opts["-worktree"]) {
-    return await fn.fnamemodify(denops, opts["-worktree"], ":p") as string;
-  } else {
-    const cwd = await fn.getcwd(denops) as string;
-    return await find(cwd);
-  }
 }

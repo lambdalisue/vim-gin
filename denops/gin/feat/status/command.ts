@@ -1,7 +1,8 @@
 import { batch, bufname, Denops, flags, fn, option, vars } from "../../deps.ts";
 import * as buffer from "../../util/buffer.ts";
 import { toBooleanArgs, toStringArgs } from "../../util/arg.ts";
-import { getOrFindWorktree, normCmdArgs } from "../../util/cmd.ts";
+import { normCmdArgs } from "../../util/cmd.ts";
+import { getWorktree } from "../../util/worktree.ts";
 import { Entry, GitStatusResult, parse } from "./parser.ts";
 import { render } from "./render.ts";
 import { execute } from "../../git/process.ts";
@@ -19,7 +20,9 @@ export async function command(
   args: string[],
 ): Promise<void> {
   const opts = parseArgs(await normCmdArgs(denops, args));
-  const worktree = await getOrFindWorktree(denops, opts);
+  const worktree = opts["-worktree"]
+    ? await fn.fnamemodify(denops, opts["-worktree"], ":p") as string
+    : await getWorktree(denops);
   const bname = bufname.format({
     scheme: "ginstatus",
     expr: worktree,

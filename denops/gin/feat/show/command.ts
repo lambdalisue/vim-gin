@@ -10,7 +10,8 @@ import {
 } from "../../deps.ts";
 import * as buffer from "../../util/buffer.ts";
 import { toBooleanArgs, toStringArgs } from "../../util/arg.ts";
-import { getOrFindWorktree, normCmdArgs } from "../../util/cmd.ts";
+import { normCmdArgs } from "../../util/cmd.ts";
+import { getWorktree } from "../../util/worktree.ts";
 import { decodeUtf8 } from "../../util/text.ts";
 import { run } from "../../git/process.ts";
 
@@ -23,7 +24,9 @@ export async function command(
     await normCmdArgs(denops, args),
     filemode,
   );
-  const worktree = await getOrFindWorktree(denops, opts);
+  const worktree = opts["-worktree"]
+    ? await fn.fnamemodify(denops, opts["-worktree"], ":p") as string
+    : await getWorktree(denops);
   const bname = bufname.format({
     scheme: "ginshow",
     expr: worktree,
