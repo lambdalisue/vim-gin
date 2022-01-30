@@ -3,6 +3,7 @@ import {
   bufname,
   Denops,
   flags,
+  path,
   fn,
   helper,
   option,
@@ -20,13 +21,14 @@ export async function command(
   args: string[],
   filemode: boolean,
 ): Promise<void> {
-  const [opts, commitish, path] = parseArgs(
+  const [opts, commitish, abspath] = parseArgs(
     await normCmdArgs(denops, args),
     filemode,
   );
   const worktree = opts["-worktree"]
     ? await fn.fnamemodify(denops, opts["-worktree"], ":p") as string
     : await getWorktree(denops);
+  const relpath = abspath ? path.relative(worktree, abspath) : undefined;
   const bname = bufname.format({
     scheme: "ginshow",
     expr: worktree,
@@ -35,7 +37,7 @@ export async function command(
       _: undefined,
       commitish,
     },
-    fragment: path,
+    fragment: relpath,
   });
   await buffer.open(denops, bname.toString());
 }
