@@ -9,10 +9,12 @@ export async function getWorktree(denops: Denops): Promise<string> {
     await fn.bufname(denops, '%');
   }) as [string, string];
   if (bname) {
-    const { scheme, expr } = bufname.parse(bname);
-    if (GIN_FILE_BUFFER_PROTOCOLS.includes(scheme)) {
-      return await fn.fnamemodify(denops, expr, ':p') as string;
-    }
+    try {
+      const { scheme, expr } = bufname.parse(bname);
+      if (GIN_FILE_BUFFER_PROTOCOLS.includes(scheme)) {
+        return await fn.fnamemodify(denops, expr, ':p') as string;
+      }
+    } catch {}
   }
   return await find(cwd);
 }

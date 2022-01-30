@@ -31,9 +31,11 @@ export async function expand(denops: Denops, expr: string): Promise<string> {
     "gin#internal#util#cmd#expand",
     expr,
   ) as string;
-  const { scheme, fragment } = bufname.parse(bname);
-  if (GIN_FILE_BUFFER_PROTOCOLS.includes(scheme)) {
-    return fragment ?? bname;
-  }
+  try {
+    const { scheme, fragment } = bufname.parse(bname);
+    if (GIN_FILE_BUFFER_PROTOCOLS.includes(scheme)) {
+      return fragment ?? bname;
+    }
+  } catch {}
   return bname;
 }
