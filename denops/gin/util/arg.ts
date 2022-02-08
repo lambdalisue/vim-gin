@@ -2,7 +2,7 @@ import { bufname } from "../deps.ts";
 
 export type ToStringArgsOptions = {
   flag?: string;
-  useEqual?: boolean;
+  noEqual?: boolean;
 };
 
 export function toStringArgs(
@@ -18,7 +18,7 @@ export function toStringArgs(
   if (Array.isArray(value)) {
     return value.map((v) => toStringArgs({ [name]: v }, name, options)).flat();
   }
-  return options.useEqual ? [`${flag}=${value}`] : [flag, value];
+  return options.noEqual ? [flag, value] : [`${flag}=${value}`];
 }
 
 export type ToBooleanArgsOptions = {

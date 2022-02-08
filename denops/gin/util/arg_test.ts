@@ -10,13 +10,13 @@ Deno.test("toStringArgs returns `[]` when the `test` is []", () => {
 Deno.test("toStringArgs returns `['--test', '']` when the `test` is ''", () => {
   assertEquals(toStringArgs({ test: "" }, "test"), ["--test", ""]);
 });
-Deno.test("toStringArgs returns `['--test', 'foo']` when the `test` is 'foo'", () => {
-  assertEquals(toStringArgs({ test: "foo" }, "test"), ["--test", "foo"]);
-});
-Deno.test("toStringArgs returns `['--test=foo']` when the `test` is 'foo' and `useEqual` is specified", () => {
-  assertEquals(toStringArgs({ test: "foo" }, "test", { useEqual: true }), [
+Deno.test("toStringArgs returns `['--test=foo']` when the `test` is 'foo'", () => {
+  assertEquals(toStringArgs({ test: "foo" }, "test"), [
     "--test=foo",
   ]);
+});
+Deno.test("toStringArgs returns `['--test', 'foo']` when the `test` is 'foo' and `noEqual` is specified", () => {
+  assertEquals(toStringArgs({ test: "foo" }, "test", { noEqual: true }), ["--test", "foo"]);
 });
 Deno.test("toStringArgs returns `['--test-test', 'foo']` when the `test` is 'foo' and `flag` is '--test-test'", () => {
   assertEquals(toStringArgs({ test: "foo" }, "test", { flag: "--test-test" }), [
