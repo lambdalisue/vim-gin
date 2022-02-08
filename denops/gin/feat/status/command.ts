@@ -27,6 +27,7 @@ export async function command(
     scheme: "ginstatus",
     expr: worktree,
     params: {
+      "untracked-files": "all",
       ...opts,
       _: undefined,
     },
