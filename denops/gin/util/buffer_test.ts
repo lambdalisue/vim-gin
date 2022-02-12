@@ -4,7 +4,8 @@ import {
   concrete,
   editData,
   editFile,
-  makeModifiable,
+  ensure,
+  modifiable,
   open,
   readData,
   readFile,
@@ -131,14 +132,65 @@ test({
 
 test({
   mode: "all",
-  name: "makeModifiable change buffers modifiable",
+  name:
+    "ensure ensures that the current buffer is specified one (buffer change)",
+  fn: async (denops) => {
+    await open(denops, "Hello");
+    const bufnr1 = await fn.bufnr(denops);
+    await open(denops, "World");
+    const bufnr2 = await fn.bufnr(denops);
+
+    assertEquals(bufnr2, await fn.bufnr(denops));
+    await ensure(denops, bufnr1, async () => {
+      assertEquals(bufnr1, await fn.bufnr(denops));
+    });
+    assertEquals(bufnr2, await fn.bufnr(denops));
+
+    assertEquals(bufnr2, await fn.bufnr(denops));
+    await ensure(denops, bufnr2, async () => {
+      assertEquals(bufnr2, await fn.bufnr(denops));
+    });
+    assertEquals(bufnr2, await fn.bufnr(denops));
+  },
+  prelude: [`set runtimepath^=${runtimepath}`],
+});
+test({
+  mode: "all",
+  name:
+    "ensure ensures that the current buffer is specified one (window change)",
+  fn: async (denops) => {
+    await open(denops, "Hello");
+    const bufnr1 = await fn.bufnr(denops);
+    await denops.cmd("new");
+    await open(denops, "World");
+    const bufnr2 = await fn.bufnr(denops);
+
+    assertEquals(bufnr2, await fn.bufnr(denops));
+    await ensure(denops, bufnr1, async () => {
+      assertEquals(bufnr1, await fn.bufnr(denops));
+    });
+    assertEquals(bufnr2, await fn.bufnr(denops));
+
+    assertEquals(bufnr2, await fn.bufnr(denops));
+    await ensure(denops, bufnr2, async () => {
+      assertEquals(bufnr2, await fn.bufnr(denops));
+    });
+    assertEquals(bufnr2, await fn.bufnr(denops));
+  },
+  prelude: [`set runtimepath^=${runtimepath}`],
+});
+
+test({
+  mode: "all",
+  name: "modifiable ensures that the buffer is modifiable",
   fn: async (denops) => {
     await denops.cmd("edit foobar");
     await denops.cmd("set nomodifiable");
+    const bufnr = await fn.bufnr(denops);
     assertEquals(0, await denops.eval("&modifiable"));
-    const restore = await makeModifiable(denops);
-    assertEquals(1, await denops.eval("&modifiable"));
-    await restore();
+    await modifiable(denops, bufnr, async () => {
+      assertEquals(1, await denops.eval("&modifiable"));
+    });
     assertEquals(0, await denops.eval("&modifiable"));
   },
   prelude: [`set runtimepath^=${runtimepath}`],

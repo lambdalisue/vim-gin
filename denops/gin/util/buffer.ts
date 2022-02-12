@@ -67,29 +67,70 @@ export async function concrete(
 }
 
 /**
- * Make the current buffer modifiable
+ * Ensure the executor is executed under the specified buffer
  */
-export async function makeModifiable(
+export async function ensure<T = void>(
   denops: Denops,
-): Promise<() => Promise<void>> {
-  const [bufnr, modified, modifiable, foldmethod] = await batch.gather(
+  bufnr: number,
+  executor: () => Promise<T>,
+): Promise<T> {
+  const [bufnrCur, winidCur, winidNext] = await batch.gather(
     denops,
     async (denops) => {
       await fn.bufnr(denops);
-      await denops.eval("&modified");
-      await denops.eval("&modifiable");
-      await denops.eval("&foldmethod");
+      await fn.win_getid(denops);
+      await fn.bufwinid(denops, bufnr);
     },
-  ) as [number, number, number, string];
+  ) as [number, number, number];
+  if (winidCur === winidNext) {
+    return executor();
+  }
+  if (winidNext === -1) {
+    await denops.cmd(`keepjumps keepalt ${bufnr}buffer`);
+    try {
+      return await executor();
+    } finally {
+      await denops.cmd(`keepjumps keepalt ${bufnrCur}buffer`);
+    }
+  } else {
+    await fn.win_gotoid(denops, winidNext);
+    try {
+      return await executor();
+    } finally {
+      await fn.win_gotoid(denops, winidCur);
+    }
+  }
+}
+
+/**
+ * Ensure the executor is executed under a modifiable buffer
+ */
+export async function modifiable<T = void>(
+  denops: Denops,
+  bufnr: number,
+  executor: () => Promise<T>,
+): Promise<T> {
+  const [modified, modifiable, foldmethod] = await batch.gather(
+    denops,
+    async (denops) => {
+      await fn.getbufvar(denops, bufnr, "&modified");
+      await fn.getbufvar(denops, bufnr, "&modifiable");
+      await fn.getbufvar(denops, bufnr, "&foldmethod");
+    },
+  ) as [number, number, string];
   await batch.batch(denops, async (denops) => {
     await fn.setbufvar(denops, bufnr, "&modifiable", 1);
     await fn.setbufvar(denops, bufnr, "&foldmethod", "manual");
   });
-  return async () => {
-    await fn.setbufvar(denops, bufnr, "&modified", modified);
-    await fn.setbufvar(denops, bufnr, "&modifiable", modifiable);
-    await fn.setbufvar(denops, bufnr, "&foldmethod", foldmethod);
-  };
+  try {
+    return await executor();
+  } finally {
+    await batch.batch(denops, async (denops) => {
+      await fn.setbufvar(denops, bufnr, "&modified", modified);
+      await fn.setbufvar(denops, bufnr, "&modifiable", modifiable);
+      await fn.setbufvar(denops, bufnr, "&foldmethod", foldmethod);
+    });
+  }
 }
 
 export type ReadFileOptions = {
@@ -117,6 +158,7 @@ async function readFileInternal(
     ...(options.keepjumps ? ["keepjumps"] : []),
     ...(options.lockmarks ? ["lockmarks"] : []),
   ].filter((v) => v).join(" ");
+  const line = options.line ?? "";
   const opt = [
     ...(options.fileformat ? [`++ff=${options.fileformat}`] : []),
     ...(options.encoding ? [`++enc=${options.encoding}`] : []),
@@ -125,20 +167,15 @@ async function readFileInternal(
     ...(options.bad ? [`++bad=${options.bad}`] : []),
     ...(options.edit ? ["++edit"] : []),
   ].filter((v) => v).join(" ");
-  await batch.batch(denops, async (denops) => {
-    if (denops.meta.host === "vim") {
-      // NOTE:
-      // It seems Vim slightly changed behaviors of `read` on empty buffer
-      // thus we need to overwrite the firstline to make sure that the buffer
-      // ends with a newline
-      await denops.cmd("call setline(1, getline(1))");
-    }
-    await denops.cmd(
-      `execute '${pre} ${options.line ?? ""}read ${opt}' fnameescape(file)`,
-      {
-        file,
-      },
-    );
+  if (denops.meta.host === "vim") {
+    // NOTE:
+    // It seems Vim slightly changed behaviors of `read` on empty buffer
+    // thus we need to overwrite the firstline to make sure that the buffer
+    // ends with a newline
+    await denops.cmd("call setline(1, getline(1))");
+  }
+  await denops.cmd(`execute '${pre} ${line}read ${opt}' fnameescape(file)`, {
+    file,
   });
 }
 
@@ -150,9 +187,12 @@ export async function readFile(
   file: string,
   options: ReadFileOptions = {},
 ): Promise<void> {
-  const restore = await makeModifiable(denops);
-  await readFileInternal(denops, file, options);
-  await restore();
+  const bufnr = await fn.bufnr(denops);
+  return await modifiable(
+    denops,
+    bufnr,
+    () => readFileInternal(denops, file, options),
+  );
 }
 
 /**
@@ -182,19 +222,20 @@ export async function editFile(
   file: string,
   options: EditFileOptions = {},
 ): Promise<void> {
+  const bufnr = await fn.bufnr(denops);
   const pre = [
     ...(options.silent ? ["silent"] : []),
     ...(options.keepalt ? ["keepalt"] : []),
     ...(options.keepjumps ? ["keepjumps"] : []),
     ...(options.lockmarks ? ["lockmarks"] : []),
   ].filter((v) => v).join(" ");
-  const restore = await makeModifiable(denops);
-  await batch.batch(denops, async (denops) => {
-    await denops.cmd(`${pre} %delete _`);
-    await readFileInternal(denops, file, { ...options, edit: true });
-    await denops.cmd(`${pre} 1delete _`);
+  await modifiable(denops, bufnr, async () => {
+    await batch.batch(denops, async (denops) => {
+      await denops.cmd(`${pre} %delete _`);
+      await readFileInternal(denops, file, { ...options, edit: true });
+      await denops.cmd(`${pre} 1delete _`);
+    });
   });
-  await restore();
 }
 
 /**
