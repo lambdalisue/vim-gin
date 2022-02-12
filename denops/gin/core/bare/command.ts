@@ -19,7 +19,6 @@ export async function command(
     string: [
       "-worktree",
     ],
-    boolean: true,
     unknown: (arg) => {
       if (arg === "-buffer") {
         return true;
