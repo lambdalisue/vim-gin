@@ -2,13 +2,13 @@ import {
   batch,
   bufname,
   Denops,
-  flags,
   path,
   fn,
   helper,
   option,
   unknownutil,
 } from "../../deps.ts";
+import * as flags from "../../util/flags.ts";
 import * as buffer from "../../util/buffer.ts";
 import { toBooleanArgs, toStringArgs } from "../../util/arg.ts";
 import { normCmdArgs } from "../../util/cmd.ts";
@@ -93,13 +93,9 @@ function parseArgs(
   args: string[],
   filemode: boolean,
 ): [flags.Args, string | undefined, string | undefined] {
-  const opts = flags.parse(args, {
-    "--": true,
-    string: [
-      "-worktree",
-    ],
-    boolean: true,
-  });
+  const opts = flags.parse(args, [
+    "show-signature",
+  ]);
   if (filemode) {
     // GinShowFile [{options}] [{commitish}] {path}
     switch (opts._.length) {

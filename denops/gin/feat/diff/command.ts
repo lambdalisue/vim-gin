@@ -2,12 +2,12 @@ import {
   batch,
   bufname,
   Denops,
-  flags,
   fn,
   helper,
   path,
   option,
 } from "../../deps.ts";
+import * as flags from "../../util/flags.ts";
 import * as buffer from "../../util/buffer.ts";
 import { toBooleanArgs, toStringArgs } from "../../util/arg.ts";
 import { normCmdArgs } from "../../util/cmd.ts";
@@ -99,12 +99,19 @@ function parseArgs(
   args: string[],
   filemode: boolean,
 ): [flags.Args, string | undefined, string | undefined] {
-  const opts = flags.parse(args, {
-    "--": true,
-    string: [
-      "-worktree",
-    ],
-    boolean: true,
+  const opts = flags.parse(args, [
+    "cached",
+    "renames",
+    "diff-filter",
+    "reverse",
+    "ignore-cr-at-eol",
+    "ignore-space-at-eol",
+    "ignore-space-change",
+    "ignore-all-space",
+    "ignore-blank-lines",
+    "ignore-matching-lines",
+    "ignore-submodules",
+  ], {
     alias: {
       R: "reverse",
       b: "ignore-space-change",

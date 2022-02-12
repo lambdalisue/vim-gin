@@ -1,4 +1,5 @@
-import { batch, bufname, Denops, flags, fn, option, vars } from "../../deps.ts";
+import { batch, bufname, Denops, fn, option, vars } from "../../deps.ts";
+import * as flags from "../../util/flags.ts";
 import * as buffer from "../../util/buffer.ts";
 import { toBooleanArgs, toStringArgs } from "../../util/arg.ts";
 import { normCmdArgs } from "../../util/cmd.ts";
@@ -100,12 +101,14 @@ async function getCandidates(
 function parseArgs(
   args: string[],
 ): flags.Args {
-  return flags.parse(args, {
-    "--": true,
-    string: [
-      "-worktree",
-    ],
-    boolean: true,
+  return flags.parse(args, [
+    "untracked-files",
+    "ignore-submodules",
+    "ignored",
+    "renames",
+    "no-renames",
+    "find-renames",
+  ],{
     alias: {
       "u": "untracked-files",
     },
