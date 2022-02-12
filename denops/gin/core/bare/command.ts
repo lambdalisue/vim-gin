@@ -1,5 +1,7 @@
-import { autocmd, Denops, flags, fn, helper } from "../../deps.ts";
+import { autocmd, batch, Denops, flags, fn, option } from "../../deps.ts";
+import { echo, echoerr } from "../../util/helper.ts";
 import { normCmdArgs } from "../../util/cmd.ts";
+import * as buffer from "../../util/buffer.ts";
 import { getWorktree } from "../../util/worktree.ts";
 import { decodeUtf8 } from "../../util/text.ts";
 import { run } from "../../git/process.ts";
@@ -16,6 +18,9 @@ export async function command(
     "--": true,
     string: [
       "-worktree",
+    ],
+    boolean: [
+      "-buffer",
     ],
     unknown: (arg) => {
       raws.push(arg);
@@ -43,12 +48,29 @@ export async function command(
     proc.stderrOutput(),
   ]);
   proc.close();
-  if (!status.success) {
-    await denops.cmd("echohl Error");
-    await helper.echo(denops, decodeUtf8(stderr));
-    await denops.cmd("echohl None");
+  if (opts["-buffer"]) {
+    await denops.cmd("enew");
+    const bufnr = await fn.bufnr(denops);
+    await buffer.ensure(denops, bufnr, async () => {
+      await batch.batch(denops, async (denops) => {
+        await option.modifiable.setLocal(denops, false);
+        await denops.cmd("execute 'lcd' fnameescape(cwd)", { cwd: worktree });
+      });
+      await buffer.editData(denops, new Uint8Array([...stdout, ...stderr]), {
+        silent: true,
+        keepalt: true,
+        keepjumps: true,
+      });
+    });
+    await buffer.concrete(denops, bufnr);
   } else {
-    await helper.echo(denops, decodeUtf8(stdout) + decodeUtf8(stderr));
+    if (status.success) {
+      await echo(denops, decodeUtf8(stdout) + decodeUtf8(stderr));
+    } else {
+      await echoerr(denops, decodeUtf8(stdout) + decodeUtf8(stderr));
+    }
+  }
+  if (status.success) {
     await autocmd.emit(denops, "User", "GinCommandPost", {
       nomodeline: true,
     });
