@@ -174,7 +174,7 @@ endfunction
 
 function! s:restore(suffix, xs) abort
   call s:norm_xs(a:xs)
-  execute printf('Gin! restore --quiet --ignore-unmerged %s %s', a:suffix, join(a:xs, ' '))
+  execute printf('Gin! restore --quiet --ignore-unmerged %s -- %s', a:suffix, join(a:xs, ' '))
 endfunction
 
 function! s:stage(xs) abort
