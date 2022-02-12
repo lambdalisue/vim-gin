@@ -76,16 +76,17 @@ export async function read(denops: Denops): Promise<void> {
     await denops.cmd("echohl None");
     return;
   }
-  const content = decodeUtf8(stdout).split("\n");
-  await batch.batch(denops, async (denops) => {
-    if (fragment) {
-      await denops.cmd("filetype detect");
-    } else {
-      await option.filetype.setLocal(denops, "diff");
-    }
-    await option.modifiable.setLocal(denops, false);
+  await buffer.ensure(denops, bufnr, async () => {
+    await batch.batch(denops, async (denops) => {
+      if (fragment) {
+        await denops.cmd("filetype detect");
+      } else {
+        await option.filetype.setLocal(denops, "diff");
+      }
+      await option.modifiable.setLocal(denops, false);
+    });
+    await buffer.editData(denops, stdout);
   });
-  await buffer.replace(denops, bufnr, content);
   await buffer.concrete(denops, bufnr);
 }
 
