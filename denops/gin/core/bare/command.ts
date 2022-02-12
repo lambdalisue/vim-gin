@@ -19,10 +19,11 @@ export async function command(
     string: [
       "-worktree",
     ],
-    boolean: [
-      "-buffer",
-    ],
+    boolean: true,
     unknown: (arg) => {
+      if (arg === "-buffer") {
+        return true;
+      }
       raws.push(arg);
       return false;
     },
