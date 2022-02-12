@@ -1,8 +1,9 @@
-import { batch, bufname, Denops, fn } from "../deps.ts";
+import { batch, bufname, Denops, fn, flags } from "../deps.ts";
 import { GIN_FILE_BUFFER_PROTOCOLS } from "../global.ts";
+import { expand } from "../util/cmd.ts";
 import { find } from "../git/finder.ts";
 
-export async function getWorktree(denops: Denops): Promise<string> {
+async function getWorktree(denops: Denops): Promise<string> {
   const [cwd, bname] = await batch.gather(denops, async (denops) => {
     await fn.getcwd(denops);
     await fn.bufname(denops, "%");
@@ -16,4 +17,11 @@ export async function getWorktree(denops: Denops): Promise<string> {
     } catch {}
   }
   return await find(cwd);
+}
+
+export async function getWorktreeFromOpts(denops: Denops, opts: flags.Args): Promise<string> {
+  const worktree = opts["-worktree"]
+    ? await find(await expand(denops, opts["-worktree"]))
+    : await getWorktree(denops);
+  return worktree;
 }

@@ -8,7 +8,7 @@ import {
 import * as flags from "../../util/flags.ts";
 import * as buffer from "../../util/buffer.ts";
 import { normCmdArgs } from "../../util/cmd.ts";
-import { getWorktree } from "../../util/worktree.ts";
+import { getWorktreeFromOpts } from "../../util/worktree.ts";
 import { command as editCommand } from "../edit/command.ts";
 
 export async function command(
@@ -18,9 +18,7 @@ export async function command(
   const [opts, abspath] = parseArgs(
     await normCmdArgs(denops, args),
   );
-  const worktree = opts["-worktree"]
-    ? await fn.fnamemodify(denops, opts["-worktree"], ":p") as string
-    : await getWorktree(denops);
+  const worktree = await getWorktreeFromOpts(denops, opts);
   const relpath = path.relative(worktree, abspath);
 
   await denops.cmd("tabedit")
