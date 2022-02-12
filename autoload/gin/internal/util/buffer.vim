@@ -19,6 +19,10 @@ function! gin#internal#util#buffer#reload(bufnr) abort
   let winid_saved = win_getid()
   let winid = bufwinid(a:bufnr)
   if winid is# -1
+    augroup gin_ingernal_util_buffer_reload_internal
+      execute printf('autocmd! * <buffer=%d>', a:bufnr)
+      execute printf('autocmd BufEnter <buffer=%d> ++nested ++once edit', a:bufnr)
+    augroup END
     return
   endif
   keepjumps keepalt call win_gotoid(winid)
