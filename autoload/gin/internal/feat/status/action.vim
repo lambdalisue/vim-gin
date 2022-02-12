@@ -60,6 +60,14 @@ function! gin#internal#feat#status#action#register() abort
   map <buffer> <Plug>(gin-action-diff:tabedit) <Plug>(gin-action-diff:smart:tabedit)
   map <buffer> <Plug>(gin-action-diff) <Plug>(gin-action-diff:smart)
 
+  noremap <buffer> <Plug>(gin-action-patch:both)
+        \ <Cmd>call gin#action#fn({ xs -> <SID>patch('', xs) })<CR>
+  noremap <buffer> <Plug>(gin-action-patch:head)
+        \ <Cmd>call gin#action#fn({ xs -> <SID>patch('--without-worktree', xs) })<CR>
+  noremap <buffer> <Plug>(gin-action-patch:worktree)
+        \ <Cmd>call gin#action#fn({ xs -> <SID>patch('--without-head', xs) })<CR>
+  map <buffer> <Plug>(gin-action-patch) <Plug>(gin-action-patch:both)
+
   noremap <buffer> <Plug>(gin-action-add)
         \ <Cmd>call gin#action#fn({ xs -> <SID>add('', xs) })<CR>
   noremap <buffer> <Plug>(gin-action-add:intent-to-add)
@@ -142,6 +150,11 @@ function! s:diff_smart(opener, xs) abort
   if !empty(xs_cached)
     call s:diff({ -> opener }, '--cached', xs_cached)
   endif
+endfunction
+
+function! s:patch(suffix, xs) abort
+  call s:norm_xs(a:xs)
+  call map(a:xs, { _, v -> execute(printf('GinPatch %s %s', a:suffix, v), '') })
 endfunction
 
 function! s:add(suffix, xs) abort

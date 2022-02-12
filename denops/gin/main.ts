@@ -7,6 +7,7 @@ import { main as mainUtil } from "./core/util/main.ts";
 
 import { main as mainDiff } from "./feat/diff/main.ts";
 import { main as mainEdit } from "./feat/edit/main.ts";
+import { main as mainPatch } from "./feat/patch/main.ts";
 import { main as mainStatus } from "./feat/status/main.ts";
 
 export function main(denops: Denops): void {
@@ -17,5 +18,6 @@ export function main(denops: Denops): void {
 
   mainDiff(denops);
   mainEdit(denops);
+  mainPatch(denops);
   mainStatus(denops);
 }
