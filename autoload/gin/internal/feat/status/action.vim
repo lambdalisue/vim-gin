@@ -11,8 +11,8 @@ function! gin#internal#feat#status#action#register() abort
         \ <Cmd>call gin#action#fn({ xs -> <SID>diff({ -> <SID>opener() }, '', xs) })<CR>
   noremap <buffer> <Plug>(gin-action-diff:cached=)
         \ <Cmd>call gin#action#fn({ xs -> <SID>diff({ -> <SID>opener() }, '--cached', xs) })<CR>
-  noremap <buffer> <Plug>(gin-action-diff:previous=)
-        \ <Cmd>call gin#action#fn({ xs -> <SID>diff({ -> <SID>opener() }, 'HEAD^', xs) })<CR>
+  noremap <buffer> <Plug>(gin-action-diff:HEAD=)
+        \ <Cmd>call gin#action#fn({ xs -> <SID>diff({ -> <SID>opener() }, 'HEAD', xs) })<CR>
   noremap <buffer> <Plug>(gin-action-diff:smart=)
         \ <Cmd>call gin#action#fn({ xs -> <SID>diff_smart({ -> <SID>opener() }, xs) })<CR>
   map <buffer> <Plug>(gin-action-diff:local:edit) <Plug>(gin-action-diff:local=)edit<CR>
@@ -25,11 +25,11 @@ function! gin#internal#feat#status#action#register() abort
   map <buffer> <Plug>(gin-action-diff:cached:vsplit) <Plug>(gin-action-diff:cached=)vsplit<CR>
   map <buffer> <Plug>(gin-action-diff:cached:tabedit) <Plug>(gin-action-diff:cached=)tabedit<CR>
   map <buffer> <Plug>(gin-action-diff:cached) <Plug>(gin-action-diff:cached:edit)
-  map <buffer> <Plug>(gin-action-diff:previous:edit) <Plug>(gin-action-diff:previous=)edit<CR>
-  map <buffer> <Plug>(gin-action-diff:previous:split) <Plug>(gin-action-diff:previous=)split<CR>
-  map <buffer> <Plug>(gin-action-diff:previous:vsplit) <Plug>(gin-action-diff:previous=)vsplit<CR>
-  map <buffer> <Plug>(gin-action-diff:previous:tabedit) <Plug>(gin-action-diff:previous=)tabedit<CR>
-  map <buffer> <Plug>(gin-action-diff:previous) <Plug>(gin-action-diff:previous:edit)
+  map <buffer> <Plug>(gin-action-diff:HEAD:edit) <Plug>(gin-action-diff:HEAD=)edit<CR>
+  map <buffer> <Plug>(gin-action-diff:HEAD:split) <Plug>(gin-action-diff:HEAD=)split<CR>
+  map <buffer> <Plug>(gin-action-diff:HEAD:vsplit) <Plug>(gin-action-diff:HEAD=)vsplit<CR>
+  map <buffer> <Plug>(gin-action-diff:HEAD:tabedit) <Plug>(gin-action-diff:HEAD=)tabedit<CR>
+  map <buffer> <Plug>(gin-action-diff:HEAD) <Plug>(gin-action-diff:HEAD:edit)
   map <buffer> <Plug>(gin-action-diff:smart:edit) <Plug>(gin-action-diff:smart=)edit<CR>
   map <buffer> <Plug>(gin-action-diff:smart:split) <Plug>(gin-action-diff:smart=)split<CR>
   map <buffer> <Plug>(gin-action-diff:smart:vsplit) <Plug>(gin-action-diff:smart=)vsplit<CR>
