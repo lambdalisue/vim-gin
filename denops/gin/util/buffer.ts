@@ -43,15 +43,17 @@ export async function concrete(
   bufnr: number,
 ): Promise<void> {
   await batch.batch(denops, async (denops) => {
-    await fn.setbufvar(denops, bufnr, "&buftype", "nofile");
-    await fn.setbufvar(denops, bufnr, "&swapfile", 0);
-    await fn.setbufvar(denops, bufnr, "&modifiable", 0);
     await autocmd.group(
       denops,
       "gin_internal_util_buffer_concrete",
       (helper) => {
         const pat = `<buffer=${bufnr}>`;
         helper.remove("*", pat);
+        helper.define(
+          "BufWriteCmd",
+          pat,
+          "call gin#internal#util#buffer#concreate_store()",
+        );
         helper.define(
           "BufReadCmd",
           pat,

@@ -89,6 +89,8 @@ export async function read(denops: Denops): Promise<void> {
   await buffer.ensure(denops, bufnr, async () => {
     await batch.batch(denops, async (denops) => {
       await option.filetype.setLocal(denops, "diff");
+      await option.buftype.setLocal(denops, "nofile");
+      await option.swapfile.setLocal(denops, false);
       await option.modifiable.setLocal(denops, false);
     });
     await buffer.editData(denops, stdout);

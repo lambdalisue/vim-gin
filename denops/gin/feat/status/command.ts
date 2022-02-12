@@ -72,6 +72,8 @@ export async function read(denops: Denops): Promise<void> {
     await batch.batch(denops, async (denops) => {
       await bind(denops, bufnr);
       await option.filetype.setLocal(denops, "gin-status");
+      await option.buftype.setLocal(denops, "nofile");
+      await option.swapfile.setLocal(denops, false);
       await option.modifiable.setLocal(denops, false);
       await vars.b.set(denops, "gin_status_result", result);
       await denops.call("gin#internal#feat#status#core#init");

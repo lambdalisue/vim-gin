@@ -83,6 +83,8 @@ export async function read(denops: Denops): Promise<void> {
       } else {
         await option.filetype.setLocal(denops, "diff");
       }
+      await option.buftype.setLocal(denops, "nofile");
+      await option.swapfile.setLocal(denops, false);
       await option.modifiable.setLocal(denops, false);
     });
     await buffer.editData(denops, stdout);
