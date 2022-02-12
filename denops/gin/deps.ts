@@ -13,6 +13,7 @@ export * as vars from "https://deno.land/x/denops_std@v2.4.0/variable/mod.ts";
 
 export * as unknownutil from "https://deno.land/x/unknownutil@v1.1.4/mod.ts";
 
+export * as fs from "https://deno.land/std@0.119.0/fs/mod.ts";
 export * as path from "https://deno.land/std@0.119.0/path/mod.ts";
 export * as flags from "https://deno.land/std@0.119.0/flags/mod.ts";
 export { deadline } from "https://deno.land/std@0.119.0/async/mod.ts";
