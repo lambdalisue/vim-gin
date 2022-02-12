@@ -65,3 +65,151 @@ export async function concrete(
     await denops.call("gin#internal#util#buffer#concreate_store");
   });
 }
+
+/**
+ * Make the current buffer modifiable
+ */
+export async function makeModifiable(
+  denops: Denops,
+): Promise<() => Promise<void>> {
+  const [bufnr, modified, modifiable, foldmethod] = await batch.gather(
+    denops,
+    async (denops) => {
+      await fn.bufnr(denops);
+      await denops.eval("&modified");
+      await denops.eval("&modifiable");
+      await denops.eval("&foldmethod");
+    },
+  ) as [number, number, number, string];
+  await batch.batch(denops, async (denops) => {
+    await fn.setbufvar(denops, bufnr, "&modifiable", 1);
+    await fn.setbufvar(denops, bufnr, "&foldmethod", "manual");
+  });
+  return async () => {
+    await fn.setbufvar(denops, bufnr, "&modified", modified);
+    await fn.setbufvar(denops, bufnr, "&modifiable", modifiable);
+    await fn.setbufvar(denops, bufnr, "&foldmethod", foldmethod);
+  };
+}
+
+export type ReadFileOptions = {
+  silent?: boolean;
+  keepalt?: boolean;
+  keepjumps?: boolean;
+  lockmarks?: boolean;
+  line?: number;
+  fileformat?: "dos" | "unix" | "mac";
+  encoding?: string;
+  binary?: boolean;
+  nobinary?: boolean;
+  bad?: string;
+  edit?: boolean;
+};
+
+async function readFileInternal(
+  denops: Denops,
+  file: string,
+  options: ReadFileOptions = {},
+): Promise<void> {
+  const pre = [
+    ...(options.silent ? ["silent"] : []),
+    ...(options.keepalt ? ["keepalt"] : []),
+    ...(options.keepjumps ? ["keepjumps"] : []),
+    ...(options.lockmarks ? ["lockmarks"] : []),
+  ].filter((v) => v).join(" ");
+  const opt = [
+    ...(options.fileformat ? [`++ff=${options.fileformat}`] : []),
+    ...(options.encoding ? [`++enc=${options.encoding}`] : []),
+    ...(options.binary ? ["++bin"] : []),
+    ...(options.nobinary ? ["++nobin"] : []),
+    ...(options.bad ? [`++bad=${options.bad}`] : []),
+    ...(options.edit ? ["++edit"] : []),
+  ].filter((v) => v).join(" ");
+  await batch.batch(denops, async (denops) => {
+    if (denops.meta.host === "vim") {
+      // NOTE:
+      // It seems Vim slightly changed behaviors of `read` on empty buffer
+      // thus we need to overwrite the firstline to make sure that the buffer
+      // ends with a newline
+      await denops.cmd("call setline(1, getline(1))");
+    }
+    await denops.cmd(
+      `execute '${pre} ${options.line ?? ""}read ${opt}' fnameescape(file)`,
+      {
+        file,
+      },
+    );
+  });
+}
+
+/**
+ * Read file content into the current buffer
+ */
+export async function readFile(
+  denops: Denops,
+  file: string,
+  options: ReadFileOptions = {},
+): Promise<void> {
+  const restore = await makeModifiable(denops);
+  await readFileInternal(denops, file, options);
+  await restore();
+}
+
+/**
+ * Read data into the current buffer through a temporary file
+ */
+export async function readData(
+  denops: Denops,
+  data: Uint8Array,
+  options: ReadFileOptions = {},
+): Promise<void> {
+  const f = await Deno.makeTempFile();
+  await Deno.writeFile(f, data);
+  try {
+    await readFile(denops, f, options);
+  } finally {
+    await Deno.remove(f);
+  }
+}
+
+export type EditFileOptions = Omit<ReadFileOptions, "edit">;
+
+/**
+ * Read file content and replace the current buffer with it
+ */
+export async function editFile(
+  denops: Denops,
+  file: string,
+  options: EditFileOptions = {},
+): Promise<void> {
+  const pre = [
+    ...(options.silent ? ["silent"] : []),
+    ...(options.keepalt ? ["keepalt"] : []),
+    ...(options.keepjumps ? ["keepjumps"] : []),
+    ...(options.lockmarks ? ["lockmarks"] : []),
+  ].filter((v) => v).join(" ");
+  const restore = await makeModifiable(denops);
+  await batch.batch(denops, async (denops) => {
+    await denops.cmd(`${pre} %delete _`);
+    await readFileInternal(denops, file, { ...options, edit: true });
+    await denops.cmd(`${pre} 1delete _`);
+  });
+  await restore();
+}
+
+/**
+ * Read  and replace the current buffer with it
+ */
+export async function editData(
+  denops: Denops,
+  data: Uint8Array,
+  options: EditFileOptions = {},
+): Promise<void> {
+  const f = await Deno.makeTempFile();
+  await Deno.writeFile(f, data);
+  try {
+    await editFile(denops, f, options);
+  } finally {
+    await Deno.remove(f);
+  }
+}
