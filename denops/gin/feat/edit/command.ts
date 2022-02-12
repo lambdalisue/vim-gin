@@ -114,13 +114,12 @@ export async function read(denops: Denops): Promise<void> {
 }
 
 export async function write(denops: Denops): Promise<void> {
-  const [bufnr, bname, content, env] = await batch.gather(
+  const [bufnr, bname, content] = await batch.gather(
     denops,
     async (denops) => {
       await fn.bufnr(denops);
       await fn.bufname(denops);
       await fn.getline(denops, 1, "$");
-      await fn.environ(denops);
     },
   ) as [number, string, string[], Record<string, string>];
   const { expr, fragment } = bufname.parse(bname);
