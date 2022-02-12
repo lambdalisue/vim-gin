@@ -129,7 +129,9 @@ export async function write(denops: Denops): Promise<void> {
   const original = path.join(expr, fragment);
   let restore: () => Promise<void>;
   try {
-    const f = await Deno.makeTempFile();
+    const f = await Deno.makeTempFile({
+      dir: path.dirname(original),
+    });
     await Deno.rename(original, f);
     restore = () => Deno.rename(f, original);
   } catch (e) {
