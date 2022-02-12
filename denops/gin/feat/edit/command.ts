@@ -103,7 +103,7 @@ export async function read(denops: Denops): Promise<void> {
             `call denops#request('gin', 'edit:write', [])`,
             {
               nested: true,
-            }
+            },
           );
         });
       }
@@ -150,7 +150,7 @@ export async function write(denops: Denops): Promise<void> {
       fragment,
     ]);
     await fn.setbufvar(denops, bufnr, "&modified", 0);
-    await helper.echo(denops, `[gin] INDEX of '${fragment}' is updated.`)
+    await helper.echo(denops, `[gin] INDEX of '${fragment}' is updated.`);
   } finally {
     await restore();
   }

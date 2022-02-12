@@ -1,10 +1,4 @@
-import {
-  Denops,
-  batch,
-  fn,
-  mapping,
-  path,
-} from "../../deps.ts";
+import { batch, Denops, fn, mapping, path } from "../../deps.ts";
 import * as flags from "../../util/flags.ts";
 import * as buffer from "../../util/buffer.ts";
 import { normCmdArgs } from "../../util/cmd.ts";
@@ -21,13 +15,13 @@ export async function command(
   const worktree = await getWorktreeFromOpts(denops, opts);
   const relpath = path.relative(worktree, abspath);
 
-  await denops.cmd("tabedit")
+  await denops.cmd("tabedit");
 
   let bufnrHead = -1;
   if (!opts["without-head"]) {
     await editCommand(denops, [`---worktree=${worktree}`, "HEAD", relpath]);
     bufnrHead = await fn.bufnr(denops);
-    await denops.cmd("botright vsplit")
+    await denops.cmd("botright vsplit");
   }
 
   await editCommand(denops, [`---worktree=${worktree}`, "--cached", relpath]);
@@ -35,7 +29,7 @@ export async function command(
 
   let bufnrWorktree = -1;
   if (!opts["without-worktree"]) {
-    await denops.cmd("botright vsplit")
+    await denops.cmd("botright vsplit");
     await editCommand(denops, [`---worktree=${worktree}`, "", relpath]);
     bufnrWorktree = await fn.bufnr(denops);
   }
