@@ -2,7 +2,7 @@ import { autocmd, batch, Denops, flags, fn, option } from "../../deps.ts";
 import { echo, echoerr } from "../../util/helper.ts";
 import { normCmdArgs } from "../../util/cmd.ts";
 import * as buffer from "../../util/buffer.ts";
-import { getWorktree } from "../../util/worktree.ts";
+import { getWorktreeFromOpts } from "../../util/worktree.ts";
 import { decodeUtf8 } from "../../util/text.ts";
 import { run } from "../../git/process.ts";
 
@@ -30,9 +30,7 @@ export async function command(
   if (opts["--"].length) {
     raws.push("--", ...opts["--"]);
   }
-  const worktree = opts["-worktree"]
-    ? await fn.fnamemodify(denops, opts["-worktree"], ":p") as string
-    : await getWorktree(denops);
+  const worktree = await getWorktreeFromOpts(denops, opts);
   const env = await fn.environ(denops) as Record<string, string>;
   const proc = run(await normCmdArgs(denops, raws), {
     stdin: "null",
