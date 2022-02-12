@@ -1,6 +1,8 @@
 import { batch, Denops, helper } from "../deps.ts";
 import * as debug from "../core/debug/core.ts";
 
+export const echo = helper.echo;
+
 export async function echoerr(denops: Denops, message: string): Promise<void> {
   await batch.batch(denops, async (denops) => {
     await denops.cmd("echohl ErrorMsg");
