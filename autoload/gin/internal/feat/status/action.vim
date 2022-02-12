@@ -98,6 +98,9 @@ function! gin#internal#feat#status#action#register() abort
         \ <Cmd>call gin#action#fn({ xs -> <SID>stage_intent_to_add(xs) })<CR>
   noremap <buffer> <Plug>(gin-action-unstage:intent-to-add)
         \ <Cmd>call gin#action#fn({ xs -> <SID>unstage_intent_to_add(xs) })<CR>
+
+  noremap <buffer> <Plug>(gin-action-discard)
+        \ <Cmd>call gin#action#fn({ xs -> <SID>discard(xs) })<CR>
 endfunction
 
 function! s:norm_xs(xs) abort
@@ -223,4 +226,9 @@ function! s:unstage_intent_to_add(xs) abort
   endif
 
   doautocmd <nomodeline> User GinCommandPost
+endfunction
+
+function! s:discard(xs) abort
+  call s:norm_xs(a:xs)
+  execute printf('GinDiscard %s', join(a:xs, ' '))
 endfunction
