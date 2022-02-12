@@ -4,8 +4,8 @@ import {
   Denops,
   fn,
   helper,
-  path,
   option,
+  path,
 } from "../../deps.ts";
 import * as flags from "../../util/flags.ts";
 import * as buffer from "../../util/buffer.ts";

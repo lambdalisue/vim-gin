@@ -2,10 +2,10 @@ import {
   batch,
   bufname,
   Denops,
-  path,
   fn,
   helper,
   option,
+  path,
   unknownutil,
 } from "../../deps.ts";
 import * as flags from "../../util/flags.ts";
@@ -125,7 +125,7 @@ function formatTreeish(
 ): [] | [string] {
   if (commitish) {
     unknownutil.ensureString(commitish);
-    return path ? [`${commitish}:${path}`] : [commitish]
+    return path ? [`${commitish}:${path}`] : [commitish];
   } else {
     return path ? [`:${path}`] : [];
   }
