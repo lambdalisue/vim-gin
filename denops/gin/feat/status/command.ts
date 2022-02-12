@@ -68,14 +68,16 @@ export async function read(denops: Denops): Promise<void> {
   );
   const content = render(result);
   await registerGatherer(denops, getCandidates);
-  await batch.batch(denops, async (denops) => {
-    await bind(denops, bufnr);
-    await option.filetype.setLocal(denops, "gin-status");
-    await option.modifiable.setLocal(denops, false);
-    await vars.b.set(denops, "gin_status_result", result);
-    await denops.call("gin#internal#feat#status#core#init");
-    await denops.cmd("execute printf('lcd %s', escape(cwd, ' '))", {
-      cwd: expr,
+  await buffer.ensure(denops, bufnr, async () => {
+    await batch.batch(denops, async (denops) => {
+      await bind(denops, bufnr);
+      await option.filetype.setLocal(denops, "gin-status");
+      await option.modifiable.setLocal(denops, false);
+      await vars.b.set(denops, "gin_status_result", result);
+      await denops.call("gin#internal#feat#status#core#init");
+      await denops.cmd("execute printf('lcd %s', escape(cwd, ' '))", {
+        cwd: expr,
+      });
     });
   });
   await buffer.replace(denops, bufnr, content);
