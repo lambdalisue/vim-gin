@@ -1,11 +1,30 @@
 function! gin#internal#feat#status#action#register() abort
-  noremap <buffer> <Plug>(gin-action-open=)
-        \ <Cmd>call gin#action#fn({ xs -> <SID>open({ -> <SID>opener() }, xs) })<CR>
-  map <buffer> <Plug>(gin-action-open:edit) <Plug>(gin-action-open=)edit<CR>
-  map <buffer> <Plug>(gin-action-open:split) <Plug>(gin-action-open=)split<CR>
-  map <buffer> <Plug>(gin-action-open:vsplit) <Plug>(gin-action-open=)vsplit<CR>
-  map <buffer> <Plug>(gin-action-open:tabedit) <Plug>(gin-action-open=)tabedit<CR>
-  map <buffer> <Plug>(gin-action-open) <Plug>(gin-action-open:edit)
+  noremap <buffer> <Plug>(gin-action-edit:local=)
+        \ <Cmd>call gin#action#fn({ xs -> <SID>edit({ -> <SID>opener() }, '', xs) })<CR>
+  noremap <buffer> <Plug>(gin-action-edit:cached=)
+        \ <Cmd>call gin#action#fn({ xs -> <SID>edit({ -> <SID>opener() }, '--cached', xs) })<CR>
+  noremap <buffer> <Plug>(gin-action-edit:HEAD=)
+        \ <Cmd>call gin#action#fn({ xs -> <SID>edit({ -> <SID>opener() }, 'HEAD', xs) })<CR>
+  map <buffer> <Plug>(gin-action-edit:local:edit) <Plug>(gin-action-edit:local=)edit<CR>
+  map <buffer> <Plug>(gin-action-edit:local:split) <Plug>(gin-action-edit:local=)split<CR>
+  map <buffer> <Plug>(gin-action-edit:local:vsplit) <Plug>(gin-action-edit:local=)vsplit<CR>
+  map <buffer> <Plug>(gin-action-edit:local:tabedit) <Plug>(gin-action-edit:local=)tabedit<CR>
+  map <buffer> <Plug>(gin-action-edit:local) <Plug>(gin-action-edit:local:edit)
+  map <buffer> <Plug>(gin-action-edit:cached:edit) <Plug>(gin-action-edit:cached=)edit<CR>
+  map <buffer> <Plug>(gin-action-edit:cached:split) <Plug>(gin-action-edit:cached=)split<CR>
+  map <buffer> <Plug>(gin-action-edit:cached:vsplit) <Plug>(gin-action-edit:cached=)vsplit<CR>
+  map <buffer> <Plug>(gin-action-edit:cached:tabedit) <Plug>(gin-action-edit:cached=)tabedit<CR>
+  map <buffer> <Plug>(gin-action-edit:cached) <Plug>(gin-action-edit:cached:edit)
+  map <buffer> <Plug>(gin-action-edit:HEAD:edit) <Plug>(gin-action-edit:HEAD=)edit<CR>
+  map <buffer> <Plug>(gin-action-edit:HEAD:split) <Plug>(gin-action-edit:HEAD=)split<CR>
+  map <buffer> <Plug>(gin-action-edit:HEAD:vsplit) <Plug>(gin-action-edit:HEAD=)vsplit<CR>
+  map <buffer> <Plug>(gin-action-edit:HEAD:tabedit) <Plug>(gin-action-edit:HEAD=)tabedit<CR>
+  map <buffer> <Plug>(gin-action-edit:HEAD) <Plug>(gin-action-edit:HEAD:edit)
+  map <buffer> <Plug>(gin-action-edit:edit) <Plug>(gin-action-edit:local:edit)
+  map <buffer> <Plug>(gin-action-edit:split) <Plug>(gin-action-edit:local:split)
+  map <buffer> <Plug>(gin-action-edit:vsplit) <Plug>(gin-action-edit:local:vsplit)
+  map <buffer> <Plug>(gin-action-edit:tabedit) <Plug>(gin-action-edit:local:tabedit)
+  map <buffer> <Plug>(gin-action-edit) <Plug>(gin-action-edit:local)
 
   noremap <buffer> <Plug>(gin-action-diff:local=)
         \ <Cmd>call gin#action#fn({ xs -> <SID>diff({ -> <SID>opener() }, '', xs) })<CR>
@@ -90,13 +109,13 @@ function! s:opener() abort
   return opener
 endfunction
 
-function! s:open(opener, xs) abort
+function! s:edit(opener, suffix, xs) abort
   let opener = a:opener()
   if opener is# v:null
     return
   endif
   call s:norm_xs(a:xs)
-  call map(a:xs, { _, v -> execute(printf('%s %s', opener, v), '') })
+  call map(a:xs, { _, v -> execute(printf('%s | GinEdit %s %s', opener, a:suffix, v), '') })
 endfunction
 
 function! s:diff(opener, suffix, xs) abort
