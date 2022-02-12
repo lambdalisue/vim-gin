@@ -18,16 +18,14 @@ import { run } from "../../git/process.ts";
 export async function command(
   denops: Denops,
   args: string[],
-  filemode: boolean,
 ): Promise<void> {
   const [opts, commitish, abspath] = parseArgs(
     await normCmdArgs(denops, args),
-    filemode,
   );
   const worktree = opts["-worktree"]
     ? await fn.fnamemodify(denops, opts["-worktree"], ":p") as string
     : await getWorktree(denops);
-  const relpath = abspath ? path.relative(worktree, abspath) : undefined;
+  const relpath = path.relative(worktree, abspath);
   const bname = bufname.format({
     scheme: "gindiff",
     expr: worktree,
@@ -100,8 +98,7 @@ export async function read(denops: Denops): Promise<void> {
 
 function parseArgs(
   args: string[],
-  filemode: boolean,
-): [flags.Args, string | undefined, string | undefined] {
+): [flags.Args, string | undefined, string] {
   const opts = flags.parse(args, [
     "cached",
     "renames",
@@ -122,25 +119,13 @@ function parseArgs(
       I: "ignore-matching-lines",
     },
   });
-  if (filemode) {
-    // GinDiffFile [{options}] [{commitish}] {path}
-    switch (opts._.length) {
-      case 1:
-        return [opts, undefined, opts._[0].toString()];
-      case 2:
-        return [opts, opts._[0].toString(), opts._[1].toString()];
-      default:
-        throw new Error("Invalid number of arguments");
-    }
-  } else {
-    // GinDiff [{options}] [{commitish}]
-    switch (opts._.length) {
-      case 0:
-        return [opts, undefined, undefined];
-      case 1:
-        return [opts, opts._[0].toString(), ""];
-      default:
-        throw new Error("Invalid number of arguments");
-    }
+  // GinDiff [{options}] [{commitish}] {path}
+  switch (opts._.length) {
+    case 1:
+      return [opts, undefined, opts._[0].toString()];
+    case 2:
+      return [opts, opts._[0].toString(), opts._[1].toString()];
+    default:
+      throw new Error("Invalid number of arguments");
   }
 }

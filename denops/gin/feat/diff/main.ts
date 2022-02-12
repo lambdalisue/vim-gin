@@ -7,11 +7,7 @@ export function main(denops: Denops): void {
     ...denops.dispatcher,
     "diff:command": (...args) => {
       unknownutil.ensureArray(args, unknownutil.isString);
-      return featCall(denops, () => command(denops, args, false));
-    },
-    "diff:command:file": (...args) => {
-      unknownutil.ensureArray(args, unknownutil.isString);
-      return featCall(denops, () => command(denops, args, true));
+      return featCall(denops, () => command(denops, args));
     },
     "diff:read": () => featCall(denops, () => read(denops)),
   };

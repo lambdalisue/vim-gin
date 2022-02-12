@@ -105,7 +105,7 @@ function! s:diff(opener, suffix, xs) abort
     return
   endif
   call s:norm_xs(a:xs)
-  call map(a:xs, { _, v -> execute(printf('%s | GinDiffFile %s %s', opener, a:suffix, v), '') })
+  call map(a:xs, { _, v -> execute(printf('%s | GinDiff %s %s', opener, a:suffix, v), '') })
 endfunction
 
 function! s:diff_smart(opener, xs) abort
