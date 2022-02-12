@@ -136,7 +136,7 @@ COMMANDS					*gin-commands*
 
 	The following {options} are available:
 
-	--untracked-files[=no/normal/all]
+	-u[=no/normal/all], --untracked-files[=no/normal/all]
 	--ignore-submodules[=none/untracked/dirty/all]
 	--ignored[=traditional/no/matching]
 	--renames/--no-renames
