@@ -7,8 +7,8 @@ Deno.test("toStringArgs returns `[]` when the `test` is undefined", () => {
 Deno.test("toStringArgs returns `[]` when the `test` is []", () => {
   assertEquals(toStringArgs({ test: [] }, "test"), []);
 });
-Deno.test("toStringArgs returns `['--test', '']` when the `test` is ''", () => {
-  assertEquals(toStringArgs({ test: "" }, "test"), ["--test", ""]);
+Deno.test("toStringArgs returns `['--test=']` when the `test` is ''", () => {
+  assertEquals(toStringArgs({ test: "" }, "test"), ["--test="]);
 });
 Deno.test("toStringArgs returns `['--test=foo']` when the `test` is 'foo'", () => {
   assertEquals(toStringArgs({ test: "foo" }, "test"), [
@@ -21,18 +21,15 @@ Deno.test("toStringArgs returns `['--test', 'foo']` when the `test` is 'foo' and
     "foo",
   ]);
 });
-Deno.test("toStringArgs returns `['--test-test', 'foo']` when the `test` is 'foo' and `flag` is '--test-test'", () => {
+Deno.test("toStringArgs returns `['--test-test=foo']` when the `test` is 'foo' and `flag` is '--test-test'", () => {
   assertEquals(toStringArgs({ test: "foo" }, "test", { flag: "--test-test" }), [
-    "--test-test",
-    "foo",
+    "--test-test=foo",
   ]);
 });
-Deno.test("toStringArgs returns `['--test', 'foo', '--test', 'bar']` when the `test` is ['foo', 'bar']", () => {
+Deno.test("toStringArgs returns `['--test=foo', '--test=bar']` when the `test` is ['foo', 'bar']", () => {
   assertEquals(toStringArgs({ test: ["foo", "bar"] }, "test"), [
-    "--test",
-    "foo",
-    "--test",
-    "bar",
+    "--test=foo",
+    "--test=bar",
   ]);
 });
 
