@@ -102,7 +102,10 @@ export function formatOpt(key: string, value: string): string {
   return value ? `++${key}=${value}` : `++${key}`;
 }
 
-export function formatFlag(key: string, value: string | string[] | undefined): string[] {
+export function formatFlag(
+  key: string,
+  value: string | string[] | undefined,
+): string[] {
   if (value == null) {
     return [];
   }
