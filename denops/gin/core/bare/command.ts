@@ -3,7 +3,9 @@ import { echo, echoerr } from "../../util/helper.ts";
 import {
   builtinOpts,
   formatBuiltinOpts,
-  parseOpts, validateOpts } from "../../util/args.ts";
+  parseOpts,
+  validateOpts,
+} from "../../util/args.ts";
 import { normCmdArgs } from "../../util/cmd.ts";
 import * as buffer from "../../util/buffer.ts";
 import { getWorktreeFromOpts } from "../../util/worktree.ts";

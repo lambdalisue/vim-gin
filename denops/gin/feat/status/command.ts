@@ -1,4 +1,4 @@
-import { batch, bufname, Denops, fn, option, vars } from "../../deps.ts";
+import { batch, bufname, Denops, fn, option, path, vars } from "../../deps.ts";
 import {
   formatFlag,
   parseArgs,
@@ -74,7 +74,9 @@ export async function read(denops: Denops): Promise<void> {
     a.path == b.path ? 0 : a.path > b.path ? 1 : -1
   );
   const content = render(result);
-  await registerGatherer(denops, getCandidates);
+  await registerGatherer(denops, (denops, range) => {
+    return getCandidates(denops, range, expr);
+  });
   await buffer.ensure(denops, bufnr, async () => {
     await batch.batch(denops, async (denops) => {
       await bind(denops, bufnr);
@@ -96,6 +98,7 @@ export async function read(denops: Denops): Promise<void> {
 async function getCandidates(
   denops: Denops,
   [start, end]: Range,
+  worktree: string,
 ): Promise<Candidate[]> {
   const result = await vars.b.get(denops, "gin_status_result") as
     | GitStatusResult
@@ -107,6 +110,6 @@ async function getCandidates(
   end = Math.max(end, 2);
   return result.entries.slice(start - 2, end - 2 + 1).map((entry) => ({
     ...entry,
-    value: entry.path,
+    value: path.join(worktree, entry.path),
   }));
 }
