@@ -21,6 +21,7 @@ import { normCmdArgs } from "../../util/cmd.ts";
 import { getWorktreeFromOpts } from "../../util/worktree.ts";
 import { decodeUtf8 } from "../../util/text.ts";
 import { run } from "../../git/process.ts";
+import { bind } from "../../core/bare/command.ts";
 
 export async function command(
   denops: Denops,
@@ -107,6 +108,7 @@ export async function read(denops: Denops): Promise<void> {
   }
   await buffer.ensure(denops, bufnr, async () => {
     await batch.batch(denops, async (denops) => {
+      await bind(denops, bufnr);
       await option.filetype.setLocal(denops, "diff");
       await option.buftype.setLocal(denops, "nofile");
       await option.swapfile.setLocal(denops, false);

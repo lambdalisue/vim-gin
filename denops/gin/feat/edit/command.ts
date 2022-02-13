@@ -24,6 +24,7 @@ import { getWorktreeFromOpts } from "../../util/worktree.ts";
 import { decodeUtf8 } from "../../util/text.ts";
 import { run } from "../../git/process.ts";
 import { command as bareCommand } from "../../core/bare/command.ts";
+import { bind } from "../../core/bare/command.ts";
 
 export async function command(
   denops: Denops,
@@ -92,6 +93,7 @@ export async function read(denops: Denops): Promise<void> {
   proc.close();
   await buffer.ensure(denops, bufnr, async () => {
     await batch.batch(denops, async (denops) => {
+      await bind(denops, bufnr);
       await denops.cmd("filetype detect");
       if (params?.commitish) {
         await option.buftype.setLocal(denops, "nowrite");
