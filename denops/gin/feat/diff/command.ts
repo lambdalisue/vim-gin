@@ -77,7 +77,6 @@ export async function read(denops: Denops): Promise<void> {
     ...params ?? {},
     commitish: undefined,
   };
-  console.log(flags);
   const args = [
     "diff",
     "--no-color",
