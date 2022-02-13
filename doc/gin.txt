@@ -150,22 +150,22 @@ COMMANDS					*gin-commands*
 	Users can use the following mappings in each buffers
 
 	HEAD/WORKTREE
-	<Plug>(gin-patch-diffput)	Put a diff chunk to INDEX buffer.
+	<Plug>(gin-diffput)		Put a diff chunk to INDEX buffer.
 					Assigned to "dp" in default.
 
 	WORKTREE
-	<Plug>(gin-patch-diffget)	Get a diff chunk from INDEX buffer.
+	<Plug>(gin-diffget)		Get a diff chunk from INDEX buffer.
 					Assigned to "do" in default.
 
 	INDEX
-	<Plug>(gin-patch-diffput)	Put a diff chunk to WORKTREE buffer.
+	<Plug>(gin-diffput)		Put a diff chunk to WORKTREE buffer.
 					Assigned to "dp" in default.
-	<Plug>(gin-patch-diffget)	Get a diff chunk from WORKTREE or HEAD
+	<Plug>(gin-diffget)		Get a diff chunk from WORKTREE or HEAD
 					buffer (prefer WORKTREE buffer.)
 					Assigned to "do" in default.
-	<Plug>(gin-patch-diffget-l)	Get a diff chunk from HEAD buffer.
+	<Plug>(gin-diffget-l)		Get a diff chunk from HEAD buffer.
 					Assigned to "dol" in default.
-	<Plug>(gin-patch-diffget-r)	Get a diff chunk from WORKTREE buffer.
+	<Plug>(gin-diffget-r)		Get a diff chunk from WORKTREE buffer.
 					Assigned to "dor" in default.
 
 								*:GinStatus*

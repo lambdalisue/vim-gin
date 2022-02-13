@@ -40,7 +40,7 @@ export async function command(
       await batch.batch(denops, async (denops) => {
         await mapping.map(
           denops,
-          "<Plug>(gin-patch-diffput)",
+          "<Plug>(gin-diffput)",
           `<Cmd>diffput ${bufnrIndex}<CR><Cmd>diffupdate<CR>`,
           {
             buffer: true,
@@ -50,7 +50,7 @@ export async function command(
         await mapping.map(
           denops,
           "dp",
-          "<Plug>(gin-patch-diffput)",
+          "<Plug>(gin-diffput)",
           {
             buffer: true,
           },
@@ -66,7 +66,7 @@ export async function command(
       if (bufnrHead !== -1) {
         await mapping.map(
           denops,
-          "<Plug>(gin-patch-diffget-l)",
+          "<Plug>(gin-diffget-l)",
           `<Cmd>diffget ${bufnrHead}<CR><Cmd>diffupdate<CR>`,
           {
             buffer: true,
@@ -75,8 +75,8 @@ export async function command(
         );
         await mapping.map(
           denops,
-          "<Plug>(gin-patch-diffget)",
-          "<Plug>(gin-patch-diffget-l)",
+          "<Plug>(gin-diffget)",
+          "<Plug>(gin-diffget-l)",
           {
             buffer: true,
           },
@@ -84,7 +84,7 @@ export async function command(
         await mapping.map(
           denops,
           "dol",
-          "<Plug>(gin-patch-diffget-l)",
+          "<Plug>(gin-diffget-l)",
           {
             buffer: true,
           },
@@ -92,7 +92,7 @@ export async function command(
         await mapping.map(
           denops,
           "do",
-          "<Plug>(gin-patch-diffget)",
+          "<Plug>(gin-diffget)",
           {
             buffer: true,
           },
@@ -101,7 +101,7 @@ export async function command(
       if (bufnrWorktree !== -1) {
         await mapping.map(
           denops,
-          "<Plug>(gin-patch-diffput)",
+          "<Plug>(gin-diffput)",
           `<Cmd>diffput ${bufnrWorktree}<CR><Cmd>diffupdate<CR>`,
           {
             buffer: true,
@@ -110,7 +110,7 @@ export async function command(
         );
         await mapping.map(
           denops,
-          "<Plug>(gin-patch-diffget-r)",
+          "<Plug>(gin-diffget-r)",
           `<Cmd>diffget ${bufnrWorktree}<CR><Cmd>diffupdate<CR>`,
           {
             buffer: true,
@@ -119,8 +119,8 @@ export async function command(
         );
         await mapping.map(
           denops,
-          "<Plug>(gin-patch-diffget)",
-          "<Plug>(gin-patch-diffget-r)",
+          "<Plug>(gin-diffget)",
+          "<Plug>(gin-diffget-r)",
           {
             buffer: true,
           },
@@ -128,7 +128,7 @@ export async function command(
         await mapping.map(
           denops,
           "dp",
-          "<Plug>(gin-patch-diffput)",
+          "<Plug>(gin-diffput)",
           {
             buffer: true,
           },
@@ -136,7 +136,7 @@ export async function command(
         await mapping.map(
           denops,
           "dor",
-          "<Plug>(gin-patch-diffget-r)",
+          "<Plug>(gin-diffget-r)",
           {
             buffer: true,
           },
@@ -144,7 +144,7 @@ export async function command(
         await mapping.map(
           denops,
           "do",
-          "<Plug>(gin-patch-diffget)",
+          "<Plug>(gin-diffget)",
           {
             buffer: true,
           },
@@ -160,7 +160,7 @@ export async function command(
       await batch.batch(denops, async (denops) => {
         await mapping.map(
           denops,
-          "<Plug>(gin-patch-diffput)",
+          "<Plug>(gin-diffput)",
           `<Cmd>diffput ${bufnrIndex}<CR><Cmd>diffupdate<CR>`,
           {
             buffer: true,
@@ -169,7 +169,7 @@ export async function command(
         );
         await mapping.map(
           denops,
-          "<Plug>(gin-patch-diffget)",
+          "<Plug>(gin-diffget)",
           `<Cmd>diffget ${bufnrIndex}<CR><Cmd>diffupdate<CR>`,
           {
             buffer: true,
@@ -179,7 +179,7 @@ export async function command(
         await mapping.map(
           denops,
           "dp",
-          "<Plug>(gin-patch-diffput)",
+          "<Plug>(gin-diffput)",
           {
             buffer: true,
           },
@@ -187,7 +187,7 @@ export async function command(
         await mapping.map(
           denops,
           "do",
-          "<Plug>(gin-patch-diffget)",
+          "<Plug>(gin-diffget)",
           {
             buffer: true,
           },
