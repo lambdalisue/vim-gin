@@ -48,7 +48,6 @@ export async function command(
     await buffer.ensure(denops, bufnr, async () => {
       await batch.batch(denops, async (denops) => {
         await option.modifiable.setLocal(denops, false);
-        await denops.cmd("execute 'lcd' fnameescape(cwd)", { cwd: worktree });
       });
       await buffer.editData(denops, new Uint8Array([...stdout, ...stderr]), {
         silent: true,
