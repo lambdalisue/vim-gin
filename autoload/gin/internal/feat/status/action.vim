@@ -2,13 +2,12 @@ function! gin#internal#feat#status#action#register() abort
   call gin#internal#feat#status#action#edit#register()
   call gin#internal#feat#status#action#diff#register()
 
-  noremap <buffer> <Plug>(gin-action-patch:both)
+  noremap <buffer> <Plug>(gin-action-patch)
         \ <Cmd>call gin#action#fn({ xs -> <SID>patch('', xs) })<CR>
   noremap <buffer> <Plug>(gin-action-patch:head)
         \ <Cmd>call gin#action#fn({ xs -> <SID>patch('--without-worktree', xs) })<CR>
   noremap <buffer> <Plug>(gin-action-patch:worktree)
         \ <Cmd>call gin#action#fn({ xs -> <SID>patch('--without-head', xs) })<CR>
-  map <buffer> <Plug>(gin-action-patch) <Plug>(gin-action-patch:both)
 
   noremap <buffer> <Plug>(gin-action-add)
         \ <Cmd>call gin#action#fn({ xs -> <SID>add('', xs) })<CR>

@@ -1,11 +1,11 @@
 function! gin#internal#feat#status#action#edit#register() abort
-  noremap <buffer> <Plug>(gin-action-edit:local=)
+  noremap <buffer> <Plug>(gin-action-edit=)
         \ <Cmd>call gin#action#fn({ xs -> <SID>edit({ -> <SID>opener() }, '', xs) })<CR>
-  map <buffer> <Plug>(gin-action-edit:local:edit) <Plug>(gin-action-edit:local=)edit<CR>
-  map <buffer> <Plug>(gin-action-edit:local:split) <Plug>(gin-action-edit:local=)split<CR>
-  map <buffer> <Plug>(gin-action-edit:local:vsplit) <Plug>(gin-action-edit:local=)vsplit<CR>
-  map <buffer> <Plug>(gin-action-edit:local:tabedit) <Plug>(gin-action-edit:local=)tabedit<CR>
-  map <buffer> <Plug>(gin-action-edit:local) <Plug>(gin-action-edit:local:edit)
+  map <buffer> <Plug>(gin-action-edit:edit) <Plug>(gin-action-edit=)edit<CR>
+  map <buffer> <Plug>(gin-action-edit:split) <Plug>(gin-action-edit=)split<CR>
+  map <buffer> <Plug>(gin-action-edit:vsplit) <Plug>(gin-action-edit=)vsplit<CR>
+  map <buffer> <Plug>(gin-action-edit:tabedit) <Plug>(gin-action-edit=)tabedit<CR>
+  map <buffer> <Plug>(gin-action-edit) <Plug>(gin-action-edit:edit)
 
   noremap <buffer> <Plug>(gin-action-edit:cached=)
         \ <Cmd>call gin#action#fn({ xs -> <SID>edit({ -> <SID>opener() }, '--cached', xs) })<CR>
@@ -22,12 +22,6 @@ function! gin#internal#feat#status#action#edit#register() abort
   map <buffer> <Plug>(gin-action-edit:HEAD:vsplit) <Plug>(gin-action-edit:HEAD=)vsplit<CR>
   map <buffer> <Plug>(gin-action-edit:HEAD:tabedit) <Plug>(gin-action-edit:HEAD=)tabedit<CR>
   map <buffer> <Plug>(gin-action-edit:HEAD) <Plug>(gin-action-edit:HEAD:edit)
-
-  map <buffer> <Plug>(gin-action-edit:edit) <Plug>(gin-action-edit:local:edit)
-  map <buffer> <Plug>(gin-action-edit:split) <Plug>(gin-action-edit:local:split)
-  map <buffer> <Plug>(gin-action-edit:vsplit) <Plug>(gin-action-edit:local:vsplit)
-  map <buffer> <Plug>(gin-action-edit:tabedit) <Plug>(gin-action-edit:local:tabedit)
-  map <buffer> <Plug>(gin-action-edit) <Plug>(gin-action-edit:local)
 endfunction
 
 function! s:norm_xs(xs) abort

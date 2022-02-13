@@ -1,11 +1,11 @@
 function! gin#internal#feat#status#action#diff#register() abort
-  noremap <buffer> <Plug>(gin-action-diff:local=)
+  noremap <buffer> <Plug>(gin-action-diff=)
         \ <Cmd>call gin#action#fn({ xs -> <SID>diff({ -> <SID>opener() }, '', xs) })<CR>
-  map <buffer> <Plug>(gin-action-diff:local:edit) <Plug>(gin-action-diff:local=)edit<CR>
-  map <buffer> <Plug>(gin-action-diff:local:split) <Plug>(gin-action-diff:local=)split<CR>
-  map <buffer> <Plug>(gin-action-diff:local:vsplit) <Plug>(gin-action-diff:local=)vsplit<CR>
-  map <buffer> <Plug>(gin-action-diff:local:tabedit) <Plug>(gin-action-diff:local=)tabedit<CR>
-  map <buffer> <Plug>(gin-action-diff:local) <Plug>(gin-action-diff:local:edit)
+  map <buffer> <Plug>(gin-action-diff:edit) <Plug>(gin-action-diff=)edit<CR>
+  map <buffer> <Plug>(gin-action-diff:split) <Plug>(gin-action-diff=)split<CR>
+  map <buffer> <Plug>(gin-action-diff:vsplit) <Plug>(gin-action-diff=)vsplit<CR>
+  map <buffer> <Plug>(gin-action-diff:tabedit) <Plug>(gin-action-diff=)tabedit<CR>
+  map <buffer> <Plug>(gin-action-diff) <Plug>(gin-action-diff:edit)
 
   noremap <buffer> <Plug>(gin-action-diff:cached=)
         \ <Cmd>call gin#action#fn({ xs -> <SID>diff({ -> <SID>opener() }, '--cached', xs) })<CR>
@@ -30,12 +30,6 @@ function! gin#internal#feat#status#action#diff#register() abort
   map <buffer> <Plug>(gin-action-diff:smart:vsplit) <Plug>(gin-action-diff:smart=)vsplit<CR>
   map <buffer> <Plug>(gin-action-diff:smart:tabedit) <Plug>(gin-action-diff:smart=)tabedit<CR>
   map <buffer> <Plug>(gin-action-diff:smart) <Plug>(gin-action-diff:smart:edit)
-
-  map <buffer> <Plug>(gin-action-diff:edit) <Plug>(gin-action-diff:smart:edit)
-  map <buffer> <Plug>(gin-action-diff:split) <Plug>(gin-action-diff:smart:split)
-  map <buffer> <Plug>(gin-action-diff:vsplit) <Plug>(gin-action-diff:smart:vsplit)
-  map <buffer> <Plug>(gin-action-diff:tabedit) <Plug>(gin-action-diff:smart:tabedit)
-  map <buffer> <Plug>(gin-action-diff) <Plug>(gin-action-diff:smart)
 endfunction
 
 function! s:norm_xs(xs) abort

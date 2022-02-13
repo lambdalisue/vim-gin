@@ -79,6 +79,7 @@ INTERFACE					*gin-interface*
 COMMANDS					*gin-commands*
 
 								*:Gin*
+								*:Gin!*
 :Gin[!] [---worktree={worktree}] [---buffer] {command} [{args}]
 	Call a git raw {command} with {args} asynchronously and echo result on
 	a {worktree}.
@@ -272,21 +273,48 @@ ACTIONS						*gin-actions*
 	It is mapped to "?" in default when no mapping exists.
 	NOTE: Not implemented yet.
 
-*<Plug>(gin-action-open=)*
-*<Plug>(gin-action-open:edit)*
-*<Plug>(gin-action-open:split)*
-*<Plug>(gin-action-open:vsplit)*
-*<Plug>(gin-action-open:tabedit)*
-*<Plug>(gin-action-open)*
-	Open active action candidates with given command.
+*<Plug>(gin-action-edit=)*
+*<Plug>(gin-action-edit:edit)*
+*<Plug>(gin-action-edit:split)*
+*<Plug>(gin-action-edit:vsplit)*
+*<Plug>(gin-action-edit:tabedit)*
+*<Plug>(gin-action-edit)*
+	Open a new buffer with given command and call |:GinEdit| on active
+	action candidates.
 	The "=" mapping can be used to define custom actions like
 >
 	map <buffer>
-	      \ <Plug>(gin-action-open:top)
-	      \ <Plug>(gin-action-open=)topleft\ split<CR>
+	      \ <Plug>(gin-action-edit:top)
+	      \ <Plug>(gin-action-edit=)topleft\ split<CR>
 <
-	This actions are enabled on the following buffer
-	|gin-status|
+	This actions are enabled on buffers shown by the following commands
+	- |:GinStatus|
+
+*<Plug>(gin-action-edit:cached=)*
+*<Plug>(gin-action-edit:cached:edit)*
+*<Plug>(gin-action-edit:cached:split)*
+*<Plug>(gin-action-edit:cached:vsplit)*
+*<Plug>(gin-action-edit:cached:tabedit)*
+*<Plug>(gin-action-edit:cached)*
+	Open a new buffer with given command and call |:GinEdit| with the
+	"--cached" option on active action candidates.
+	See |<Plug>(gin-action-edit=)| for customization.
+
+	This actions are enabled on buffers shown by the following commands
+	- |:GinStatus|
+
+*<Plug>(gin-action-edit:HEAD=)*
+*<Plug>(gin-action-edit:HEAD:edit)*
+*<Plug>(gin-action-edit:HEAD:split)*
+*<Plug>(gin-action-edit:HEAD:vsplit)*
+*<Plug>(gin-action-edit:HEAD:tabedit)*
+*<Plug>(gin-action-edit:HEAD)*
+	Open a new buffer with given command and call |:GinEdit| with
+	the commit "HEAD" on active action candidates.
+	See |<Plug>(gin-action-edit=)| for customization.
+
+	This actions are enabled on buffers shown by the following commands
+	- |:GinStatus|
 
 *<Plug>(gin-action-diff=)*
 *<Plug>(gin-action-diff:edit)*
@@ -294,11 +322,12 @@ ACTIONS						*gin-actions*
 *<Plug>(gin-action-diff:vsplit)*
 *<Plug>(gin-action-diff:tabedit)*
 *<Plug>(gin-action-diff)*
-	Open diff on active action candidates with given command.
-	See |<Plug>(gin-action-open=)| for customization.
+	Open a new buffer with given command and call |:GinDiff| on active
+	action candidates (INDEX vs WORKTREE).
+	See |<Plug>(gin-action-edit=)| for customization.
 
-	This actions are enabled on the following buffer
-	|gin-status|
+	This actions are enabled on buffers shown by the following commands
+	- |:GinStatus|
 
 *<Plug>(gin-action-diff:cached=)*
 *<Plug>(gin-action-diff:cached:edit)*
@@ -306,43 +335,71 @@ ACTIONS						*gin-actions*
 *<Plug>(gin-action-diff:cached:vsplit)*
 *<Plug>(gin-action-diff:cached:tabedit)*
 *<Plug>(gin-action-diff:cached)*
-	Open diff with cached on active action candidates with given command.
-	See |<Plug>(gin-action-open=)| for customization.
+	Open a new buffer with given command and call |:GinDiff| with the
+	"--cached" option on active action candidates (HEAD vs INDEX).
+	See |<Plug>(gin-action-edit=)| for customization.
 
-	This actions are enabled on the following buffer
-	|gin-status|
+	This actions are enabled on buffers shown by the following commands
+	- |:GinStatus|
 
-*<Plug>(gin-action-diff:previous=)*
-*<Plug>(gin-action-diff:previous:edit)*
-*<Plug>(gin-action-diff:previous:split)*
-*<Plug>(gin-action-diff:previous:vsplit)*
-*<Plug>(gin-action-diff:previous:tabedit)*
-*<Plug>(gin-action-diff:previous)*
-	Open diff with HEAD^ on active action candidates with given command.
-	See |<Plug>(gin-action-open=)| for customization.
+*<Plug>(gin-action-diff:HEAD=)*
+*<Plug>(gin-action-diff:HEAD:edit)*
+*<Plug>(gin-action-diff:HEAD:split)*
+*<Plug>(gin-action-diff:HEAD:vsplit)*
+*<Plug>(gin-action-diff:HEAD:tabedit)*
+*<Plug>(gin-action-diff:HEAD)*
+	Open a new buffer with given command and call |:GinDiff| with the
+	commit "HEAD" on active action candidates (HEAD vs WORKTREE).
+	See |<Plug>(gin-action-edit=)| for customization.
 
-	This actions are enabled on the following buffer
-	|gin-status|
+	This actions are enabled on buffers shown by the following commands
+	- |:GinStatus|
+
+*<Plug>(gin-action-diff:smart=)*
+*<Plug>(gin-action-diff:smart:edit)*
+*<Plug>(gin-action-diff:smart:split)*
+*<Plug>(gin-action-diff:smart:vsplit)*
+*<Plug>(gin-action-diff:smart:tabedit)*
+*<Plug>(gin-action-diff:smart)*
+	Open a new buffer with given command and call |:GinDiff| on active
+	action candidates.
+	It works like |<Plug>(gin-action-diff)| when there is no staged
+	changes. Otherwise it works like |<Plug>(gin-action-diff:cached)|.
+	See |<Plug>(gin-action-edit=)| for customization.
+
+	This actions are enabled on buffers shown by the following commands
+	- |:GinStatus|
+
+*<Plug>(gin-action-patch)*
+*<Plug>(gin-action-patch:head)*
+*<Plug>(gin-action-patch:worktree)*
+	Call |:GinPatch| on active action candidates to stage changes
+	partially.
+	If ":head" or ":worktree" variant is used, it call the command with
+	"--without-worktree" or "--without-head" respectively.
+
+	This actions are enabled on buffers shown by the following commands
+	- |:GinStatus|
 
 *<Plug>(gin-action-add)*
 *<Plug>(gin-action-add:intent-to-add)*
 	Call "git add" on active action candidates.
 
-	This actions are enabled on the following buffer
-	|gin-status|
+	This actions are enabled on buffers shown by the following commands
+	- |:GinStatus|
 
 *<Plug>(gin-action-rm)*
 *<Plug>(gin-action-rm:force)*
 	Call "git rm" on active action candidates.
 
-	This actions are enabled on the following buffer
-	|gin-status|
+	This actions are enabled on buffers shown by the following commands
+	- |:GinStatus|
 
 *<Plug>(gin-action-reset)*
 	Call "git reset" on active action candidates.
 
-	This actions are enabled on the following buffer
-	|gin-status|
+	This actions are enabled on buffers shown by the following commands
+	- |:GinStatus|
 
 *<Plug>(gin-action-restore)*
 *<Plug>(gin-action-restore:staged)*
@@ -350,16 +407,16 @@ ACTIONS						*gin-actions*
 *<Plug>(gin-action-restore:theirs)*
 	Call "git restore" on active action candidates.
 
-	This actions are enabled on the following buffer
-	|gin-status|
+	This actions are enabled on buffers shown by the following commands
+	- |:GinStatus|
 
 *<Plug>(gin-action-stage)*
 *<Plug>(gin-action-stage:intent-to-add)*
-	Call "git add" or "git rm" on active action candidates. The command
-	will be determined from the status of candidates.
+	Call "git add" or "git rm" on active action candidates. 
+	The command will be determined from the status of candidates.
 
-	This actions are enabled on the following buffer
-	|gin-status|
+	This actions are enabled on buffers shown by the following commands
+	- |:GinStatus|
 
 *<Plug>(gin-action-unstage)*
 *<Plug>(gin-action-unstage:intent-to-add)*
@@ -367,8 +424,15 @@ ACTIONS						*gin-actions*
 	variant is used, the result status on "A " (added) candidates will be
 	" A" (intent to add) instead of "??" (unknown).
 
-	This actions are enabled on the following buffer
-	|gin-status|
+	This actions are enabled on buffers shown by the following commands
+	- |:GinStatus|
+
+*<Plug>(gin-action-stash)*
+*<Plug>(gin-action-stash:keep-index)*
+	Call "git stash" on active action candidates.
+
+	This actions are enabled on buffers shown by the following commands
+	- |:GinStatus|
 
 =============================================================================
 vim:tw=78:fo=tcq2mM:ts=8:ft=help:norl
