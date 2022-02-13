@@ -1,8 +1,8 @@
 import { batch, Denops, fn, mapping, path } from "../../deps.ts";
 import {
   builtinOpts,
-  formatBuiltinOpts,
-  parseArgs,
+  formatOpts,
+  parse,
   validateFlags,
   validateOpts,
 } from "../../util/args.ts";
@@ -15,7 +15,7 @@ export async function command(
   denops: Denops,
   args: string[],
 ): Promise<void> {
-  const [opts, flags, residue] = parseArgs(await normCmdArgs(denops, args));
+  const [opts, flags, residue] = parse(await normCmdArgs(denops, args));
   validateOpts(opts, [
     "worktree",
     ...builtinOpts,
@@ -27,8 +27,7 @@ export async function command(
   const [abspath] = parseResidue(residue);
   const worktree = await getWorktreeFromOpts(denops, opts);
   const relpath = path.relative(worktree, abspath);
-  const cmdarg = formatBuiltinOpts(opts);
-  const leading = cmdarg.split(" ");
+  const leading = formatOpts(opts, builtinOpts);
 
   await denops.cmd("tabedit");
 

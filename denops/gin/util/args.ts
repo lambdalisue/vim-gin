@@ -1,5 +1,5 @@
-export type Flags = Record<string, string | string[]>;
-export type Opts = Record<string, string>;
+export type Flags = Record<string, string | string[] | undefined>;
+export type Opts = Record<string, string | undefined>;
 
 export const builtinOpts = [
   "ff",
@@ -18,7 +18,7 @@ const optPattern = /^\+\+([a-zA-Z0-9-]+)(?:=(.*))?/;
 const longPattern = /^--([a-zA-Z0-9-]+)(?:=(.*))?/;
 const shortPattern = /^-([a-zA-Z0-9])(.*)/;
 
-export function parseArgs(args: string[]): [Opts, Flags, string[]] {
+export function parse(args: string[]): [Opts, Flags, string[]] {
   const [opts, intermediate] = parseOpts(args);
   const [flags, residue] = parseFlags(intermediate);
   return [opts, flags, residue];
@@ -64,8 +64,8 @@ export function parseFlags(args: string[]): [Flags, string[]] {
       const r = parsePattern(arg, pattern);
       if (r) {
         const [k, v] = r;
-        if (k in flags) {
-          const b = flags[k];
+        const b = flags[k];
+        if (b != undefined) {
           flags[k] = Array.isArray(b) ? [...b, v] : [b, v];
         } else {
           flags[k] = v;
@@ -98,15 +98,26 @@ export function validateFlags(flags: Flags, knownAttributes: string[]): void {
   });
 }
 
-export function formatOpt(key: string, value: string): string {
-  return value ? `++${key}=${value}` : `++${key}`;
+export function formatOpt(key: string, value: string | undefined): string[] {
+  if (value == undefined) {
+    return [];
+  }
+  return value ? [`++${key}=${value}`] : [`++${key}`];
+}
+
+export function formatOpts(opts: Opts, includes?: string[]): string[] {
+  let entries = Object.entries(opts);
+  if (includes != undefined) {
+    entries = entries.filter(([k, _]) => includes.includes(k));
+  }
+  return entries.map(([k, v]) => formatOpt(k, v)).flat();
 }
 
 export function formatFlag(
   key: string,
   value: string | string[] | undefined,
 ): string[] {
-  if (value == null) {
+  if (value == undefined) {
     return [];
   }
   value = Array.isArray(value) ? value : [value];
@@ -117,20 +128,21 @@ export function formatFlag(
   }
 }
 
-export function formatBuiltinOpts(opts: Opts): string {
-  const vs: string[] = [];
-  for (const opt of builtinOpts) {
-    if (opt in opts) {
-      vs.push(formatOpt(opt, opts[opt]));
-    }
+export function formatFlags(flags: Flags, includes?: string[]): string[] {
+  let entries = Object.entries(flags);
+  if (includes != undefined) {
+    entries = entries.filter(([k, _]) => includes.includes(k));
   }
-  return vs.join(" ");
+  return entries.map(([k, v]) => formatFlag(k, v)).flat();
 }
 
-function parsePattern(arg: string, pattern: RegExp): [string, string] | null {
+function parsePattern(
+  arg: string,
+  pattern: RegExp,
+): [string, string] | undefined {
   const m = arg.match(pattern);
   if (!m) {
-    return null;
+    return undefined;
   }
   return [m[1], m[2] ?? ""];
 }

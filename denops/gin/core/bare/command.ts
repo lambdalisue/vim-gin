@@ -2,7 +2,7 @@ import { autocmd, batch, Denops, fn, option } from "../../deps.ts";
 import { echo, echoerr } from "../../util/helper.ts";
 import {
   builtinOpts,
-  formatBuiltinOpts,
+  formatOpts,
   parseOpts,
   validateOpts,
 } from "../../util/args.ts";
@@ -42,7 +42,7 @@ export async function command(
   ]);
   proc.close();
   if (opts.buffer) {
-    const cmdarg = formatBuiltinOpts(opts);
+    const cmdarg = formatOpts(opts, builtinOpts).join(" ");
     await denops.cmd("enew");
     const bufnr = await fn.bufnr(denops);
     await buffer.ensure(denops, bufnr, async () => {

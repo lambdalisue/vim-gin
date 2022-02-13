@@ -1,7 +1,7 @@
 import { batch, bufname, Denops, fn, option, path, vars } from "../../deps.ts";
 import {
-  formatFlag,
-  parseArgs,
+  formatFlags,
+  parse,
   validateFlags,
   validateOpts,
 } from "../../util/args.ts";
@@ -24,7 +24,7 @@ export async function command(
   denops: Denops,
   args: string[],
 ): Promise<void> {
-  const [opts, flags, _] = parseArgs(await normCmdArgs(denops, args));
+  const [opts, flags, _] = parse(await normCmdArgs(denops, args));
   validateOpts(opts, [
     "worktree",
   ]);
@@ -62,7 +62,7 @@ export async function read(denops: Denops): Promise<void> {
     "--branch",
     "--ahead-behind",
     "-z",
-    ...Object.entries(flags).map(([k, v]) => formatFlag(k, v)).flat(),
+    ...formatFlags(flags),
   ];
   const stdout = await execute(args, {
     noOptionalLocks: true,

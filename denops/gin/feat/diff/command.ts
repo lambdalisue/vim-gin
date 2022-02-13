@@ -10,9 +10,9 @@ import {
 } from "../../deps.ts";
 import {
   builtinOpts,
-  formatBuiltinOpts,
-  formatFlag,
-  parseArgs,
+  formatFlags,
+  formatOpts,
+  parse,
   validateFlags,
   validateOpts,
 } from "../../util/args.ts";
@@ -27,7 +27,7 @@ export async function command(
   denops: Denops,
   args: string[],
 ): Promise<void> {
-  const [opts, flags, residue] = parseArgs(await normCmdArgs(denops, args));
+  const [opts, flags, residue] = parse(await normCmdArgs(denops, args));
   validateOpts(opts, [
     "worktree",
     ...builtinOpts,
@@ -51,7 +51,7 @@ export async function command(
   const [commitish, abspath] = parseResidue(residue);
   const worktree = await getWorktreeFromOpts(denops, opts);
   const relpath = path.relative(worktree, abspath);
-  const cmdarg = formatBuiltinOpts(opts);
+  const cmdarg = formatOpts(opts, builtinOpts).join(" ");
   const bname = bufname.format({
     scheme: "gindiff",
     expr: worktree,
@@ -81,7 +81,7 @@ export async function read(denops: Denops): Promise<void> {
   const args = [
     "diff",
     "--no-color",
-    ...Object.entries(flags).map(([k, v]) => formatFlag(k, v)).flat(),
+    ...formatFlags(flags),
     ...(params?.commitish ? [params.commitish as string] : []),
     fragment,
   ];

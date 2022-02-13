@@ -1,8 +1,8 @@
 import { assertEquals } from "../deps_test.ts";
-import { parseArgs, parseFlags, parseOpts } from "./args.ts";
+import { parse, parseFlags, parseOpts } from "./args.ts";
 
-Deno.test("parseArgs", () => {
-  const [opts, flags, residue] = parseArgs([
+Deno.test("parse", () => {
+  const [opts, flags, residue] = parse([
     "Gin",
     "++buffer",
     "status",
