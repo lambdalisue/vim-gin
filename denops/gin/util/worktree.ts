@@ -14,7 +14,9 @@ async function getWorktree(denops: Denops): Promise<string> {
       if (GIN_FILE_BUFFER_PROTOCOLS.includes(scheme)) {
         return await fn.fnamemodify(denops, expr, ":p") as string;
       }
-    } catch {}
+    } catch {
+      // Ignore errors
+    }
   }
   return await find(cwd);
 }

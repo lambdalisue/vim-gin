@@ -36,6 +36,8 @@ export async function expand(denops: Denops, expr: string): Promise<string> {
     if (GIN_FILE_BUFFER_PROTOCOLS.includes(scheme)) {
       return fragment ?? bname;
     }
-  } catch {}
+  } catch {
+    // Ignore errors
+  }
   return bname;
 }
