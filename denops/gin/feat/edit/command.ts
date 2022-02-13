@@ -8,8 +8,15 @@ import {
   option,
   path,
   unknownutil,
+  vars,
 } from "../../deps.ts";
-import { parseArgs, validateFlags, validateOpts } from "../../util/args.ts";
+import {
+  builtinOpts,
+  formatBuiltinOpts,
+  parseArgs,
+  validateFlags,
+  validateOpts,
+} from "../../util/args.ts";
 import * as helper from "../../util/helper.ts";
 import * as buffer from "../../util/buffer.ts";
 import { normCmdArgs } from "../../util/cmd.ts";
@@ -25,6 +32,7 @@ export async function command(
   const [opts, flags, residue] = parseArgs(await normCmdArgs(denops, args));
   validateOpts(opts, [
     "worktree",
+    ...builtinOpts,
   ]);
   validateFlags(flags, [
     "cached",
@@ -32,10 +40,11 @@ export async function command(
   const [commitish, abspath] = parseResidue(residue);
   const worktree = await getWorktreeFromOpts(denops, opts);
   const relpath = path.relative(worktree, abspath);
+  const cmdarg = formatBuiltinOpts(opts);
 
   if (!commitish && flags.cached == null) {
     // worktree
-    await buffer.open(denops, path.join(worktree, relpath));
+    await buffer.open(denops, path.join(worktree, relpath), cmdarg);
   } else {
     // commitish/cached
     const bname = bufname.format({
@@ -48,15 +57,16 @@ export async function command(
       },
       fragment: relpath,
     });
-    await buffer.open(denops, bname.toString());
+    await buffer.open(denops, bname.toString(), cmdarg);
   }
 }
 
 export async function read(denops: Denops): Promise<void> {
-  const [bufnr, bname] = await batch.gather(denops, async (denops) => {
+  const [bufnr, bname, cmdarg] = await batch.gather(denops, async (denops) => {
     await fn.bufnr(denops, "%");
     await fn.bufname(denops, "%");
-  }) as [number, string];
+    await vars.v.get(denops, "cmdarg");
+  }) as [number, string, string];
   const { expr, params, fragment } = bufname.parse(bname);
   if (!fragment) {
     throw new Error("A buffer 'ginedit://' requires a fragment part");
@@ -103,7 +113,9 @@ export async function read(denops: Denops): Promise<void> {
         });
       }
     });
-    await buffer.editData(denops, stdout);
+    await buffer.editData(denops, stdout, {
+      cmdarg,
+    });
   });
   await buffer.concrete(denops, bufnr);
   if (!status.success) {

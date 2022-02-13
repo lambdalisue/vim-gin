@@ -1,6 +1,19 @@
 export type Flags = Record<string, string | string[]>;
 export type Opts = Record<string, string>;
 
+export const builtinOpts = [
+  "ff",
+  "fileformat",
+  "enc",
+  "encoding",
+  "bin",
+  "binary",
+  "nobin",
+  "nobinary",
+  "bad",
+  "edit",
+];
+
 const optPattern = /^\+\+([a-zA-Z0-9-]+)(?:=(.*))?/;
 const longPattern = /^--([a-zA-Z0-9-]+)(?:=(.*))?/;
 const shortPattern = /^-([a-zA-Z0-9])(.*)/;
@@ -96,6 +109,16 @@ export function formatFlag(key: string, value: string | string[]): string[] {
   } else {
     return value.map((v) => v ? `--${key}=${v}` : `--${key}`);
   }
+}
+
+export function formatBuiltinOpts(opts: Opts): string {
+  const vs: string[] = [];
+  for (const opt of builtinOpts) {
+    if (opt in opts) {
+      vs.push(formatOpt(opt, opts[opt]));
+    }
+  }
+  return vs.join(" ");
 }
 
 function parsePattern(arg: string, pattern: RegExp): [string, string] | null {

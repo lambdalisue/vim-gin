@@ -6,8 +6,11 @@ import {
   helper,
   option,
   path,
+  vars,
 } from "../../deps.ts";
 import {
+  builtinOpts,
+  formatBuiltinOpts,
   formatFlag,
   parseArgs,
   validateFlags,
@@ -26,6 +29,7 @@ export async function command(
   const [opts, flags, residue] = parseArgs(await normCmdArgs(denops, args));
   validateOpts(opts, [
     "worktree",
+    ...builtinOpts,
   ]);
   validateFlags(flags, [
     "R",
@@ -46,6 +50,7 @@ export async function command(
   const [commitish, abspath] = parseResidue(residue);
   const worktree = await getWorktreeFromOpts(denops, opts);
   const relpath = path.relative(worktree, abspath);
+  const cmdarg = formatBuiltinOpts(opts);
   const bname = bufname.format({
     scheme: "gindiff",
     expr: worktree,
@@ -55,14 +60,15 @@ export async function command(
     },
     fragment: relpath,
   });
-  await buffer.open(denops, bname.toString());
+  await buffer.open(denops, bname.toString(), cmdarg);
 }
 
 export async function read(denops: Denops): Promise<void> {
-  const [bufnr, bname] = await batch.gather(denops, async (denops) => {
+  const [bufnr, bname, cmdarg] = await batch.gather(denops, async (denops) => {
     await fn.bufnr(denops, "%");
     await fn.bufname(denops, "%");
-  }) as [number, string];
+    await vars.v.get(denops, "cmdarg");
+  }) as [number, string, string];
   const { expr, params, fragment } = bufname.parse(bname);
   if (!fragment) {
     throw new Error("A buffer 'gindiff://' requires a fragment part");
@@ -106,7 +112,9 @@ export async function read(denops: Denops): Promise<void> {
       await option.swapfile.setLocal(denops, false);
       await option.modifiable.setLocal(denops, false);
     });
-    await buffer.editData(denops, stdout);
+    await buffer.editData(denops, stdout, {
+      cmdarg,
+    });
   });
   await buffer.concrete(denops, bufnr);
 }
