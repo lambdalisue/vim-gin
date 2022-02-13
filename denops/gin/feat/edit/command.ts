@@ -41,6 +41,7 @@ export async function command(
         ...opts,
         _: undefined,
         cached: undefined,
+        "-worktree": undefined,
         commitish,
       },
       fragment: relpath,

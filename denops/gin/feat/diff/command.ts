@@ -30,6 +30,7 @@ export async function command(
     params: {
       ...opts,
       _: undefined,
+      "-worktree": undefined,
       commitish,
     },
     fragment: relpath,
