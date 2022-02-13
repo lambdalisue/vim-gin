@@ -3,8 +3,8 @@ import { autocmd, batch, Denops, fn } from "../deps.ts";
 /**
  * Open a buffer
  */
-export async function open(denops: Denops, bufname: string): Promise<void> {
-  await denops.cmd("edit `=bufname`", { bufname });
+export async function open(denops: Denops, bufname: string, cmdarg = ""): Promise<void> {
+  await denops.cmd(`edit ${cmdarg} \`=bufname\``, { bufname });
 }
 
 /**
