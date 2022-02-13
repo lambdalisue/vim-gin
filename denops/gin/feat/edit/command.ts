@@ -33,7 +33,7 @@ export async function command(
   const worktree = await getWorktreeFromOpts(denops, opts);
   const relpath = path.relative(worktree, abspath);
 
-  if (!commitish && !flags.cached) {
+  if (!commitish && flags.cached == null) {
     // worktree
     await buffer.open(denops, path.join(worktree, relpath));
   } else {
