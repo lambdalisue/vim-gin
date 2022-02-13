@@ -62,7 +62,7 @@ export async function read(denops: Denops): Promise<void> {
     "--branch",
     "--ahead-behind",
     "-z",
-    ...Object.entries(flags).map(([k, v]) => v ? formatFlag(k, v) : []).flat(),
+    ...Object.entries(flags).map(([k, v]) => formatFlag(k, v)).flat(),
   ];
   const stdout = await execute(args, {
     noOptionalLocks: true,

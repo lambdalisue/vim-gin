@@ -102,7 +102,10 @@ export function formatOpt(key: string, value: string): string {
   return value ? `++${key}=${value}` : `++${key}`;
 }
 
-export function formatFlag(key: string, value: string | string[]): string[] {
+export function formatFlag(key: string, value: string | string[] | undefined): string[] {
+  if (value == null) {
+    return [];
+  }
   value = Array.isArray(value) ? value : [value];
   if (key.length === 1) {
     return value.map((v) => v ? `-${key}${v}` : `-${key}`);

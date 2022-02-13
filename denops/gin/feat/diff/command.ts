@@ -77,10 +77,11 @@ export async function read(denops: Denops): Promise<void> {
     ...params ?? {},
     commitish: undefined,
   };
+  console.log(flags);
   const args = [
     "diff",
     "--no-color",
-    ...Object.entries(flags).map(([k, v]) => v ? formatFlag(k, v) : []).flat(),
+    ...Object.entries(flags).map(([k, v]) => formatFlag(k, v)).flat(),
     ...(params?.commitish ? [params.commitish as string] : []),
     fragment,
   ];
