@@ -79,7 +79,8 @@ INTERFACE					*gin-interface*
 COMMANDS					*gin-commands*
 
 								*:Gin*
-:Gin[!] [++worktree={worktree}] [++buffer] {command} [{args}]
+:Gin[!] [++worktree={worktree}] {command} [{args}]
+:Gin[!] [++opt] [++worktree={worktree}] ++buffer {command} [{args}]
 	Call a git raw {command} with {args} asynchronously and echo result on
 	a {worktree}.
 	For example, "Gin add %" on "hello.txt" invokes "git add hello.txt".
@@ -96,9 +97,9 @@ COMMANDS					*gin-commands*
 	prompt to input passphrase on "Gin push" or so on.
 
 								*:GinDiff*
-:GinDiff [++worktree={worktree}] [{flags}] {path}
-:GinDiff [++worktree={worktree}] [{flags}] --cached {path}
-:GinDiff [++worktree={worktree}] [{flags}] {commitish} {path}
+:GinDiff [++opt] [++worktree={worktree}] [{flags}] {path}
+:GinDiff [++opt] [++worktree={worktree}] [{flags}] --cached {path}
+:GinDiff [++opt] [++worktree={worktree}] [{flags}] {commitish} {path}
 	Open a "gin-diff" buffer of a file in a {worktree}.
 	If no {worktree} is specified, gin will find the one from the current
 	working directory.
@@ -120,9 +121,9 @@ COMMANDS					*gin-commands*
 	See ":man git-diff(1)" for detail about {flags}.
 
 								*:GinEdit*
-:GinEdit [++worktree={worktree}] {path}
-:GinEdit [++worktree={worktree}] --cached {path}
-:GinEdit [++worktree={worktree}] {commitish} {path}
+:GinEdit [++opt] [++worktree={worktree}] {path}
+:GinEdit [++opt] [++worktree={worktree}] --cached {path}
+:GinEdit [++opt] [++worktree={worktree}] {commitish} {path}
 	Open a local {path} or "gin-edit" buffer of a file in a {worktree}.
 	If no {worktree} is specified, gin will find the one from the current
 	working directory.
@@ -135,9 +136,9 @@ COMMANDS					*gin-commands*
 	in the {commitish} rather than the local working tree.
 
 								*:GinPatch*
-:GinPatch [++worktree={worktree}] {path}
-:GinPatch [++worktree={worktree}] --without-head {path}
-:GinPatch [++worktree={worktree}] --without-worktree {path}
+:GinPatch [++opt] [++worktree={worktree}] {path}
+:GinPatch [++opt] [++worktree={worktree}] --without-head {path}
+:GinPatch [++opt] [++worktree={worktree}] --without-worktree {path}
 	Open three buffers (HEAD, INDEX, and WORKTREE) to patch changes of
 	{path} in a {worktree}. 
 	If no {worktree} is specified, gin will find the one from the current

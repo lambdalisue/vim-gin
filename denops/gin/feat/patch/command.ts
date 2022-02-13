@@ -1,5 +1,11 @@
 import { batch, Denops, fn, mapping, path } from "../../deps.ts";
-import { parseArgs, validateFlags, validateOpts } from "../../util/args.ts";
+import {
+  builtinOpts,
+  formatBuiltinOpts,
+  parseArgs,
+  validateFlags,
+  validateOpts,
+} from "../../util/args.ts";
 import * as buffer from "../../util/buffer.ts";
 import { normCmdArgs } from "../../util/cmd.ts";
 import { getWorktreeFromOpts } from "../../util/worktree.ts";
@@ -12,6 +18,7 @@ export async function command(
   const [opts, flags, residue] = parseArgs(await normCmdArgs(denops, args));
   validateOpts(opts, [
     "worktree",
+    ...builtinOpts,
   ]);
   validateFlags(flags, [
     "without-head",
@@ -20,23 +27,40 @@ export async function command(
   const [abspath] = parseResidue(residue);
   const worktree = await getWorktreeFromOpts(denops, opts);
   const relpath = path.relative(worktree, abspath);
+  const cmdarg = formatBuiltinOpts(opts);
+  const leading = cmdarg.split(" ");
 
   await denops.cmd("tabedit");
 
   let bufnrHead = -1;
   if (!flags["without-head"]) {
-    await editCommand(denops, [`++worktree=${worktree}`, "HEAD", relpath]);
+    await editCommand(denops, [
+      ...leading,
+      `++worktree=${worktree}`,
+      "HEAD",
+      relpath,
+    ]);
     bufnrHead = await fn.bufnr(denops);
     await denops.cmd("botright vsplit");
   }
 
-  await editCommand(denops, [`++worktree=${worktree}`, "--cached", relpath]);
+  await editCommand(denops, [
+    ...leading,
+    `++worktree=${worktree}`,
+    "--cached",
+    relpath,
+  ]);
   const bufnrIndex = await fn.bufnr(denops);
 
   let bufnrWorktree = -1;
   if (!flags["without-worktree"]) {
     await denops.cmd("botright vsplit");
-    await editCommand(denops, [`++worktree=${worktree}`, "", relpath]);
+    await editCommand(denops, [
+      ...leading,
+      `++worktree=${worktree}`,
+      "",
+      relpath,
+    ]);
     bufnrWorktree = await fn.bufnr(denops);
   }
 

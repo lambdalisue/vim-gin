@@ -1,6 +1,9 @@
 import { autocmd, batch, Denops, fn, option } from "../../deps.ts";
 import { echo, echoerr } from "../../util/helper.ts";
-import { parseOpts, validateOpts } from "../../util/args.ts";
+import {
+  builtinOpts,
+  formatBuiltinOpts,
+  parseOpts, validateOpts } from "../../util/args.ts";
 import { normCmdArgs } from "../../util/cmd.ts";
 import * as buffer from "../../util/buffer.ts";
 import { getWorktreeFromOpts } from "../../util/worktree.ts";
@@ -18,6 +21,7 @@ export async function command(
   validateOpts(opts, [
     "worktree",
     "buffer",
+    ...builtinOpts,
   ]);
   const worktree = await getWorktreeFromOpts(denops, opts);
   const env = await fn.environ(denops) as Record<string, string>;
@@ -36,6 +40,7 @@ export async function command(
   ]);
   proc.close();
   if (opts.buffer) {
+    const cmdarg = formatBuiltinOpts(opts);
     await denops.cmd("enew");
     const bufnr = await fn.bufnr(denops);
     await buffer.ensure(denops, bufnr, async () => {
@@ -47,6 +52,7 @@ export async function command(
         silent: true,
         keepalt: true,
         keepjumps: true,
+        cmdarg,
       });
     });
     await buffer.concrete(denops, bufnr);
