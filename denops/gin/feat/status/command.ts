@@ -1,10 +1,14 @@
 import { batch, bufname, Denops, fn, option, vars } from "../../deps.ts";
-import * as flags from "../../util/flags.ts";
+import {
+  formatFlag,
+  parseArgs,
+  validateFlags,
+  validateOpts,
+} from "../../util/args.ts";
 import * as buffer from "../../util/buffer.ts";
-import { toBooleanArgs, toStringArgs } from "../../util/arg.ts";
 import { normCmdArgs } from "../../util/cmd.ts";
 import { getWorktreeFromOpts } from "../../util/worktree.ts";
-import { Entry, GitStatusResult, parse } from "./parser.ts";
+import { Entry, GitStatusResult, parse as parseStatus } from "./parser.ts";
 import { render } from "./render.ts";
 import { execute } from "../../git/process.ts";
 import { bind } from "../../core/bare/command.ts";
@@ -20,15 +24,26 @@ export async function command(
   denops: Denops,
   args: string[],
 ): Promise<void> {
-  const opts = parseArgs(await normCmdArgs(denops, args));
+  const [opts, flags, _] = parseArgs(await normCmdArgs(denops, args));
+  validateOpts(opts, [
+    "worktree",
+  ]);
+  validateFlags(flags, [
+    "u",
+    "untracked-files",
+    "ignore-submodules",
+    "ignored",
+    "renames",
+    "no-renames",
+    "find-renames",
+  ]);
   const worktree = await getWorktreeFromOpts(denops, opts);
   const bname = bufname.format({
     scheme: "ginstatus",
     expr: worktree,
     params: {
       "untracked-files": "all",
-      ...opts,
-      _: undefined,
+      ...flags,
     },
   });
   await buffer.open(denops, bname.toString());
@@ -40,26 +55,20 @@ export async function read(denops: Denops): Promise<void> {
     await fn.bufname(denops, "%");
   }) as [number, string];
   const { expr, params } = bufname.parse(bname);
+  const flags = params ?? {};
   const args = [
     "status",
     "--porcelain=v2",
     "--branch",
     "--ahead-behind",
     "-z",
-    ...toStringArgs(params, "untracked-files"),
-    ...toStringArgs(params, "ignore-submodules"),
-    ...toStringArgs(params, "ignored"),
-    ...toBooleanArgs(params, "renames", {
-      flagFalse: "--no-renames",
-    }),
-    ...toStringArgs(params, "find-renames"),
-    ...toStringArgs(params, "--", { flag: "--" }),
+    ...Object.entries(flags).map(([k, v]) => v ? formatFlag(k, v) : []).flat(),
   ];
   const stdout = await execute(args, {
     noOptionalLocks: true,
     cwd: expr,
   });
-  const result = parse(stdout);
+  const result = parseStatus(stdout);
   // Sort entries by its path
   result.entries.sort((a, b) =>
     a.path == b.path ? 0 : a.path > b.path ? 1 : -1
@@ -100,21 +109,4 @@ async function getCandidates(
     ...entry,
     value: entry.path,
   }));
-}
-
-function parseArgs(
-  args: string[],
-): flags.Args {
-  return flags.parse(args, [
-    "untracked-files",
-    "ignore-submodules",
-    "ignored",
-    "renames",
-    "no-renames",
-    "find-renames",
-  ], {
-    alias: {
-      "u": "untracked-files",
-    },
-  });
 }

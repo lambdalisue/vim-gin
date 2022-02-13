@@ -9,10 +9,9 @@ import {
   path,
   unknownutil,
 } from "../../deps.ts";
+import { parseArgs, validateFlags, validateOpts } from "../../util/args.ts";
 import * as helper from "../../util/helper.ts";
-import * as flags from "../../util/flags.ts";
 import * as buffer from "../../util/buffer.ts";
-import { toStringArgs } from "../../util/arg.ts";
 import { normCmdArgs } from "../../util/cmd.ts";
 import { getWorktreeFromOpts } from "../../util/worktree.ts";
 import { decodeUtf8 } from "../../util/text.ts";
@@ -23,13 +22,18 @@ export async function command(
   denops: Denops,
   args: string[],
 ): Promise<void> {
-  const [opts, commitish, abspath] = parseArgs(
-    await normCmdArgs(denops, args),
-  );
+  const [opts, flags, residue] = parseArgs(await normCmdArgs(denops, args));
+  validateOpts(opts, [
+    "worktree",
+  ]);
+  validateFlags(flags, [
+    "cached",
+  ]);
+  const [commitish, abspath] = parseResidue(residue);
   const worktree = await getWorktreeFromOpts(denops, opts);
   const relpath = path.relative(worktree, abspath);
 
-  if (!commitish && !opts["cached"]) {
+  if (!commitish && !flags.cached) {
     // worktree
     await buffer.open(denops, path.join(worktree, relpath));
   } else {
@@ -38,10 +42,8 @@ export async function command(
       scheme: "ginedit",
       expr: worktree,
       params: {
-        ...opts,
-        _: undefined,
+        ...flags,
         cached: undefined,
-        "-worktree": undefined,
         commitish,
       },
       fragment: relpath,
@@ -57,13 +59,11 @@ export async function read(denops: Denops): Promise<void> {
   }) as [number, string];
   const { expr, params, fragment } = bufname.parse(bname);
   if (!fragment) {
-    throw new Error("fragment is required for ginedit");
+    throw new Error("A buffer 'ginedit://' requires a fragment part");
   }
   const args = [
     "show",
     ...formatTreeish(params?.commitish, fragment),
-    "--",
-    ...toStringArgs(params, "--", { flag: "--" }),
   ];
   const env = await fn.environ(denops) as Record<string, string>;
   const proc = run(args, {
@@ -122,7 +122,7 @@ export async function write(denops: Denops): Promise<void> {
   ) as [number, string, string[], Record<string, string>];
   const { expr, fragment } = bufname.parse(bname);
   if (!fragment) {
-    throw new Error("fragment is required for ginedit");
+    throw new Error("A buffer 'ginedit://' requires a fragment part");
   }
   const original = path.join(expr, fragment);
   let restore: () => Promise<void>;
@@ -142,7 +142,7 @@ export async function write(denops: Denops): Promise<void> {
     await fs.ensureFile(original);
     await Deno.writeTextFile(original, `${content.join("\n")}\n`);
     await bareCommand(denops, [
-      `---worktree=${expr}`,
+      `++worktree=${expr}`,
       "add",
       "--force",
       "--",
@@ -155,20 +155,17 @@ export async function write(denops: Denops): Promise<void> {
   }
 }
 
-function parseArgs(
-  args: string[],
-): [flags.Args, string | undefined, string] {
-  const opts = flags.parse(args, [
-    "cached",
-  ]);
+function parseResidue(
+  residue: string[],
+): [string | undefined, string] {
   // GinEdit [{options}] {path}
   // GinEdit [{options}] --cached {path}
   // GinEdit [{options}] {commitish} {path}
-  switch (opts._.length) {
+  switch (residue.length) {
     case 1:
-      return [opts, undefined, opts._[0].toString()];
+      return [undefined, residue[0].toString()];
     case 2:
-      return [opts, opts._[0].toString(), opts._[1].toString()];
+      return [residue[0].toString(), residue[1].toString()];
     default:
       throw new Error("Invalid number of arguments");
   }

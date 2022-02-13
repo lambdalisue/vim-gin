@@ -7,9 +7,13 @@ import {
   option,
   path,
 } from "../../deps.ts";
-import * as flags from "../../util/flags.ts";
+import {
+  formatFlag,
+  parseArgs,
+  validateFlags,
+  validateOpts,
+} from "../../util/args.ts";
 import * as buffer from "../../util/buffer.ts";
-import { toBooleanArgs, toStringArgs } from "../../util/arg.ts";
 import { normCmdArgs } from "../../util/cmd.ts";
 import { getWorktreeFromOpts } from "../../util/worktree.ts";
 import { decodeUtf8 } from "../../util/text.ts";
@@ -19,18 +23,34 @@ export async function command(
   denops: Denops,
   args: string[],
 ): Promise<void> {
-  const [opts, commitish, abspath] = parseArgs(
-    await normCmdArgs(denops, args),
-  );
+  const [opts, flags, residue] = parseArgs(await normCmdArgs(denops, args));
+  validateOpts(opts, [
+    "worktree",
+  ]);
+  validateFlags(flags, [
+    "R",
+    "b",
+    "w",
+    "I",
+    "cached",
+    "renames",
+    "diff-filter",
+    "ignore-cr-at-eol",
+    "ignore-space-at-eol",
+    "ignore-space-change",
+    "ignore-all-space",
+    "ignore-blank-lines",
+    "ignore-matching-lines",
+    "ignore-submodules",
+  ]);
+  const [commitish, abspath] = parseResidue(residue);
   const worktree = await getWorktreeFromOpts(denops, opts);
   const relpath = path.relative(worktree, abspath);
   const bname = bufname.format({
     scheme: "gindiff",
     expr: worktree,
     params: {
-      ...opts,
-      _: undefined,
-      "-worktree": undefined,
+      ...flags,
       commitish,
     },
     fragment: relpath,
@@ -44,23 +64,19 @@ export async function read(denops: Denops): Promise<void> {
     await fn.bufname(denops, "%");
   }) as [number, string];
   const { expr, params, fragment } = bufname.parse(bname);
+  if (!fragment) {
+    throw new Error("A buffer 'gindiff://' requires a fragment part");
+  }
+  const flags = {
+    ...params ?? {},
+    commitish: undefined,
+  };
   const args = [
     "diff",
     "--no-color",
-    ...toBooleanArgs(params, "cached"),
-    ...toBooleanArgs(params, "renames"),
-    ...toStringArgs(params, "diff-filter"),
-    ...toBooleanArgs(params, "reverse", { flag: "-R" }),
-    ...toBooleanArgs(params, "ignore-cr-at-eol"),
-    ...toBooleanArgs(params, "ignore-space-at-eol"),
-    ...toBooleanArgs(params, "ignore-space-change"),
-    ...toBooleanArgs(params, "ignore-all-space"),
-    ...toBooleanArgs(params, "ignore-blank-lines"),
-    ...toStringArgs(params, "ignore-matching-lines"),
-    ...toStringArgs(params, "ignore-submodules"),
+    ...Object.entries(flags).map(([k, v]) => v ? formatFlag(k, v) : []).flat(),
     ...(params?.commitish ? [params.commitish as string] : []),
-    ...(fragment ? [fragment] : []),
-    ...toStringArgs(params, "--", { flag: "--" }),
+    fragment,
   ];
   const env = await fn.environ(denops) as Record<string, string>;
   const proc = run(args, {
@@ -95,35 +111,13 @@ export async function read(denops: Denops): Promise<void> {
   await buffer.concrete(denops, bufnr);
 }
 
-function parseArgs(
-  args: string[],
-): [flags.Args, string | undefined, string] {
-  const opts = flags.parse(args, [
-    "cached",
-    "renames",
-    "diff-filter",
-    "reverse",
-    "ignore-cr-at-eol",
-    "ignore-space-at-eol",
-    "ignore-space-change",
-    "ignore-all-space",
-    "ignore-blank-lines",
-    "ignore-matching-lines",
-    "ignore-submodules",
-  ], {
-    alias: {
-      R: "reverse",
-      b: "ignore-space-change",
-      w: "ignore-all-space",
-      I: "ignore-matching-lines",
-    },
-  });
+function parseResidue(residue: string[]): [string | undefined, string] {
   // GinDiff [{options}] [{commitish}] {path}
-  switch (opts._.length) {
+  switch (residue.length) {
     case 1:
-      return [opts, undefined, opts._[0].toString()];
+      return [undefined, residue[0].toString()];
     case 2:
-      return [opts, opts._[0].toString(), opts._[1].toString()];
+      return [residue[0].toString(), residue[1].toString()];
     default:
       throw new Error("Invalid number of arguments");
   }

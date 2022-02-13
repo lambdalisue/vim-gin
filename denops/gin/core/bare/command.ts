@@ -1,5 +1,6 @@
-import { autocmd, batch, Denops, flags, fn, option } from "../../deps.ts";
+import { autocmd, batch, Denops, fn, option } from "../../deps.ts";
 import { echo, echoerr } from "../../util/helper.ts";
+import { parseOpts, validateOpts } from "../../util/args.ts";
 import { normCmdArgs } from "../../util/cmd.ts";
 import * as buffer from "../../util/buffer.ts";
 import { getWorktreeFromOpts } from "../../util/worktree.ts";
@@ -13,10 +14,14 @@ export async function command(
   await autocmd.emit(denops, "User", "GinCommandPre", {
     nomodeline: true,
   });
-  const opts = parseArgs(await normCmdArgs(denops, args));
+  const [opts, residue] = parseOpts(await normCmdArgs(denops, args));
+  validateOpts(opts, [
+    "worktree",
+    "buffer",
+  ]);
   const worktree = await getWorktreeFromOpts(denops, opts);
   const env = await fn.environ(denops) as Record<string, string>;
-  const proc = run(await normCmdArgs(denops, opts._.map((v) => v.toString())), {
+  const proc = run(residue, {
     stdin: "null",
     stdout: "piped",
     stderr: "piped",
@@ -30,7 +35,7 @@ export async function command(
     proc.stderrOutput(),
   ]);
   proc.close();
-  if (opts["-buffer"]) {
+  if (opts.buffer) {
     await denops.cmd("enew");
     const bufnr = await fn.bufnr(denops);
     await buffer.ensure(denops, bufnr, async () => {
@@ -71,27 +76,4 @@ export async function bind(denops: Denops, bufnr: number): Promise<void> {
       },
     );
   });
-}
-
-function parseArgs(args: string[]): flags.Args {
-  const opts: flags.Args = {
-    "_": [],
-  };
-  for (let i = 0; i < args.length; i++) {
-    const arg = args[i];
-    if (arg === "--") {
-      opts._.push(...args.slice(i));
-      break;
-    }
-    if (arg.startsWith("---worktree=")) {
-      opts["-worktree"] = arg.replace(/^---worktree=/, "");
-      continue;
-    }
-    if (arg === "---buffer") {
-      opts["-buffer"] = true;
-      continue;
-    }
-    opts._.push(arg);
-  }
-  return opts;
 }

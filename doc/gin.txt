@@ -79,15 +79,14 @@ INTERFACE					*gin-interface*
 COMMANDS					*gin-commands*
 
 								*:Gin*
-								*:Gin!*
-:Gin[!] [---worktree={worktree}] [---buffer] {command} [{args}]
+:Gin[!] [++worktree={worktree}] [++buffer] {command} [{args}]
 	Call a git raw {command} with {args} asynchronously and echo result on
 	a {worktree}.
 	For example, "Gin add %" on "hello.txt" invokes "git add hello.txt".
 	If a bang (!) is specified, it calls command synchronously instead.
 	If no {worktree} is specified, gin will find the one from the current
 	working directory.
-	If ---buffer option is specified, it opens a |scratch-buffer| to show
+	If ++buffer option is specified, it opens a |scratch-buffer| to show
 	the result of the command.
 
 	Note that users need to install guise.vim (|gin-guise|) to open a
@@ -97,19 +96,19 @@ COMMANDS					*gin-commands*
 	prompt to input passphrase on "Gin push" or so on.
 
 								*:GinDiff*
-:GinDiff [---worktree={worktree}] [{options}] {path}
-:GinDiff [---worktree={worktree}] [{options}] --cached {path}
-:GinDiff [---worktree={worktree}] [{options}] {commitish} {path}
+:GinDiff [++worktree={worktree}] [{flags}] {path}
+:GinDiff [++worktree={worktree}] [{flags}] --cached {path}
+:GinDiff [++worktree={worktree}] [{flags}] {commitish} {path}
 	Open a "gin-diff" buffer of a file in a {worktree}.
 	If no {worktree} is specified, gin will find the one from the current
 	working directory.
 
-	The following {options} are available:
+	The following {flags} are available:
 
 	--cached
 	--renames/--no-renames
 	--diff-filter={filter}
-	--reverse/-R
+	-R
 	--ignore-cr-at-eol
 	--ignore-space-at-eol
 	--ignore-space-change/-b
@@ -118,17 +117,17 @@ COMMANDS					*gin-commands*
 	--ignore-matching-lines={regex}/-I={regex}
 	--ignore-submodules[=none/untracked/dirty/all]
 		
-	See ":man git-diff(1)" for detail about {options}.
+	See ":man git-diff(1)" for detail about {flags}.
 
 								*:GinEdit*
-:GinEdit [---worktree={worktree}] {path}
-:GinEdit [---worktree={worktree}] --cached {path}
-:GinEdit [---worktree={worktree}] {commitish} {path}
+:GinEdit [++worktree={worktree}] {path}
+:GinEdit [++worktree={worktree}] --cached {path}
+:GinEdit [++worktree={worktree}] {commitish} {path}
 	Open a local {path} or "gin-edit" buffer of a file in a {worktree}.
 	If no {worktree} is specified, gin will find the one from the current
 	working directory.
 
-	If --cached option is specified, it opens a buffer that shows content
+	If --cached flag is specified, it opens a buffer that shows content
 	in INDEX rather than the local working tree. The buffer is modifiable
 	and write the buffer to apply changes on INDEX.
 
@@ -136,9 +135,9 @@ COMMANDS					*gin-commands*
 	in the {commitish} rather than the local working tree.
 
 								*:GinPatch*
-:GinPatch [---worktree={worktree}] {path}
-:GinPatch [---worktree={worktree}] --without-head {path}
-:GinPatch [---worktree={worktree}] --without-worktree {path}
+:GinPatch [++worktree={worktree}] {path}
+:GinPatch [++worktree={worktree}] --without-head {path}
+:GinPatch [++worktree={worktree}] --without-worktree {path}
 	Open three buffers (HEAD, INDEX, and WORKTREE) to patch changes of
 	{path} in a {worktree}. 
 	If no {worktree} is specified, gin will find the one from the current
@@ -169,12 +168,12 @@ COMMANDS					*gin-commands*
 					Assigned to "dor" in default.
 
 								*:GinStatus*
-:GinStatus [---worktree={worktree}] [{options}] [-- {pathspec}...]
+:GinStatus [++worktree={worktree}] [{flags}]
 	Open a "gin-status" buffer to show a status of a {worktree}.
 	If no {worktree} is specified, gin will find the one from the current
 	working directory.
 
-	The following {options} are available:
+	The following {flags} are available:
 
 	-u[=no/normal/all], --untracked-files[=no/normal/all]
 	--ignore-submodules[=none/untracked/dirty/all]
@@ -182,7 +181,7 @@ COMMANDS					*gin-commands*
 	--renames/--no-renames
 	--find-renames[={n}]
 		
-	See ":man git-status(1)" for detail about {options} and {pathspec}.
+	See ":man git-status(1)" for detail about {flags}.
 
 -----------------------------------------------------------------------------
 FUNCTIONS					*gin-functions*

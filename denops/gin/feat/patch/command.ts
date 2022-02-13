@@ -1,5 +1,5 @@
 import { batch, Denops, fn, mapping, path } from "../../deps.ts";
-import * as flags from "../../util/flags.ts";
+import { parseArgs, validateFlags, validateOpts } from "../../util/args.ts";
 import * as buffer from "../../util/buffer.ts";
 import { normCmdArgs } from "../../util/cmd.ts";
 import { getWorktreeFromOpts } from "../../util/worktree.ts";
@@ -9,28 +9,34 @@ export async function command(
   denops: Denops,
   args: string[],
 ): Promise<void> {
-  const [opts, abspath] = parseArgs(
-    await normCmdArgs(denops, args),
-  );
+  const [opts, flags, residue] = parseArgs(await normCmdArgs(denops, args));
+  validateOpts(opts, [
+    "worktree",
+  ]);
+  validateFlags(flags, [
+    "without-head",
+    "without-worktree",
+  ]);
+  const [abspath] = parseResidue(residue);
   const worktree = await getWorktreeFromOpts(denops, opts);
   const relpath = path.relative(worktree, abspath);
 
   await denops.cmd("tabedit");
 
   let bufnrHead = -1;
-  if (!opts["without-head"]) {
-    await editCommand(denops, [`---worktree=${worktree}`, "HEAD", relpath]);
+  if (!flags["without-head"]) {
+    await editCommand(denops, [`++worktree=${worktree}`, "HEAD", relpath]);
     bufnrHead = await fn.bufnr(denops);
     await denops.cmd("botright vsplit");
   }
 
-  await editCommand(denops, [`---worktree=${worktree}`, "--cached", relpath]);
+  await editCommand(denops, [`++worktree=${worktree}`, "--cached", relpath]);
   const bufnrIndex = await fn.bufnr(denops);
 
   let bufnrWorktree = -1;
-  if (!opts["without-worktree"]) {
+  if (!flags["without-worktree"]) {
     await denops.cmd("botright vsplit");
-    await editCommand(denops, [`---worktree=${worktree}`, "", relpath]);
+    await editCommand(denops, [`++worktree=${worktree}`, "", relpath]);
     bufnrWorktree = await fn.bufnr(denops);
   }
 
@@ -202,17 +208,13 @@ export async function command(
   await fn.win_gotoid(denops, winid);
 }
 
-function parseArgs(
-  args: string[],
-): [flags.Args, string] {
-  const opts = flags.parse(args, [
-    "without-head",
-    "without-worktree",
-  ]);
+function parseResidue(
+  residue: string[],
+): [string] {
   // GinPatch [{options}] {path}
-  switch (opts._.length) {
+  switch (residue.length) {
     case 1:
-      return [opts, opts._[0].toString()];
+      return [residue[0]];
     default:
       throw new Error("Invalid number of arguments");
   }
