@@ -1,64 +1,6 @@
 function! gin#internal#feat#status#action#register() abort
-  noremap <buffer> <Plug>(gin-action-edit:local=)
-        \ <Cmd>call gin#action#fn({ xs -> <SID>edit({ -> <SID>opener() }, '', xs) })<CR>
-  noremap <buffer> <Plug>(gin-action-edit:cached=)
-        \ <Cmd>call gin#action#fn({ xs -> <SID>edit({ -> <SID>opener() }, '--cached', xs) })<CR>
-  noremap <buffer> <Plug>(gin-action-edit:HEAD=)
-        \ <Cmd>call gin#action#fn({ xs -> <SID>edit({ -> <SID>opener() }, 'HEAD', xs) })<CR>
-  map <buffer> <Plug>(gin-action-edit:local:edit) <Plug>(gin-action-edit:local=)edit<CR>
-  map <buffer> <Plug>(gin-action-edit:local:split) <Plug>(gin-action-edit:local=)split<CR>
-  map <buffer> <Plug>(gin-action-edit:local:vsplit) <Plug>(gin-action-edit:local=)vsplit<CR>
-  map <buffer> <Plug>(gin-action-edit:local:tabedit) <Plug>(gin-action-edit:local=)tabedit<CR>
-  map <buffer> <Plug>(gin-action-edit:local) <Plug>(gin-action-edit:local:edit)
-  map <buffer> <Plug>(gin-action-edit:cached:edit) <Plug>(gin-action-edit:cached=)edit<CR>
-  map <buffer> <Plug>(gin-action-edit:cached:split) <Plug>(gin-action-edit:cached=)split<CR>
-  map <buffer> <Plug>(gin-action-edit:cached:vsplit) <Plug>(gin-action-edit:cached=)vsplit<CR>
-  map <buffer> <Plug>(gin-action-edit:cached:tabedit) <Plug>(gin-action-edit:cached=)tabedit<CR>
-  map <buffer> <Plug>(gin-action-edit:cached) <Plug>(gin-action-edit:cached:edit)
-  map <buffer> <Plug>(gin-action-edit:HEAD:edit) <Plug>(gin-action-edit:HEAD=)edit<CR>
-  map <buffer> <Plug>(gin-action-edit:HEAD:split) <Plug>(gin-action-edit:HEAD=)split<CR>
-  map <buffer> <Plug>(gin-action-edit:HEAD:vsplit) <Plug>(gin-action-edit:HEAD=)vsplit<CR>
-  map <buffer> <Plug>(gin-action-edit:HEAD:tabedit) <Plug>(gin-action-edit:HEAD=)tabedit<CR>
-  map <buffer> <Plug>(gin-action-edit:HEAD) <Plug>(gin-action-edit:HEAD:edit)
-  map <buffer> <Plug>(gin-action-edit:edit) <Plug>(gin-action-edit:local:edit)
-  map <buffer> <Plug>(gin-action-edit:split) <Plug>(gin-action-edit:local:split)
-  map <buffer> <Plug>(gin-action-edit:vsplit) <Plug>(gin-action-edit:local:vsplit)
-  map <buffer> <Plug>(gin-action-edit:tabedit) <Plug>(gin-action-edit:local:tabedit)
-  map <buffer> <Plug>(gin-action-edit) <Plug>(gin-action-edit:local)
-
-  noremap <buffer> <Plug>(gin-action-diff:local=)
-        \ <Cmd>call gin#action#fn({ xs -> <SID>diff({ -> <SID>opener() }, '', xs) })<CR>
-  noremap <buffer> <Plug>(gin-action-diff:cached=)
-        \ <Cmd>call gin#action#fn({ xs -> <SID>diff({ -> <SID>opener() }, '--cached', xs) })<CR>
-  noremap <buffer> <Plug>(gin-action-diff:HEAD=)
-        \ <Cmd>call gin#action#fn({ xs -> <SID>diff({ -> <SID>opener() }, 'HEAD', xs) })<CR>
-  noremap <buffer> <Plug>(gin-action-diff:smart=)
-        \ <Cmd>call gin#action#fn({ xs -> <SID>diff_smart({ -> <SID>opener() }, xs) })<CR>
-  map <buffer> <Plug>(gin-action-diff:local:edit) <Plug>(gin-action-diff:local=)edit<CR>
-  map <buffer> <Plug>(gin-action-diff:local:split) <Plug>(gin-action-diff:local=)split<CR>
-  map <buffer> <Plug>(gin-action-diff:local:vsplit) <Plug>(gin-action-diff:local=)vsplit<CR>
-  map <buffer> <Plug>(gin-action-diff:local:tabedit) <Plug>(gin-action-diff:local=)tabedit<CR>
-  map <buffer> <Plug>(gin-action-diff:local) <Plug>(gin-action-diff:local:edit)
-  map <buffer> <Plug>(gin-action-diff:cached:edit) <Plug>(gin-action-diff:cached=)edit<CR>
-  map <buffer> <Plug>(gin-action-diff:cached:split) <Plug>(gin-action-diff:cached=)split<CR>
-  map <buffer> <Plug>(gin-action-diff:cached:vsplit) <Plug>(gin-action-diff:cached=)vsplit<CR>
-  map <buffer> <Plug>(gin-action-diff:cached:tabedit) <Plug>(gin-action-diff:cached=)tabedit<CR>
-  map <buffer> <Plug>(gin-action-diff:cached) <Plug>(gin-action-diff:cached:edit)
-  map <buffer> <Plug>(gin-action-diff:HEAD:edit) <Plug>(gin-action-diff:HEAD=)edit<CR>
-  map <buffer> <Plug>(gin-action-diff:HEAD:split) <Plug>(gin-action-diff:HEAD=)split<CR>
-  map <buffer> <Plug>(gin-action-diff:HEAD:vsplit) <Plug>(gin-action-diff:HEAD=)vsplit<CR>
-  map <buffer> <Plug>(gin-action-diff:HEAD:tabedit) <Plug>(gin-action-diff:HEAD=)tabedit<CR>
-  map <buffer> <Plug>(gin-action-diff:HEAD) <Plug>(gin-action-diff:HEAD:edit)
-  map <buffer> <Plug>(gin-action-diff:smart:edit) <Plug>(gin-action-diff:smart=)edit<CR>
-  map <buffer> <Plug>(gin-action-diff:smart:split) <Plug>(gin-action-diff:smart=)split<CR>
-  map <buffer> <Plug>(gin-action-diff:smart:vsplit) <Plug>(gin-action-diff:smart=)vsplit<CR>
-  map <buffer> <Plug>(gin-action-diff:smart:tabedit) <Plug>(gin-action-diff:smart=)tabedit<CR>
-  map <buffer> <Plug>(gin-action-diff:smart) <Plug>(gin-action-diff:smart:edit)
-  map <buffer> <Plug>(gin-action-diff:edit) <Plug>(gin-action-diff:smart:edit)
-  map <buffer> <Plug>(gin-action-diff:split) <Plug>(gin-action-diff:smart:split)
-  map <buffer> <Plug>(gin-action-diff:vsplit) <Plug>(gin-action-diff:smart:vsplit)
-  map <buffer> <Plug>(gin-action-diff:tabedit) <Plug>(gin-action-diff:smart:tabedit)
-  map <buffer> <Plug>(gin-action-diff) <Plug>(gin-action-diff:smart)
+  call gin#internal#feat#status#action#edit#register()
+  call gin#internal#feat#status#action#diff#register()
 
   noremap <buffer> <Plug>(gin-action-patch:both)
         \ <Cmd>call gin#action#fn({ xs -> <SID>patch('', xs) })<CR>
@@ -103,53 +45,6 @@ endfunction
 function! s:norm_xs(xs) abort
   call map(a:xs, { _, v -> v.value })
   call map(a:xs, { _, v -> escape(v, ' \\') })
-endfunction
-
-function! s:opener() abort
-  let opener = input('Open with: ')
-  redraw | echo ''
-  if empty(opener)
-    echohl WarningMsg
-    echo 'Cancelled'
-    echohl None
-    return v:null
-  endif
-  return opener
-endfunction
-
-function! s:edit(opener, suffix, xs) abort
-  let opener = a:opener()
-  if opener is# v:null
-    return
-  endif
-  call s:norm_xs(a:xs)
-  call map(a:xs, { _, v -> execute(printf('%s | GinEdit %s %s', opener, a:suffix, v), '') })
-endfunction
-
-function! s:diff(opener, suffix, xs) abort
-  let opener = a:opener()
-  if opener is# v:null
-    return
-  endif
-  call s:norm_xs(a:xs)
-  call map(a:xs, { _, v -> execute(printf('%s | GinDiff %s %s', opener, a:suffix, v), '') })
-endfunction
-
-function! s:diff_smart(opener, xs) abort
-  let opener = a:opener()
-  if opener is# v:null
-    return
-  endif
-
-  let xs_local = filter(copy(a:xs), { _, v -> v.XY[0] ==# '.' })
-  if !empty(xs_local)
-    call s:diff({ -> opener }, '', xs_local)
-  endif
-
-  let xs_cached = filter(copy(a:xs), { _, v -> v.XY[0] !=# '.' })
-  if !empty(xs_cached)
-    call s:diff({ -> opener }, '--cached', xs_cached)
-  endif
 endfunction
 
 function! s:patch(suffix, xs) abort
