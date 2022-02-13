@@ -16,7 +16,7 @@ export async function command(
   const opts = parseArgs(await normCmdArgs(denops, args));
   const worktree = await getWorktreeFromOpts(denops, opts);
   const env = await fn.environ(denops) as Record<string, string>;
-  const proc = run(await normCmdArgs(denops, opts._.map(v => v.toString())), {
+  const proc = run(await normCmdArgs(denops, opts._.map((v) => v.toString())), {
     stdin: "null",
     stdout: "piped",
     stderr: "piped",
@@ -77,7 +77,7 @@ function parseArgs(args: string[]): flags.Args {
   const opts: flags.Args = {
     "_": [],
   };
-  for (let i = 0; i<args.length; i++) {
+  for (let i = 0; i < args.length; i++) {
     const arg = args[i];
     if (arg === "--") {
       opts._.push(...args.slice(i));
@@ -85,11 +85,11 @@ function parseArgs(args: string[]): flags.Args {
     }
     if (arg.startsWith("---worktree=")) {
       opts["-worktree"] = arg.replace(/^---worktree=/, "");
-      continue
+      continue;
     }
     if (arg === "---buffer") {
       opts["-buffer"] = true;
-      continue
+      continue;
     }
     opts._.push(arg);
   }
