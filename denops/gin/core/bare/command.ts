@@ -13,26 +13,10 @@ export async function command(
   await autocmd.emit(denops, "User", "GinCommandPre", {
     nomodeline: true,
   });
-  const raws: string[] = [];
-  const opts = flags.parse(await normCmdArgs(denops, args), {
-    "--": true,
-    string: [
-      "-worktree",
-    ],
-    unknown: (arg) => {
-      if (arg === "-buffer") {
-        return true;
-      }
-      raws.push(arg);
-      return false;
-    },
-  });
-  if (opts["--"].length) {
-    raws.push("--", ...opts["--"]);
-  }
+  const opts = parseArgs(await normCmdArgs(denops, args));
   const worktree = await getWorktreeFromOpts(denops, opts);
   const env = await fn.environ(denops) as Record<string, string>;
-  const proc = run(await normCmdArgs(denops, raws), {
+  const proc = run(await normCmdArgs(denops, opts._.map(v => v.toString())), {
     stdin: "null",
     stdout: "piped",
     stderr: "piped",
@@ -87,4 +71,27 @@ export async function bind(denops: Denops, bufnr: number): Promise<void> {
       },
     );
   });
+}
+
+function parseArgs(args: string[]): flags.Args {
+  const opts: flags.Args = {
+    "_": [],
+  };
+  for (let i = 0; i<args.length; i++) {
+    const arg = args[i];
+    if (arg === "--") {
+      opts._.push(...args.slice(i));
+      break;
+    }
+    if (arg.startsWith("---worktree=")) {
+      opts["-worktree"] = arg.replace(/^---worktree=/, "");
+      continue
+    }
+    if (arg === "---buffer") {
+      opts["-buffer"] = true;
+      continue
+    }
+    opts._.push(arg);
+  }
+  return opts;
 }
