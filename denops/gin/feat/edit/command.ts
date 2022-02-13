@@ -5,11 +5,11 @@ import {
   Denops,
   fn,
   fs,
-  helper,
   option,
   path,
   unknownutil,
 } from "../../deps.ts";
+import * as helper from "../../util/helper.ts";
 import * as flags from "../../util/flags.ts";
 import * as buffer from "../../util/buffer.ts";
 import { toStringArgs } from "../../util/arg.ts";
@@ -80,12 +80,6 @@ export async function read(denops: Denops): Promise<void> {
     proc.stderrOutput(),
   ]);
   proc.close();
-  if (!status.success) {
-    await denops.cmd("echohl Error");
-    await helper.echo(denops, decodeUtf8(stderr));
-    await denops.cmd("echohl None");
-    return;
-  }
   await buffer.ensure(denops, bufnr, async () => {
     await batch.batch(denops, async (denops) => {
       await denops.cmd("filetype detect");
@@ -112,6 +106,9 @@ export async function read(denops: Denops): Promise<void> {
     await buffer.editData(denops, stdout);
   });
   await buffer.concrete(denops, bufnr);
+  if (!status.success) {
+    await helper.echoerr(denops, decodeUtf8(stderr));
+  }
 }
 
 export async function write(denops: Denops): Promise<void> {
