@@ -1,0 +1,6 @@
+pre-commit:
+  commands:
+    lint:
+      run: make lint
+    fmt:
+      run: make fmt
