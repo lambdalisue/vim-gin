@@ -40,6 +40,11 @@ function! gin#internal#feat#status#action#register() abort
         \ <Cmd>call gin#action#fn({ xs -> <SID>stage_intent_to_add(xs) })<CR>
   noremap <buffer> <Plug>(gin-action-unstage:intent-to-add)
         \ <Cmd>call gin#action#fn({ xs -> <SID>unstage_intent_to_add(xs) })<CR>
+
+  noremap <buffer> <Plug>(gin-action-stash)
+        \ <Cmd>call gin#action#fn({ xs -> <SID>stash('', xs) })<CR>
+  noremap <buffer> <Plug>(gin-action-stash:keep-index)
+        \ <Cmd>call gin#action#fn({ xs -> <SID>stash('--keep-index', xs) })<CR>
 endfunction
 
 function! s:norm_xs(xs) abort
@@ -118,4 +123,9 @@ function! s:unstage_intent_to_add(xs) abort
   endif
 
   doautocmd <nomodeline> User GinCommandPost
+endfunction
+
+function! s:stash(suffix, xs) abort
+  call s:norm_xs(a:xs)
+  execute printf('Gin! stash push --all %s -- %s', a:suffix, join(a:xs, ' '))
 endfunction
