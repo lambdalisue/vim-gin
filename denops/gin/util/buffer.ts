@@ -3,7 +3,11 @@ import { autocmd, batch, Denops, fn } from "../deps.ts";
 /**
  * Open a buffer
  */
-export async function open(denops: Denops, bufname: string, cmdarg = ""): Promise<void> {
+export async function open(
+  denops: Denops,
+  bufname: string,
+  cmdarg = "",
+): Promise<void> {
   await denops.cmd(`edit ${cmdarg} \`=bufname\``, { bufname });
 }
 
@@ -141,12 +145,7 @@ export type ReadFileOptions = {
   keepjumps?: boolean;
   lockmarks?: boolean;
   line?: number;
-  fileformat?: "dos" | "unix" | "mac";
-  encoding?: string;
-  binary?: boolean;
-  nobinary?: boolean;
-  bad?: string;
-  edit?: boolean;
+  cmdarg?: string;
 };
 
 async function readFileInternal(
@@ -161,14 +160,7 @@ async function readFileInternal(
     ...(options.lockmarks ? ["lockmarks"] : []),
   ].filter((v) => v).join(" ");
   const line = options.line ?? "";
-  const opt = [
-    ...(options.fileformat ? [`++ff=${options.fileformat}`] : []),
-    ...(options.encoding ? [`++enc=${options.encoding}`] : []),
-    ...(options.binary ? ["++bin"] : []),
-    ...(options.nobinary ? ["++nobin"] : []),
-    ...(options.bad ? [`++bad=${options.bad}`] : []),
-    ...(options.edit ? ["++edit"] : []),
-  ].filter((v) => v).join(" ");
+  const opt = options.cmdarg ?? "";
   if (denops.meta.host === "vim") {
     // NOTE:
     // It seems Vim slightly changed behaviors of `read` on empty buffer
@@ -234,7 +226,10 @@ export async function editFile(
   await modifiable(denops, bufnr, async () => {
     await batch.batch(denops, async (denops) => {
       await denops.cmd(`${pre} %delete _`);
-      await readFileInternal(denops, file, { ...options, edit: true });
+      await readFileInternal(denops, file, {
+        ...options,
+        cmdarg: `++edit ${options.cmdarg ?? ""}`,
+      });
       await denops.cmd(`${pre} 1delete _`);
     });
   });
