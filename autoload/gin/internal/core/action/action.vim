@@ -10,18 +10,6 @@ function! gin#internal#core#action#action#register() abort
 
   nnoremap <buffer> <Plug>(gin-action-help)
         \ <Cmd>call <SID>help()<CR>
-
-  if !hasmapto('<Plug>(gin-action-choice)')
-    map <buffer><nowait> a <Plug>(gin-action-choice)
-  endif
-
-  if !hasmapto('<Plug>(gin-action-repeat)')
-    map <buffer><nowait> . <Plug>(gin-action-repeat)
-  endif
-
-  if !hasmapto('<Plug>(gin-action-help)', 'n')
-    nmap <buffer><nowait> ? <Plug>(gin-action-help)
-  endif
 endfunction
 
 function! s:echo(xs) abort
