@@ -279,6 +279,18 @@ ACTIONS						*gin-actions*
 *<Plug>(gin-action-edit:vsplit)*
 *<Plug>(gin-action-edit:tabedit)*
 *<Plug>(gin-action-edit)*
+	Aliases to |<Plug>(gin-action-edit:local)| variants. Re-define those
+	mappings to change behavior of "edit" action variants
+
+	This actions are enabled on buffers shown by the following commands
+	- |:GinStatus|
+
+*<Plug>(gin-action-edit:local=)*
+*<Plug>(gin-action-edit:local:edit)*
+*<Plug>(gin-action-edit:local:split)*
+*<Plug>(gin-action-edit:local:vsplit)*
+*<Plug>(gin-action-edit:local:tabedit)*
+*<Plug>(gin-action-edit:local)*
 	Open a new buffer with given command and call |:GinEdit| on active
 	action candidates.
 	The "=" mapping can be used to define custom actions like
@@ -322,6 +334,18 @@ ACTIONS						*gin-actions*
 *<Plug>(gin-action-diff:vsplit)*
 *<Plug>(gin-action-diff:tabedit)*
 *<Plug>(gin-action-diff)*
+	Aliases to |<Plug>(gin-action-diff:smart)| variants. Re-define those
+	mappings to change behavior of "diff" action variants
+
+	This actions are enabled on buffers shown by the following commands
+	- |:GinStatus|
+
+*<Plug>(gin-action-diff:local=)*
+*<Plug>(gin-action-diff:local:edit)*
+*<Plug>(gin-action-diff:local:split)*
+*<Plug>(gin-action-diff:local:vsplit)*
+*<Plug>(gin-action-diff:local:tabedit)*
+*<Plug>(gin-action-diff:local)*
 	Open a new buffer with given command and call |:GinDiff| on active
 	action candidates (INDEX vs WORKTREE).
 	See |<Plug>(gin-action-edit=)| for customization.
