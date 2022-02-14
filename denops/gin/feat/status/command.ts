@@ -1,4 +1,13 @@
-import { batch, bufname, Denops, fn, option, path, vars } from "../../deps.ts";
+import {
+  autocmd,
+  batch,
+  bufname,
+  Denops,
+  fn,
+  option,
+  path,
+  vars,
+} from "../../deps.ts";
 import {
   formatFlags,
   parse,
@@ -86,6 +95,18 @@ export async function read(denops: Denops): Promise<void> {
       await option.modifiable.setLocal(denops, false);
       await vars.b.set(denops, "gin_status_result", result);
       await denops.call("gin#internal#feat#status#core#init");
+      await autocmd.group(
+        denops,
+        `gin_feat_status_command_read_${bufnr}`,
+        (helper) => {
+          helper.remove();
+          helper.define(
+            ["BufWritePost", "FileWritePost"],
+            "*",
+            `call gin#util#reload(${bufnr})`,
+          );
+        },
+      );
     });
   });
   await buffer.replace(denops, bufnr, content);
