@@ -4,7 +4,7 @@ import { command } from "./command.ts";
 export function main(denops: Denops): void {
   denops.dispatcher = {
     ...denops.dispatcher,
-    "command": (...args: unknown[]) => {
+    "command": (args: unknown) => {
       unknownutil.ensureArray(args, unknownutil.isString);
       return command(denops, args);
     },

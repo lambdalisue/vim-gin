@@ -9,18 +9,18 @@ augroup gin_plugin_internal
   autocmd User GinCommandPost :
 augroup END
 
-function! s:command(bang, ...) abort
+function! s:command(bang, args) abort
   if a:bang ==# '!'
     call denops#plugin#wait('gin')
-    call denops#request('gin', 'command', a:000)
+    call denops#request('gin', 'command', [a:args])
   else
     let l:Callback = function('denops#notify', [
           \ 'gin',
           \ 'command',
-          \ a:000,
+          \ [a:args],
           \])
     call denops#plugin#wait_async('gin', l:Callback)
   endif
 endfunction
 
-command! -bang -bar -nargs=* Gin call s:command(<q-bang>, <f-args>)
+command! -bang -bar -nargs=* Gin call s:command(<q-bang>, [<f-args>])
