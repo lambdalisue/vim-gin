@@ -147,10 +147,7 @@ export async function modifiable<T = void>(
 }
 
 export type ReadFileOptions = {
-  silent?: boolean;
-  keepalt?: boolean;
-  keepjumps?: boolean;
-  lockmarks?: boolean;
+  mods?: string;
   line?: number;
   cmdarg?: string;
 };
@@ -160,14 +157,9 @@ async function readFileInternal(
   file: string,
   options: ReadFileOptions = {},
 ): Promise<void> {
-  const pre = [
-    ...(options.silent ? ["silent"] : []),
-    ...(options.keepalt ? ["keepalt"] : []),
-    ...(options.keepjumps ? ["keepjumps"] : []),
-    ...(options.lockmarks ? ["lockmarks"] : []),
-  ].filter((v) => v).join(" ");
+  const mods = options.mods ?? "";
   const line = options.line ?? "";
-  const opt = options.cmdarg ?? "";
+  const cmdarg = options.cmdarg ?? "";
   if (denops.meta.host === "vim") {
     // NOTE:
     // It seems Vim slightly changed behaviors of `read` on empty buffer
@@ -175,9 +167,12 @@ async function readFileInternal(
     // ends with a newline
     await denops.cmd("call setline(1, getline(1))");
   }
-  await denops.cmd(`execute '${pre} ${line}read ${opt}' fnameescape(file)`, {
-    file,
-  });
+  await denops.cmd(
+    `execute '${mods} ${line}read ${cmdarg}' fnameescape(file)`,
+    {
+      file,
+    },
+  );
 }
 
 /**
@@ -224,20 +219,15 @@ export async function editFile(
   options: EditFileOptions = {},
 ): Promise<void> {
   const bufnr = await fn.bufnr(denops);
-  const pre = [
-    ...(options.silent ? ["silent"] : []),
-    ...(options.keepalt ? ["keepalt"] : []),
-    ...(options.keepjumps ? ["keepjumps"] : []),
-    ...(options.lockmarks ? ["lockmarks"] : []),
-  ].filter((v) => v).join(" ");
+  const mods = options.mods ?? "";
   await modifiable(denops, bufnr, async () => {
     await batch.batch(denops, async (denops) => {
-      await denops.cmd(`${pre} %delete _`);
+      await denops.cmd(`${mods} %delete _`);
       await readFileInternal(denops, file, {
         ...options,
         cmdarg: `++edit ${options.cmdarg ?? ""}`,
       });
-      await denops.cmd(`${pre} 1delete _`);
+      await denops.cmd(`${mods} 1delete _`);
     });
   });
 }

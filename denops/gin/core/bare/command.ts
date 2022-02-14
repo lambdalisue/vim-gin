@@ -49,9 +49,7 @@ export async function command(
         await option.modifiable.setLocal(denops, false);
       });
       await buffer.editData(denops, new Uint8Array([...stdout, ...stderr]), {
-        silent: true,
-        keepalt: true,
-        keepjumps: true,
+        mods: "silent keepalt keepjumps",
         cmdarg,
       });
     });
