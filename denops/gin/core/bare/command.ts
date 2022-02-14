@@ -78,9 +78,6 @@ export async function bind(denops: Denops, bufnr: number): Promise<void> {
       "User",
       "GinCommandPost",
       `call gin#util#reload(${bufnr})`,
-      {
-        nested: true,
-      },
     );
   });
 }
