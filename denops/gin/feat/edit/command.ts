@@ -45,7 +45,7 @@ export async function command(
 
   if (!commitish && flags.cached == null) {
     // worktree
-    await buffer.open(denops, path.join(worktree, relpath), cmdarg);
+    await buffer.open(denops, path.join(worktree, relpath), { cmdarg });
   } else {
     // commitish/cached
     const bname = bufname.format({
@@ -58,7 +58,7 @@ export async function command(
       },
       fragment: relpath,
     });
-    await buffer.open(denops, bname.toString(), cmdarg);
+    await buffer.open(denops, bname.toString(), { cmdarg });
   }
 }
 

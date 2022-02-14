@@ -1,14 +1,21 @@
 import { autocmd, batch, Denops, fn } from "../deps.ts";
 
+export type OpenOptions = {
+  mods?: string;
+  cmdarg?: string;
+};
+
 /**
  * Open a buffer
  */
 export async function open(
   denops: Denops,
   bufname: string,
-  cmdarg = "",
+  options: OpenOptions = {},
 ): Promise<void> {
-  await denops.cmd(`edit ${cmdarg} \`=bufname\``, { bufname });
+  const mods = options.mods ?? "";
+  const cmdarg = options.cmdarg ?? "";
+  await denops.cmd(`${mods} edit ${cmdarg} \`=bufname\``, { bufname });
 }
 
 /**

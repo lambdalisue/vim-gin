@@ -61,7 +61,7 @@ export async function command(
     },
     fragment: relpath,
   });
-  await buffer.open(denops, bname.toString(), cmdarg);
+  await buffer.open(denops, bname.toString(), { cmdarg });
 }
 
 export async function read(denops: Denops): Promise<void> {
