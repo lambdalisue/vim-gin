@@ -1,5 +1,4 @@
-import { autocmd, batch, Denops, fn, option } from "../../deps.ts";
-import { echo, echoerr } from "../../util/helper.ts";
+import { autocmd, batch, Denops, fn, helper, option } from "../../deps.ts";
 import {
   builtinOpts,
   formatOpts,
@@ -59,9 +58,9 @@ export async function command(
     await buffer.concrete(denops, bufnr);
   } else {
     if (status.success) {
-      await echo(denops, decodeUtf8(stdout) + decodeUtf8(stderr));
+      await helper.echo(denops, decodeUtf8(stdout) + decodeUtf8(stderr));
     } else {
-      await echoerr(denops, decodeUtf8(stdout) + decodeUtf8(stderr));
+      await helper.echoerr(denops, decodeUtf8(stdout) + decodeUtf8(stderr));
     }
   }
   if (status.success) {

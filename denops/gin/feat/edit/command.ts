@@ -5,6 +5,7 @@ import {
   Denops,
   fn,
   fs,
+  helper,
   option,
   path,
   unknownutil,
@@ -17,7 +18,6 @@ import {
   validateFlags,
   validateOpts,
 } from "../../util/args.ts";
-import * as helper from "../../util/helper.ts";
 import * as buffer from "../../util/buffer.ts";
 import { normCmdArgs } from "../../util/cmd.ts";
 import { getWorktreeFromOpts } from "../../util/worktree.ts";
