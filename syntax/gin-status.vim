@@ -14,14 +14,12 @@ highlight default link GinStatusUpstream GinColor10
 highlight default link GinStatusDownstream GinColor9
 
 syntax clear
-syntax match GinStatusState /^../ display transparent oneline
-syntax match GinStatusUntracked /??/ containedin=GinStatusState
-syntax match GinStatusIgnored /!!/ containedin=GinStatusState
-syntax match GinStatusConflicted /\%(DD\|AU\|UD\|UA\|DU\|AA\|UU\)/ containedin=GinStatusState
-syntax match GinStatusStateX /[ MADRC]/ containedin=GinStatusState nextgroup=GinStatusStateY
+syntax match GinStatusUntracked /^??/
+syntax match GinStatusIgnored /^!!/
+syntax match GinStatusConflicted /^\%(DD\|AU\|UD\|UA\|DU\|AA\|UU\)/
+syntax match GinStatusStateX /^[ MADRC]/ nextgroup=GinStatusStateY
 syntax match GinStatusStateY /[ MADRC]/ contained
-syntax match GinStatusHeader /\%1l/ display transparent oneline
-syntax match GinStatusLocal /## [^\.]\+/hs=s+3 containedin=GinStatusHeader nextgroup=GinStatusRemote,GinStatusUpstream
-syntax match GinStatusRemote /\.\.\.\S\+/hs=s+3 containedin=GinStatusHeader
-syntax match GinStatusUpstream /+\d\+/ containedin=GinStatusHeader nextgroup=GinStatusDownstream
-syntax match GinStatusDownstream /-\d\+/ containedin=GinStatusHeader
+syntax match GinStatusLocal /\%1l## [^\.]\+/hs=s+3 nextgroup=GinStatusRemote,GinStatusUpstream
+syntax match GinStatusRemote /\.\.\.\S\+/hs=s+3
+syntax match GinStatusUpstream /+\d\+/ nextgroup=GinStatusDownstream
+syntax match GinStatusDownstream /-\d\+/
