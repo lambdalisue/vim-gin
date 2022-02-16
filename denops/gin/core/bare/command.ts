@@ -40,7 +40,7 @@ export async function command(
     proc.stderrOutput(),
   ]);
   proc.close();
-  if (opts.buffer) {
+  if ("buffer" in opts) {
     const cmdarg = formatOpts(opts, builtinOpts).join(" ");
     await denops.cmd("enew");
     const bufnr = await fn.bufnr(denops);
