@@ -1,3 +1,5 @@
+import { fs, path } from "../../deps.ts";
+
 const beginMarker = `${"<".repeat(7)} `;
 const endMarker = `${">".repeat(7)} `;
 
@@ -13,4 +15,23 @@ export function stripConflicts(content: string[]): string[] {
     }
     return !inner;
   });
+}
+
+const validAliasHeads = [
+  "MERGE_HEAD",
+  "REBASE_HEAD",
+  "CHERRY_PICK_HEAD",
+  "REVERT_HEAD",
+] as const;
+export type AliasHead = typeof validAliasHeads[number];
+
+export async function getInProgressAliasHead(
+  worktree: string,
+): Promise<AliasHead | undefined> {
+  for (const head of validAliasHeads) {
+    if (await fs.exists(path.join(worktree, ".git", head))) {
+      return head;
+    }
+  }
+  return undefined;
 }

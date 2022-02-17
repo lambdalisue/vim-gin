@@ -18,7 +18,7 @@ import * as buffer from "../../util/buffer.ts";
 import { normCmdArgs } from "../../util/cmd.ts";
 import { getWorktreeFromOpts } from "../../util/worktree.ts";
 import { command as editCommand } from "../edit/command.ts";
-import { stripConflicts } from "./util.ts";
+import { AliasHead, getInProgressAliasHead, stripConflicts } from "./util.ts";
 
 export async function command(
   denops: Denops,
@@ -47,6 +47,8 @@ export async function command(
     ? 0
     : await vars.g.get(denops, "gin_chaperon_supplement_height", 10 as unknown);
   unknownutil.ensureNumber(supplementHeight);
+
+  const inProgressAliasHead = await getInProgressAliasHead(worktree);
 
   let bufnrTheirs = -1;
   if (!withoutTheirs) {
@@ -81,7 +83,13 @@ export async function command(
 
   // Theirs
   if (bufnrTheirs !== -1) {
-    await initTheirs(denops, bufnrTheirs, bufnrWorktree, supplementHeight);
+    await initTheirs(
+      denops,
+      bufnrTheirs,
+      bufnrWorktree,
+      supplementHeight,
+      inProgressAliasHead,
+    );
   }
 
   // WORKTREE
@@ -91,6 +99,7 @@ export async function command(
     bufnrTheirs,
     bufnrOurs,
     supplementHeight,
+    inProgressAliasHead,
   );
 
   // Ours
@@ -120,6 +129,7 @@ async function initTheirs(
   bufnr: number,
   bufnrWorktree: number,
   supplementHeight: number,
+  inProgressAliasHead?: AliasHead,
 ): Promise<void> {
   await buffer.ensure(denops, bufnr, async () => {
     await batch.batch(denops, async (denops) => {
@@ -144,7 +154,7 @@ async function initTheirs(
     });
     if (supplementHeight) {
       await denops.cmd(
-        `leftabove ${supplementHeight}split | Gin! ++buffer log -1 MERGE_HEAD -p | set filetype=git`,
+        `leftabove ${supplementHeight}split | Gin! ++buffer log -1 ${inProgressAliasHead} -p | set filetype=git`,
       );
     }
   });
@@ -179,7 +189,7 @@ async function initOurs(
     });
     if (supplementHeight) {
       await denops.cmd(
-        `leftabove ${supplementHeight}split | Gin! ++buffer log -1 ORIG_HEAD -p | set filetype=git`,
+        `leftabove ${supplementHeight}split | Gin! ++buffer log -1 HEAD -p | set filetype=git`,
       );
     }
   });
@@ -191,6 +201,7 @@ async function initWorktree(
   bufnrTheirs: number,
   bufnrOurs: number,
   supplementHeight: number,
+  inProgressAliasHead?: string,
 ): Promise<void> {
   await buffer.ensure(denops, bufnr, async () => {
     const content = await fn.getbufline(denops, bufnr, 1, "$");
@@ -270,7 +281,7 @@ async function initWorktree(
     });
     if (supplementHeight) {
       await denops.cmd(
-        `leftabove ${supplementHeight}split | Gin! ++buffer log --oneline --left-right HEAD...MERGE_HEAD | set filetype=diff`,
+        `leftabove ${supplementHeight}split | Gin! ++buffer log --oneline --left-right ${inProgressAliasHead}...HEAD | set filetype=diff`,
       );
     }
   });
