@@ -45,15 +45,7 @@ function! s:norm_xs(xs) abort
 endfunction
 
 function! s:opener() abort
-  let opener = input('Open with: ')
-  redraw | echo ''
-  if empty(opener)
-    echohl WarningMsg
-    echo 'Cancelled'
-    echohl None
-    return v:null
-  endif
-  return opener
+  return gin#internal#util#action#select_opener()
 endfunction
 
 function! s:diff(opener, suffix, xs) abort
