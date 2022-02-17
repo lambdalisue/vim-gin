@@ -13,6 +13,7 @@ USAGE				|gin-usage|
   ACTION			  |gin-action|
 INTERFACE			|gin-interface|
   COMMANDS			  |gin-commands|
+  VARIABLES			  |gin-variables|
   FUNCTIONS			  |gin-functions|
   ACTIONS			  |gin-actions|
 
@@ -97,15 +98,22 @@ COMMANDS					*gin-commands*
 	prompt to input passphrase on "Gin push" or so on.
 
 								*:GinChaperon*
-:GinChaperon [++opt] [++worktree={worktree}] {path}
-:GinChaperon [++opt] [++worktree={worktree}] --without-theirs {path}
-:GinChaperon [++opt] [++worktree={worktree}] --without-ours {path}
-	Open three buffers (THEIRS, WORKTREE, and OURS) to solve conflicts on
-	{path} in a {worktree}. 
+:GinChaperon [++opt] [++worktree={worktree}] [--without-supplements] {path}
+:GinChaperon [++opt] [++worktree={worktree}] [--without-supplements] 
+	--without-theirs {path}
+:GinChaperon [++opt] [++worktree={worktree}] [--without-supplements]
+	--without-ours {path}
+	Open three main buffers (THEIRS, WORKTREE, and OURS) and three
+	supplemental buffers to solve conflicts on {path} in a {worktree}. 
 	If no {worktree} is specified, gin will find the one from the current
 	working directory.
 	If --without-theirs is specified, it does not open a THEIRS buffer.
 	If --without-ours is specified, it does not open a OURS buffer.
+	If --without-supplements is specified, it does not open supplemental
+	buffers.
+
+	Use |g:gin_chaperon_supplement_height| to regulate the height of
+	supplemental buffers.
 
 	Users can use the following mappings in each buffers
 
@@ -114,12 +122,12 @@ COMMANDS					*gin-commands*
 					Assigned to "dp" in default.
 
 	WORKTREE~
-	*<Plug>(gin-diffget)*		Get a diff chunk from THEIRS or OURS
+	|<Plug>(gin-diffget)|		Get a diff chunk from THEIRS or OURS
 					buffer (prefer OURS buffer.)
 					Assigned to "do" in default.
-	*<Plug>(gin-diffget-l)*		Get a diff chunk from THEIRS buffer.
+	|<Plug>(gin-diffget-l)|		Get a diff chunk from THEIRS buffer.
 					Assigned to "dol" in default.
-	*<Plug>(gin-diffget-r)*		Get a diff chunk from OURS buffer.
+	|<Plug>(gin-diffget-r)|		Get a diff chunk from OURS buffer.
 					Assigned to "dor" in default.
 
 	OURS~
@@ -218,6 +226,15 @@ COMMANDS					*gin-commands*
 	--find-renames[={n}]
 		
 	See ":man git-status(1)" for detail about {flags}.
+
+-----------------------------------------------------------------------------
+VARIABLES					*gin-variables*
+
+*g:gin_chaperon_supplement_height*
+	|Number| that indicates the height of supplemental buffers of
+	|:GinChaperon| command.
+
+	Default: 10
 
 -----------------------------------------------------------------------------
 FUNCTIONS					*gin-functions*
@@ -388,9 +405,19 @@ ACTIONS						*gin-actions*
 *<Plug>(gin-action-chaperon)*
 *<Plug>(gin-action-chaperon:theirs)*
 *<Plug>(gin-action-chaperon:ours)*
+*<Plug>(gin-action-chaperon:supplements)*
+*<Plug>(gin-action-chaperon:supplements:theirs)*
+*<Plug>(gin-action-chaperon:supplements:ours)*
+*<Plug>(gin-action-chaperon:nosupplements)*
+*<Plug>(gin-action-chaperon:nosupplements:theirs)*
+*<Plug>(gin-action-chaperon:nosupplements:ours)*
 	Call |:GinChaperon| on active action candidates to solve conflicts.
 	If ":theirs" or ":ours" variant is used, it call the command with
 	"--without-ours" or "--without-theirs" respectively.
+	If ":nosupplements" variant is used, it call the command with
+	"--without-supplements".
+	Variants without ":supplements" or ":nosupplements" are aliased to
+	":supplements" variants.
 
 *<Plug>(gin-action-patch)*
 *<Plug>(gin-action-patch:head)*

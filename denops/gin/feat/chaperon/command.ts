@@ -1,4 +1,12 @@
-import { batch, Denops, fn, mapping, path } from "../../deps.ts";
+import {
+  batch,
+  Denops,
+  fn,
+  mapping,
+  path,
+  unknownutil,
+  vars,
+} from "../../deps.ts";
 import {
   builtinOpts,
   formatOpts,
@@ -24,16 +32,26 @@ export async function command(
   validateFlags(flags, [
     "without-ours",
     "without-theirs",
+    "without-supplements",
   ]);
   const [abspath] = parseResidue(residue);
   const worktree = await getWorktreeFromOpts(denops, opts);
   const relpath = path.relative(worktree, abspath);
   const leading = formatOpts(opts, builtinOpts);
 
+  const withoutTheirs = "without-theirs" in flags;
+  const withoutOurs = "without-ours" in flags;
+  const withoutSupplements = "without-supplements" in flags;
+
+  const supplementHeight = withoutSupplements
+    ? 0
+    : await vars.g.get(denops, "gin_chaperon_supplement_height", 10 as unknown);
+  unknownutil.ensureNumber(supplementHeight);
+
   await denops.cmd("tabedit");
 
   let bufnrTheirs = -1;
-  if (!flags["without-theirs"]) {
+  if (!withoutTheirs) {
     await editCommand(denops, [
       ...leading,
       `++worktree=${worktree}`,
@@ -52,7 +70,7 @@ export async function command(
   const bufnrWorktree = await fn.bufnr(denops);
 
   let bufnrOurs = -1;
-  if (!flags["without-ours"]) {
+  if (!withoutOurs) {
     await denops.cmd("botright vsplit");
     await editCommand(denops, [
       ...leading,
@@ -65,15 +83,21 @@ export async function command(
 
   // Theirs
   if (bufnrTheirs !== -1) {
-    await initTheirs(denops, bufnrTheirs, bufnrWorktree);
+    await initTheirs(denops, bufnrTheirs, bufnrWorktree, supplementHeight);
   }
 
   // WORKTREE
-  await initWorktree(denops, bufnrWorktree, bufnrTheirs, bufnrOurs);
+  await initWorktree(
+    denops,
+    bufnrWorktree,
+    bufnrTheirs,
+    bufnrOurs,
+    supplementHeight,
+  );
 
   // Ours
   if (bufnrOurs !== -1) {
-    await initOurs(denops, bufnrOurs, bufnrWorktree);
+    await initOurs(denops, bufnrOurs, bufnrWorktree, supplementHeight);
   }
 
   // Focus Worktree
@@ -97,6 +121,7 @@ async function initTheirs(
   denops: Denops,
   bufnr: number,
   bufnrWorktree: number,
+  supplementHeight: number,
 ): Promise<void> {
   await buffer.ensure(denops, bufnr, async () => {
     await batch.batch(denops, async (denops) => {
@@ -119,6 +144,11 @@ async function initTheirs(
       );
       await denops.cmd("diffthis");
     });
+    if (supplementHeight) {
+      await denops.cmd(
+        `leftabove ${supplementHeight}split | Gin! ++buffer log -1 MERGE_HEAD -p | set filetype=git`,
+      );
+    }
   });
 }
 
@@ -126,6 +156,7 @@ async function initOurs(
   denops: Denops,
   bufnr: number,
   bufnrWorktree: number,
+  supplementHeight: number,
 ): Promise<void> {
   await buffer.ensure(denops, bufnr, async () => {
     await batch.batch(denops, async (denops) => {
@@ -148,6 +179,11 @@ async function initOurs(
       );
       await denops.cmd("diffthis");
     });
+    if (supplementHeight) {
+      await denops.cmd(
+        `leftabove ${supplementHeight}split | Gin! ++buffer log -1 ORIG_HEAD -p | set filetype=git`,
+      );
+    }
   });
 }
 
@@ -156,6 +192,7 @@ async function initWorktree(
   bufnr: number,
   bufnrTheirs: number,
   bufnrOurs: number,
+  supplementHeight: number,
 ): Promise<void> {
   await buffer.ensure(denops, bufnr, async () => {
     const content = await fn.getbufline(denops, bufnr, 1, "$");
@@ -233,5 +270,10 @@ async function initWorktree(
       }
       await denops.cmd("diffthis");
     });
+    if (supplementHeight) {
+      await denops.cmd(
+        `leftabove ${supplementHeight}split | Gin! ++buffer log --oneline --left-right HEAD...MERGE_HEAD | set filetype=diff`,
+      );
+    }
   });
 }
