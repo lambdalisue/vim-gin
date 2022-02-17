@@ -30,13 +30,18 @@ function! gin#internal#feat#status#action#register() abort
         \ <Cmd>call gin#action#fn({ xs -> <SID>reset(xs) })<CR>
 
   noremap <buffer> <Plug>(gin-action-restore)
-        \ <Cmd>call gin#action#fn({ xs -> <SID>restore('', xs) })<CR>
+        \ <Cmd>call gin#action#fn({ xs -> <SID>restore('--ignore-unmerged', xs) })<CR>
   noremap <buffer> <Plug>(gin-action-restore:staged)
-        \ <Cmd>call gin#action#fn({ xs -> <SID>restore('--staged', xs) })<CR>
+        \ <Cmd>call gin#action#fn({ xs -> <SID>restore('--ignore-unmerged --staged', xs) })<CR>
   noremap <buffer> <Plug>(gin-action-restore:ours)
-        \ <Cmd>call gin#action#fn({ xs -> <SID>restore('--ours', xs) })<CR>
+        \ <Cmd>call gin#action#fn({ xs -> <SID>restore('--ignore-unmerged --ours', xs) })<CR>
   noremap <buffer> <Plug>(gin-action-restore:theirs)
-        \ <Cmd>call gin#action#fn({ xs -> <SID>restore('--theirs', xs) })<CR>
+        \ <Cmd>call gin#action#fn({ xs -> <SID>restore('--ignore-unmerged --theirs', xs) })<CR>
+  noremap <buffer> <Plug>(gin-action-restore:conflict:merge)
+        \ <Cmd>call gin#action#fn({ xs -> <SID>restore('--conflict=merge', xs) })<CR>
+  noremap <buffer> <Plug>(gin-action-restore:conflict:diff3)
+        \ <Cmd>call gin#action#fn({ xs -> <SID>restore('--conflict=diff3', xs) })<CR>
+  map <buffer> <Plug>(gin-action-restore:conflict) <Plug>(gin-action-restore:conflict:merge)
 
   noremap <buffer> <Plug>(gin-action-stage)
         \ <Cmd>call gin#action#fn({ xs -> <SID>stage(xs) })<CR>
@@ -85,7 +90,7 @@ endfunction
 
 function! s:restore(suffix, xs) abort
   call s:norm_xs(a:xs)
-  execute printf('Gin! restore --quiet --ignore-unmerged %s -- %s', a:suffix, join(a:xs, ' '))
+  execute printf('Gin! restore --quiet %s -- %s', a:suffix, join(a:xs, ' '))
 endfunction
 
 function! s:stage(xs) abort

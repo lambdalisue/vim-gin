@@ -415,6 +415,9 @@ ACTIONS						*gin-actions*
 *<Plug>(gin-action-restore:staged)*
 *<Plug>(gin-action-restore:ours)*
 *<Plug>(gin-action-restore:theirs)*
+*<Plug>(gin-action-restore:conflict)*
+*<Plug>(gin-action-restore:conflict:merge)*
+*<Plug>(gin-action-restore:conflict:diff3)*
 	Call "git restore" on active action candidates.
 
 *<Plug>(gin-action-stage)*
