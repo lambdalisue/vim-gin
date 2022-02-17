@@ -1,8 +1,8 @@
 // XXX:
 // https://github.com/vim-denops/deno-denops-std/pull/119
-import type { Denops } from "https://deno.land/x/denops_std@v2.4.0/mod.ts";
-import { batch } from "https://deno.land/x/denops_std@v2.4.0/batch/mod.ts";
-import { echo } from "https://deno.land/x/denops_std@v2.4.0/helper/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v3.0.0/mod.ts";
+import { batch } from "https://deno.land/x/denops_std@v3.0.0/batch/mod.ts";
+import { echo } from "https://deno.land/x/denops_std@v3.0.0/helper/mod.ts";
 
 /**
  * Echo message as an error message.
@@ -42,4 +42,4 @@ export async function friendlyCall(
   }
 }
 
-export * from "https://deno.land/x/denops_std@v2.4.0/helper/mod.ts";
+export * from "https://deno.land/x/denops_std@v3.0.0/helper/mod.ts";
