@@ -96,6 +96,39 @@ COMMANDS					*gin-commands*
 	Note that users need to install askpass.vim (|gin-askpass|) to open a
 	prompt to input passphrase on "Gin push" or so on.
 
+								*:GinChaperon*
+:GinChaperon [++opt] [++worktree={worktree}] {path}
+:GinChaperon [++opt] [++worktree={worktree}] --without-theirs {path}
+:GinChaperon [++opt] [++worktree={worktree}] --without-ours {path}
+	Open three buffers (THEIRS, WORKTREE, and OURS) to solve conflicts on
+	{path} in a {worktree}. 
+	If no {worktree} is specified, gin will find the one from the current
+	working directory.
+	If --without-theirs is specified, it does not open a THEIRS buffer.
+	If --without-ours is specified, it does not open a OURS buffer.
+
+	Users can use the following mappings in each buffers
+
+	THEIRS~
+	|<Plug>(gin-diffput)|		Put a diff chunk to WORKTREE buffer.
+					Assigned to "dp" in default.
+
+	WORKTREE~
+	*<Plug>(gin-diffget)*		Get a diff chunk from THEIRS or OURS
+					buffer (prefer OURS buffer.)
+					Assigned to "do" in default.
+	*<Plug>(gin-diffget-l)*		Get a diff chunk from THEIRS buffer.
+					Assigned to "dol" in default.
+	*<Plug>(gin-diffget-r)*		Get a diff chunk from OURS buffer.
+					Assigned to "dor" in default.
+
+	OURS~
+	|<Plug>(gin-diffget)|		Get a diff chunk from WORKTREE buffer.
+					Assigned to "do" in default.
+
+	NOTE that the buffers appearance order is opposite from 
+	"Gina chaperon" if you were user of gina.vim.
+
 								*:GinDiff*
 :GinDiff [++opt] [++worktree={worktree}] [{flags}] {path}
 :GinDiff [++opt] [++worktree={worktree}] [{flags}] --cached {path}
