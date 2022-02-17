@@ -48,8 +48,6 @@ export async function command(
     : await vars.g.get(denops, "gin_chaperon_supplement_height", 10 as unknown);
   unknownutil.ensureNumber(supplementHeight);
 
-  await denops.cmd("tabedit");
-
   let bufnrTheirs = -1;
   if (!withoutTheirs) {
     await editCommand(denops, [

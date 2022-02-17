@@ -29,8 +29,6 @@ export async function command(
   const relpath = path.relative(worktree, abspath);
   const leading = formatOpts(opts, builtinOpts);
 
-  await denops.cmd("tabedit");
-
   let bufnrHead = -1;
   if (!flags["without-head"]) {
     await editCommand(denops, [

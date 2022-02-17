@@ -75,12 +75,12 @@ endfunction
 
 function! s:chaperon(suffix, xs) abort
   call s:norm_xs(a:xs)
-  call map(a:xs, { _, v -> execute(printf('GinChaperon %s %s', a:suffix, v), '') })
+  call map(a:xs, { _, v -> execute(printf('tabedit | GinChaperon %s %s', a:suffix, v), '') })
 endfunction
 
 function! s:patch(suffix, xs) abort
   call s:norm_xs(a:xs)
-  call map(a:xs, { _, v -> execute(printf('GinPatch %s %s', a:suffix, v), '') })
+  call map(a:xs, { _, v -> execute(printf('tabedit | GinPatch %s %s', a:suffix, v), '') })
 endfunction
 
 function! s:add(suffix, xs) abort
