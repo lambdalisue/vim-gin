@@ -25,8 +25,12 @@ export async function command(
     ...builtinOpts,
   ]);
   const worktree = await getWorktreeFromOpts(denops, opts);
-  const env = await fn.environ(denops) as Record<string, string>;
+  const [env, verbose] = await batch.gather(denops, async (denops) => {
+    await fn.environ(denops);
+    await option.verbose.get(denops);
+  }) as [Record<string, string>, number];
   const proc = run(residue, {
+    printCommand: !!verbose,
     stdin: "null",
     stdout: "piped",
     stderr: "piped",

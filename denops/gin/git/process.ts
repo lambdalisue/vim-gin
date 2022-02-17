@@ -2,6 +2,7 @@ import { decodeUtf8 } from "../util/text.ts";
 
 export type RunOptions = Omit<Deno.RunOptions, "cmd"> & {
   noOptionalLocks?: boolean;
+  printCommand?: boolean;
 };
 
 export function run(
@@ -17,6 +18,9 @@ export function run(
     cmd.push("--no-optional-locks");
   }
   cmd.push(...args);
+  if (options.printCommand) {
+    console.debug(`Run '${cmd.join(" ")}'`);
+  }
   return Deno.run({
     cmd,
     stdout: options.stdout,

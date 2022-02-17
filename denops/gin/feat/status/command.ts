@@ -73,9 +73,15 @@ export async function read(denops: Denops): Promise<void> {
     "-z",
     ...formatFlags(flags),
   ];
+  const [env, verbose] = await batch.gather(denops, async (denops) => {
+    await fn.environ(denops);
+    await option.verbose.get(denops);
+  }) as [Record<string, string>, number];
   const stdout = await execute(args, {
+    printCommand: !!verbose,
     noOptionalLocks: true,
     cwd: expr,
+    env,
   });
   const result = parseStatus(stdout);
   // Sort entries by its path
