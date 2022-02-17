@@ -109,7 +109,7 @@ function! s:stage(xs) abort
     noautocmd call s:rm('', xs_removed)
   endif
 
-  let xs_others = filter(a:xs, { _, v -> v.XY[1] !=# 'D' })
+  let xs_others = filter(a:xs, { _, v -> v.XY[1] !=# '.' && v.XY[1] !=# 'D' })
   if !empty(xs_others)
     noautocmd call s:add('', xs_others)
   endif
