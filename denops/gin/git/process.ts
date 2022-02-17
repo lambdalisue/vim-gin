@@ -1,5 +1,4 @@
 import { decodeUtf8 } from "../util/text.ts";
-import { report } from "../core/debug/core.ts";
 
 export type RunOptions = Omit<Deno.RunOptions, "cmd"> & {
   noOptionalLocks?: boolean;
@@ -18,7 +17,6 @@ export function run(
     cmd.push("--no-optional-locks");
   }
   cmd.push(...args);
-  report(`Run: ${JSON.stringify(cmd)}`);
   return Deno.run({
     cmd,
     stdout: options.stdout,

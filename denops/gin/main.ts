@@ -2,7 +2,6 @@ import { Denops } from "./deps.ts";
 
 import { main as mainAction } from "./core/action/main.ts";
 import { main as mainBare } from "./core/bare/main.ts";
-import { main as mainDebug } from "./core/debug/main.ts";
 import { main as mainUtil } from "./core/util/main.ts";
 
 import { main as mainChaperon } from "./feat/chaperon/main.ts";
@@ -14,7 +13,6 @@ import { main as mainStatus } from "./feat/status/main.ts";
 export function main(denops: Denops): void {
   mainAction(denops);
   mainBare(denops);
-  mainDebug(denops);
   mainUtil(denops);
 
   mainChaperon(denops);
