@@ -2,6 +2,13 @@ function! gin#internal#feat#status#action#register() abort
   call gin#internal#feat#status#action#edit#register()
   call gin#internal#feat#status#action#diff#register()
 
+  noremap <buffer> <Plug>(gin-action-chaperon)
+        \ <Cmd>call gin#action#fn({ xs -> <SID>chaperon('', xs) })<CR>
+  noremap <buffer> <Plug>(gin-action-chaperon:theirs)
+        \ <Cmd>call gin#action#fn({ xs -> <SID>chaperon('--without-ours', xs) })<CR>
+  noremap <buffer> <Plug>(gin-action-chaperon:ours)
+        \ <Cmd>call gin#action#fn({ xs -> <SID>chaperon('--without-theirs', xs) })<CR>
+
   noremap <buffer> <Plug>(gin-action-patch)
         \ <Cmd>call gin#action#fn({ xs -> <SID>patch('', xs) })<CR>
   noremap <buffer> <Plug>(gin-action-patch:head)
@@ -49,6 +56,11 @@ endfunction
 function! s:norm_xs(xs) abort
   call map(a:xs, { _, v -> v.value })
   call map(a:xs, { _, v -> escape(v, ' \\') })
+endfunction
+
+function! s:chaperon(suffix, xs) abort
+  call s:norm_xs(a:xs)
+  call map(a:xs, { _, v -> execute(printf('GinChaperon %s %s', a:suffix, v), '') })
 endfunction
 
 function! s:patch(suffix, xs) abort

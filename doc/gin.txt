@@ -385,6 +385,13 @@ ACTIONS						*gin-actions*
 	It works like |<Plug>(gin-action-diff)| when there is no staged
 	changes. Otherwise it works like |<Plug>(gin-action-diff:cached)|.
 
+*<Plug>(gin-action-chaperon)*
+*<Plug>(gin-action-chaperon:theirs)*
+*<Plug>(gin-action-chaperon:ours)*
+	Call |:GinChaperon| on active action candidates to solve conflicts.
+	If ":theirs" or ":ours" variant is used, it call the command with
+	"--without-ours" or "--without-theirs" respectively.
+
 *<Plug>(gin-action-patch)*
 *<Plug>(gin-action-patch:head)*
 *<Plug>(gin-action-patch:worktree)*
