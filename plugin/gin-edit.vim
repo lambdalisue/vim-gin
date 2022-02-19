@@ -9,7 +9,9 @@ augroup gin_plugin_edit_internal
 augroup END
 
 function! s:command(...) abort
-  call denops#plugin#wait('gin')
+  if denops#plugin#wait('gin')
+    return
+  endif
   call denops#request('gin', 'edit:command', a:000)
 endfunction
 

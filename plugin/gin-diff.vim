@@ -9,7 +9,9 @@ augroup gin_plugin_diff_internal
 augroup END
 
 function! s:command(...) abort
-  call denops#plugin#wait('gin')
+  if denops#plugin#wait('gin')
+    return
+  endif
   call denops#request('gin', 'diff:command', a:000)
 endfunction
 

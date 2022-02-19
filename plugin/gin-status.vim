@@ -9,7 +9,9 @@ augroup gin_plugin_status_internal
 augroup END
 
 function! s:command(...) abort
-  call denops#plugin#wait('gin')
+  if denops#plugin#wait('gin')
+    return
+  endif
   call denops#request('gin', 'status:command', a:000)
 endfunction
 

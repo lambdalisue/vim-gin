@@ -11,7 +11,9 @@ augroup END
 
 function! s:command(bang, args) abort
   if a:bang ==# '!'
-    call denops#plugin#wait('gin')
+    if denops#plugin#wait('gin')
+      return
+    endif
     call denops#request('gin', 'command', [a:args])
   else
     let l:Callback = function('denops#notify', [

@@ -4,7 +4,9 @@ endif
 let g:loaded_gin_patch = 1
 
 function! s:command(...) abort
-  call denops#plugin#wait('gin')
+  if denops#plugin#wait('gin')
+    return
+  endif
   call denops#request('gin', 'patch:command', a:000)
 endfunction
 
