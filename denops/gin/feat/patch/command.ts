@@ -1,4 +1,4 @@
-import { batch, Denops, fn, mapping, path } from "../../deps.ts";
+import { batch, Denops, fn, mapping } from "../../deps.ts";
 import {
   builtinOpts,
   formatOpts,
@@ -26,7 +26,6 @@ export async function command(
   ]);
   const [abspath] = parseResidue(residue);
   const worktree = await getWorktreeFromOpts(denops, opts);
-  const relpath = path.relative(worktree, abspath);
   const leading = formatOpts(opts, builtinOpts);
 
   let bufnrHead = -1;
@@ -35,7 +34,7 @@ export async function command(
       ...leading,
       `++worktree=${worktree}`,
       "HEAD",
-      relpath,
+      abspath,
     ]);
     bufnrHead = await fn.bufnr(denops);
     await denops.cmd("botright vsplit");
@@ -45,7 +44,7 @@ export async function command(
     ...leading,
     `++worktree=${worktree}`,
     "--cached",
-    relpath,
+    abspath,
   ]);
   const bufnrIndex = await fn.bufnr(denops);
 
@@ -56,7 +55,7 @@ export async function command(
       ...leading,
       `++worktree=${worktree}`,
       "",
-      relpath,
+      abspath,
     ]);
     bufnrWorktree = await fn.bufnr(denops);
   }
