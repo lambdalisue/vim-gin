@@ -20,9 +20,10 @@ export function main(denops: Denops): void {
       unknownutil.ensureLike([0, 0] as [number, number], range);
       return action.actionRepeat(denops, range);
     },
-    "action:action:help": (range) => {
+    "action:action:help": (range, reduced) => {
       unknownutil.ensureLike([0, 0] as [number, number], range);
-      return action.actionHelp(denops, range);
+      unknownutil.ensureBoolean(reduced);
+      return action.actionHelp(denops, range, reduced);
     },
   };
 }

@@ -296,9 +296,9 @@ ACTIONS						*gin-actions*
 	It is mapped to "." in default when no mapping exists.
 
 *<Plug>(gin-action-help)*
+*<Plug>(gin-action-help:all)*
 	Show action help.
 	It is mapped to "?" in default when no mapping exists.
-	NOTE: Not implemented yet.
 
 *<Plug>(gin-action-edit=)*
 *<Plug>(gin-action-edit:edit)*
