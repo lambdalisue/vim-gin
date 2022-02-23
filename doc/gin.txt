@@ -227,6 +227,9 @@ COMMANDS					*gin-commands*
 		
 	See ":man git-status(1)" for detail about {flags}.
 
+	Several default mappings are defined in the buffer. Use "help" action
+	to see mappings or disable by |g:gin_status_disable_default_mappings|.
+
 -----------------------------------------------------------------------------
 VARIABLES					*gin-variables*
 
@@ -235,6 +238,11 @@ VARIABLES					*gin-variables*
 	|:GinChaperon| command.
 
 	Default: 10
+
+*g:gin_status_disable_default_mappings*
+	Disable default mappings on `:GinStatus` buffer.
+
+	Default: 0
 
 -----------------------------------------------------------------------------
 FUNCTIONS					*gin-functions*
