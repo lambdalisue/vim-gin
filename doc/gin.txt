@@ -115,7 +115,8 @@ COMMANDS					*gin-commands*
 	Use |g:gin_chaperon_supplement_height| to regulate the height of
 	supplemental buffers.
 
-	Users can use the following mappings in each buffers
+	Users can use the following mappings in each buffers or disable
+	default mappings by |g:gin_chaperon_disable_default_mappings|.
 
 	THEIRS~
 	|<Plug>(gin-diffput)|		Put a diff chunk to WORKTREE buffer.
@@ -188,7 +189,9 @@ COMMANDS					*gin-commands*
 	If --without-worktree is specified, it does not open a WORKTREE
 	buffer.
 
-	Users can use the following mappings in each buffers
+	Users can use the following mappings in each buffers or disable
+	default mappings by |g:gin_patch_disable_default_mappings|.
+
 
 	HEAD~
 	|<Plug>(gin-diffput)|		Put a diff chunk to INDEX buffer.
@@ -233,11 +236,21 @@ COMMANDS					*gin-commands*
 -----------------------------------------------------------------------------
 VARIABLES					*gin-variables*
 
+*g:gin_chaperon_disable_default_mappings*
+	Disable default mappings on buffers shown by `:GinChaperon`.
+
+	Default: 0
+
 *g:gin_chaperon_supplement_height*
 	|Number| that indicates the height of supplemental buffers of
 	|:GinChaperon| command.
 
 	Default: 10
+
+*g:gin_patch_disable_default_mappings*
+	Disable default mappings on buffers shown by `:GinPatch`.
+
+	Default: 0
 
 *g:gin_status_disable_default_mappings*
 	Disable default mappings on `:GinStatus` buffer.

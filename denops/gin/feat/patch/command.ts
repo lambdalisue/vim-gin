@@ -1,4 +1,4 @@
-import { batch, Denops, fn, mapping } from "../../deps.ts";
+import { batch, Denops, fn, mapping, unknownutil, vars } from "../../deps.ts";
 import {
   builtinOpts,
   formatOpts,
@@ -27,6 +27,13 @@ export async function command(
   const [abspath] = parseResidue(residue);
   const worktree = await getWorktreeFromOpts(denops, opts);
   const leading = formatOpts(opts, builtinOpts);
+
+  const disableDefaultMappings = await vars.g.get(
+    denops,
+    "gin_patch_disable_default_mappings",
+    false,
+  );
+  unknownutil.ensureBoolean(disableDefaultMappings);
 
   let bufnrHead = -1;
   if (!flags["without-head"]) {
@@ -62,15 +69,26 @@ export async function command(
 
   // HEAD
   if (bufnrHead !== -1) {
-    await initHead(denops, bufnrHead, bufnrIndex);
+    await initHead(denops, bufnrHead, bufnrIndex, disableDefaultMappings);
   }
 
   // INDEX
-  await initIndex(denops, bufnrIndex, bufnrHead, bufnrWorktree);
+  await initIndex(
+    denops,
+    bufnrIndex,
+    bufnrHead,
+    bufnrWorktree,
+    disableDefaultMappings,
+  );
 
   // WORKTREE
   if (bufnrWorktree !== -1) {
-    await initWorktree(denops, bufnrWorktree, bufnrIndex);
+    await initWorktree(
+      denops,
+      bufnrWorktree,
+      bufnrIndex,
+      disableDefaultMappings,
+    );
   }
 
   // Focus INDEX
@@ -94,6 +112,7 @@ async function initHead(
   denops: Denops,
   bufnr: number,
   bufnrIndex: number,
+  disableDefaultMappings: boolean,
 ): Promise<void> {
   await buffer.ensure(denops, bufnr, async () => {
     await batch.batch(denops, async (denops) => {
@@ -106,14 +125,16 @@ async function initHead(
           noremap: true,
         },
       );
-      await mapping.map(
-        denops,
-        "dp",
-        "<Plug>(gin-diffput)",
-        {
-          buffer: true,
-        },
-      );
+      if (!disableDefaultMappings) {
+        await mapping.map(
+          denops,
+          "dp",
+          "<Plug>(gin-diffput)",
+          {
+            buffer: true,
+          },
+        );
+      }
       await denops.cmd("diffthis");
     });
   });
@@ -123,6 +144,7 @@ async function initWorktree(
   denops: Denops,
   bufnr: number,
   bufnrIndex: number,
+  disableDefaultMappings: boolean,
 ): Promise<void> {
   await buffer.ensure(denops, bufnr, async () => {
     await batch.batch(denops, async (denops) => {
@@ -144,22 +166,24 @@ async function initWorktree(
           noremap: true,
         },
       );
-      await mapping.map(
-        denops,
-        "dp",
-        "<Plug>(gin-diffput)",
-        {
-          buffer: true,
-        },
-      );
-      await mapping.map(
-        denops,
-        "do",
-        "<Plug>(gin-diffget)",
-        {
-          buffer: true,
-        },
-      );
+      if (!disableDefaultMappings) {
+        await mapping.map(
+          denops,
+          "dp",
+          "<Plug>(gin-diffput)",
+          {
+            buffer: true,
+          },
+        );
+        await mapping.map(
+          denops,
+          "do",
+          "<Plug>(gin-diffget)",
+          {
+            buffer: true,
+          },
+        );
+      }
       await denops.cmd("diffthis");
     });
   });
@@ -170,6 +194,7 @@ async function initIndex(
   bufnr: number,
   bufnrHead: number,
   bufnrWorktree: number,
+  disableDefaultMappings: boolean,
 ): Promise<void> {
   await buffer.ensure(denops, bufnr, async () => {
     await batch.batch(denops, async (denops) => {
@@ -191,22 +216,24 @@ async function initIndex(
             buffer: true,
           },
         );
-        await mapping.map(
-          denops,
-          "dol",
-          "<Plug>(gin-diffget-l)",
-          {
-            buffer: true,
-          },
-        );
-        await mapping.map(
-          denops,
-          "do",
-          "<Plug>(gin-diffget)",
-          {
-            buffer: true,
-          },
-        );
+        if (disableDefaultMappings) {
+          await mapping.map(
+            denops,
+            "dol",
+            "<Plug>(gin-diffget-l)",
+            {
+              buffer: true,
+            },
+          );
+          await mapping.map(
+            denops,
+            "do",
+            "<Plug>(gin-diffget)",
+            {
+              buffer: true,
+            },
+          );
+        }
       }
       if (bufnrWorktree !== -1) {
         await mapping.map(
@@ -235,30 +262,32 @@ async function initIndex(
             buffer: true,
           },
         );
-        await mapping.map(
-          denops,
-          "dp",
-          "<Plug>(gin-diffput)",
-          {
-            buffer: true,
-          },
-        );
-        await mapping.map(
-          denops,
-          "dor",
-          "<Plug>(gin-diffget-r)",
-          {
-            buffer: true,
-          },
-        );
-        await mapping.map(
-          denops,
-          "do",
-          "<Plug>(gin-diffget)",
-          {
-            buffer: true,
-          },
-        );
+        if (!disableDefaultMappings) {
+          await mapping.map(
+            denops,
+            "dp",
+            "<Plug>(gin-diffput)",
+            {
+              buffer: true,
+            },
+          );
+          await mapping.map(
+            denops,
+            "dor",
+            "<Plug>(gin-diffget-r)",
+            {
+              buffer: true,
+            },
+          );
+          await mapping.map(
+            denops,
+            "do",
+            "<Plug>(gin-diffget)",
+            {
+              buffer: true,
+            },
+          );
+        }
       }
       await denops.cmd("diffthis");
     });
