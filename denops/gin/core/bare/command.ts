@@ -15,9 +15,6 @@ export async function command(
   denops: Denops,
   args: string[],
 ): Promise<void> {
-  await autocmd.emit(denops, "User", "GinCommandPre", {
-    nomodeline: true,
-  });
   const [opts, residue] = parseOpts(await normCmdArgs(denops, args));
   validateOpts(opts, [
     "worktree",

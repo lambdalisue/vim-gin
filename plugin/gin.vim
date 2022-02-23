@@ -5,7 +5,6 @@ let g:loaded_gin = 1
 
 augroup gin_plugin_internal
   autocmd!
-  autocmd User GinCommandPre :
   autocmd User GinCommandPost :
 augroup END
 
