@@ -4,23 +4,48 @@ endif
 let g:loaded_gin_colors = 1
 
 " Ref: https://github.com/w0ng/vim-hybrid
+let s:terminal_ansi_colors = [
+      \ '#282a2e',
+      \ '#a54242',
+      \ '#8c9440',
+      \ '#de935f',
+      \ '#5f819d',
+      \ '#85678f',
+      \ '#5e8d87',
+      \ '#707880',
+      \ '#373b41',
+      \ '#cc6666',
+      \ '#b5bd68',
+      \ '#f0c674',
+      \ '#81a2be',
+      \ '#b294bb',
+      \ '#8abeb7',
+      \ '#c5c8c6',
+      \]
+
+if has('nvim')
+  function! s:list_colors() abort
+    return map(
+          \ range(16),
+          \ { _, v -> get(g:, printf('terminal_color_%d', v), s:terminal_ansi_colors[v]) },
+          \)
+  endfunction
+else
+  function! s:list_colors() abort
+    return get(g:, 'terminal_ansi_colors', s:terminal_ansi_colors)
+  endfunction
+endif
+
 function! s:define_highlight() abort
-  highlight default GinColor0  ctermfg=0  guifg=#282A2E
-  highlight default GinColor1  ctermfg=1  guifg=#A54242
-  highlight default GinColor2  ctermfg=2  guifg=#8C9440
-  highlight default GinColor3  ctermfg=3  guifg=#DE935F
-  highlight default GinColor4  ctermfg=4  guifg=#5F819D
-  highlight default GinColor5  ctermfg=5  guifg=#85678F
-  highlight default GinColor6  ctermfg=6  guifg=#5E8D87
-  highlight default GinColor7  ctermfg=7  guifg=#707880
-  highlight default GinColor8  ctermfg=8  guifg=#373B41
-  highlight default GinColor9  ctermfg=9  guifg=#CC6666
-  highlight default GinColor10 ctermfg=10 guifg=#B5BD68
-  highlight default GinColor11 ctermfg=11 guifg=#F0C674
-  highlight default GinColor12 ctermfg=12 guifg=#81A2BE
-  highlight default GinColor13 ctermfg=13 guifg=#B294BB
-  highlight default GinColor14 ctermfg=14 guifg=#8ABEB7
-  highlight default GinColor15 ctermfg=15 guifg=#C5C8C6
+  let colors = s:list_colors()
+  for i in range(16)
+    execute printf(
+          \ 'highlight default GinColor%d  ctermfg=%d  guifg=%s',
+          \ i,
+          \ i,
+          \ colors[i],
+          \)
+  endfor
 endfunction
 
 augroup gin_plugin_colors_define_highlight_internal
