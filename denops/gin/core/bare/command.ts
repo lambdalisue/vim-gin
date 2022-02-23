@@ -1,4 +1,12 @@
-import { autocmd, batch, Denops, fn, helper, option } from "../../deps.ts";
+import {
+  autocmd,
+  batch,
+  Denops,
+  fn,
+  helper,
+  option,
+  unknownutil,
+} from "../../deps.ts";
 import {
   builtinOpts,
   formatOpts,
@@ -15,6 +23,17 @@ export async function command(
   denops: Denops,
   args: string[],
 ): Promise<void> {
+  const [env, verbose, eventignore] = await batch.gather(
+    denops,
+    async (denops) => {
+      await fn.environ(denops);
+      await option.verbose.get(denops);
+      await option.eventignore.get(denops);
+    },
+  );
+  unknownutil.ensureObject(env, unknownutil.isString);
+  unknownutil.ensureNumber(verbose);
+  unknownutil.ensureString(eventignore);
   const [opts, residue] = parseOpts(await normCmdArgs(denops, args));
   validateOpts(opts, [
     "worktree",
@@ -22,10 +41,6 @@ export async function command(
     ...builtinOpts,
   ]);
   const worktree = await getWorktreeFromOpts(denops, opts);
-  const [env, verbose] = await batch.gather(denops, async (denops) => {
-    await fn.environ(denops);
-    await option.verbose.get(denops);
-  }) as [Record<string, string>, number];
   const proc = run(residue, {
     printCommand: !!verbose,
     stdin: "null",
@@ -62,7 +77,7 @@ export async function command(
       await helper.echoerr(denops, decodeUtf8(stdout) + decodeUtf8(stderr));
     }
   }
-  if (status.success) {
+  if (status.success && !eventignore.includes("all")) {
     await autocmd.emit(denops, "User", "GinCommandPost", {
       nomodeline: true,
     });
