@@ -44,7 +44,7 @@ guise.vim~
 askpass.vim~
 	To input SSH key passphrase on "Gin push" or so on.
 	https://github.com/lambdalisue/askpass.vim
-  
+
 
 =============================================================================
 USAGE						*gin-usage*
@@ -463,6 +463,7 @@ ACTIONS						*gin-actions*
 *<Plug>(gin-action-stash)*
 *<Plug>(gin-action-stash:keep-index)*
 	Call "git stash" on active action candidates.
+
 
 =============================================================================
 vim:tw=78:fo=tcq2mM:ts=8:ft=help:norl

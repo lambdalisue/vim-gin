@@ -9,7 +9,17 @@
 
 Gin (_gin.vim_) is a plugin to handle git repository from Vim/Neovim.
 
-**UNDER DEVELOPMENT**
+**Alpha version. Any changes, including backward incompatible ones, are applied
+without announcements.**
+
+## Features
+
+- `Gin` to call a raw git command
+- `GinChaperon` to solve git conflicts (like `git mergetool`)
+- `GinDiff` to see `git diff` of a file
+- `GinEdit` to see `git show` or local content of a file
+- `GinPatch` to stage changes partially (like `git add -p`)
+- `GinStatus` to see `git status` of a repository
 
 ## Requirements
 
@@ -31,8 +41,12 @@ Additionally, the following Vim/Neovim plugins are highly recommended to use:
 
 ## Similar projects
 
-- [lambdalisue/gina.vim](https://github.com/lambdalisue/gina.vim)
-- [tpope/vim-fugitive](https://github.com/tpope/vim-fugitive)
+- [tpope/vim-fugitive](https://github.com/tpope/vim-fugitive)<br>A plugin that
+  lead me to the development of gita.vim
+- [lambdalisue/vim-gita](https://github.com/lambdalisue/vim-gita)<br>First git
+  manipulation plugin that I made, works on Vim 7.9
+- [lambdalisue/gina.vim](https://github.com/lambdalisue/gina.vim)<br>Second git
+  manipulation plugin that I made, works asynchronously on Vim 8.1
 
 ## License
 
