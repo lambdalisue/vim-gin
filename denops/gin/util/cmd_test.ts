@@ -1,5 +1,5 @@
 import { assertEquals, test } from "../deps_test.ts";
-import { batch, deadline, fn, path } from "../deps.ts";
+import { batch, deadline, fn, path, unknownutil } from "../deps.ts";
 import { normCmdArgs } from "./cmd.ts";
 
 const runtimepath = path.resolve(
@@ -53,7 +53,7 @@ test({
       await denops.cmd("edit dummy1");
       await denops.cmd("file dummy2");
     });
-    const cwd = await fn.getcwd(denops) as string;
+    const cwd = unknownutil.ensureString(await fn.getcwd(denops));
     const src = ["%", "%:p", "%hello", "#", "#:p", "#hello"];
     const dst = await normCmdArgs(denops, src);
     const exp = [

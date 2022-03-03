@@ -66,7 +66,10 @@ export async function read(denops: Denops): Promise<void> {
     await fn.bufnr(denops, "%");
     await fn.bufname(denops, "%");
     await vars.v.get(denops, "cmdarg");
-  }) as [number, string, string];
+  });
+  unknownutil.assertNumber(bufnr);
+  unknownutil.assertString(bname);
+  unknownutil.assertString(cmdarg);
   const { expr, params, fragment } = bufname.parse(bname);
   if (!fragment) {
     throw new Error("A buffer 'ginedit://' requires a fragment part");
@@ -78,7 +81,9 @@ export async function read(denops: Denops): Promise<void> {
   const [env, verbose] = await batch.gather(denops, async (denops) => {
     await fn.environ(denops);
     await option.verbose.get(denops);
-  }) as [Record<string, string>, number];
+  });
+  unknownutil.assertObject(env, unknownutil.isString);
+  unknownutil.assertNumber(verbose);
   const proc = run(args, {
     printCommand: !!verbose,
     stdin: "null",
@@ -134,7 +139,10 @@ export async function write(denops: Denops): Promise<void> {
       await fn.bufname(denops);
       await fn.getline(denops, 1, "$");
     },
-  ) as [number, string, string[], Record<string, string>];
+  );
+  unknownutil.assertNumber(bufnr);
+  unknownutil.assertString(bname);
+  unknownutil.assertArray(content, unknownutil.isString);
   const { expr, fragment } = bufname.parse(bname);
   if (!fragment) {
     throw new Error("A buffer 'ginedit://' requires a fragment part");

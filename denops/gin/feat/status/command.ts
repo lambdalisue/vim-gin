@@ -6,6 +6,7 @@ import {
   fn,
   option,
   path,
+  unknownutil,
   vars,
 } from "../../deps.ts";
 import {
@@ -62,7 +63,9 @@ export async function read(denops: Denops): Promise<void> {
   const [bufnr, bname] = await batch.gather(denops, async (denops) => {
     await fn.bufnr(denops, "%");
     await fn.bufname(denops, "%");
-  }) as [number, string];
+  });
+  unknownutil.assertNumber(bufnr);
+  unknownutil.assertString(bname);
   const { expr, params } = bufname.parse(bname);
   const flags = params ?? {};
   const args = [
@@ -76,7 +79,9 @@ export async function read(denops: Denops): Promise<void> {
   const [env, verbose] = await batch.gather(denops, async (denops) => {
     await fn.environ(denops);
     await option.verbose.get(denops);
-  }) as [Record<string, string>, number];
+  });
+  unknownutil.assertObject(env, unknownutil.isString);
+  unknownutil.assertNumber(verbose);
   const stdout = await execute(args, {
     printCommand: !!verbose,
     noOptionalLocks: true,

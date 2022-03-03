@@ -5,16 +5,17 @@ export type { Range };
 
 export type Candidate = {
   value: string;
+  [key: string]: unknown;
 };
 
-export type Gatherer<T extends Candidate> = (
+export type Gatherer = (
   denops: Denops,
   range: Range,
-) => Promise<T[]>;
+) => Promise<Candidate[]>;
 
-export async function register<T extends Candidate>(
+export async function register(
   denops: Denops,
-  gatherer: Gatherer<T>,
+  gatherer: Gatherer,
 ): Promise<void> {
   const bufnr = await fn.bufnr(denops);
   const pat = `<buffer=${bufnr}>`;
@@ -39,17 +40,17 @@ export async function register<T extends Candidate>(
   registry.set(bufnr, gatherer);
 }
 
-export async function gatherCandidates<T extends Candidate>(
+export async function gatherCandidates(
   denops: Denops,
   range: Range,
-): Promise<T[]> {
+): Promise<Candidate[]> {
   const bufnr = await fn.bufnr(denops);
   const gatherer = registry.get(bufnr);
   if (!gatherer) {
     throw new Error(`No gatherer is registered on a buffer ${bufnr}`);
   }
-  return await gatherer(denops, range) as T[];
+  return await gatherer(denops, range);
 }
 
 // Global registry
-const registry: Map<number, Gatherer<Candidate>> = new Map();
+const registry: Map<number, Gatherer> = new Map();

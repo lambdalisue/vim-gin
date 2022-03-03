@@ -1,4 +1,4 @@
-import { bufname, Denops } from "../deps.ts";
+import { bufname, Denops, unknownutil } from "../deps.ts";
 import { GIN_FILE_BUFFER_PROTOCOLS } from "../global.ts";
 
 export async function normCmdArgs(
@@ -30,7 +30,8 @@ export async function expand(denops: Denops, expr: string): Promise<string> {
   const bname = await denops.call(
     "gin#internal#util#cmd#expand",
     expr,
-  ) as string;
+  );
+  unknownutil.assertString(bname);
   try {
     const { scheme, fragment } = bufname.parse(bname);
     if (GIN_FILE_BUFFER_PROTOCOLS.includes(scheme)) {

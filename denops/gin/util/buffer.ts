@@ -1,4 +1,4 @@
-import { autocmd, batch, Denops, fn } from "../deps.ts";
+import { autocmd, batch, Denops, fn, unknownutil } from "../deps.ts";
 
 export type OpenOptions = {
   mods?: string;
@@ -94,7 +94,10 @@ export async function ensure<T = void>(
       await fn.win_getid(denops);
       await fn.bufwinid(denops, bufnr);
     },
-  ) as [number, number, number];
+  );
+  unknownutil.assertNumber(bufnrCur);
+  unknownutil.assertNumber(winidCur);
+  unknownutil.assertNumber(winidNext);
   if (winidCur === winidNext) {
     return executor();
   }
@@ -130,7 +133,10 @@ export async function modifiable<T = void>(
       await fn.getbufvar(denops, bufnr, "&modifiable");
       await fn.getbufvar(denops, bufnr, "&foldmethod");
     },
-  ) as [number, number, string];
+  );
+  unknownutil.assertNumber(modified);
+  unknownutil.assertNumber(modifiable);
+  unknownutil.assertString(foldmethod);
   await batch.batch(denops, async (denops) => {
     await fn.setbufvar(denops, bufnr, "&modifiable", 1);
     await fn.setbufvar(denops, bufnr, "&foldmethod", "manual");

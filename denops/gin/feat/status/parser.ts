@@ -69,11 +69,9 @@ export function parse(
       }
     }
   }
-  if (!branch.oid || !branch.head) {
-    throw new GitStatusParseError(`Not enough header`);
-  }
+  assertBranchHeaders(branch);
   return {
-    branch: branch as BranchHeaders,
+    branch,
     entries,
   };
 }
@@ -84,6 +82,14 @@ export interface BranchHeaders {
   upstream?: string;
   ahead?: number;
   behind?: number;
+}
+
+function assertBranchHeaders(
+  branch: Partial<BranchHeaders>,
+): asserts branch is BranchHeaders {
+  if (!branch.oid || !branch.head) {
+    throw new GitStatusParseError(`Not enough header`);
+  }
 }
 
 export function parseBranchHeaders(

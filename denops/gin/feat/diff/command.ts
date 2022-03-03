@@ -6,6 +6,7 @@ import {
   helper,
   option,
   path,
+  unknownutil,
   vars,
 } from "../../deps.ts";
 import {
@@ -64,11 +65,14 @@ export async function command(
 }
 
 export async function read(denops: Denops): Promise<void> {
-  const [bufnr, bname, cmdarg] = await batch.gather(denops, async (denops) => {
-    await fn.bufnr(denops, "%");
-    await fn.bufname(denops, "%");
-    await vars.v.get(denops, "cmdarg");
-  }) as [number, string, string];
+  const [bufnr, bname, cmdarg] = unknownutil.ensureLike(
+    [0, "", ""],
+    await batch.gather(denops, async (denops) => {
+      await fn.bufnr(denops, "%");
+      await fn.bufname(denops, "%");
+      await vars.v.get(denops, "cmdarg");
+    }),
+  );
   const { expr, params, fragment } = bufname.parse(bname);
   if (!fragment) {
     throw new Error("A buffer 'gindiff://' requires a fragment part");
@@ -81,13 +85,15 @@ export async function read(denops: Denops): Promise<void> {
     "diff",
     "--no-color",
     ...formatFlags(flags),
-    ...(params?.commitish ? [params.commitish as string] : []),
+    ...(params?.commitish ? [unknownutil.ensureString(params.commitish)] : []),
     fragment,
   ];
   const [env, verbose] = await batch.gather(denops, async (denops) => {
     await fn.environ(denops);
     await option.verbose.get(denops);
-  }) as [Record<string, string>, number];
+  });
+  unknownutil.assertObject(env, unknownutil.isString);
+  unknownutil.assertNumber(verbose);
   const proc = run(args, {
     printCommand: !!verbose,
     stdin: "null",
