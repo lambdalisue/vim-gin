@@ -141,16 +141,17 @@ export async function write(denops: Denops): Promise<void> {
   }
   const original = path.join(expr, fragment);
   let restore: () => Promise<void>;
+  const f = await Deno.makeTempFile({
+    dir: path.dirname(original),
+  });
   try {
-    const f = await Deno.makeTempFile({
-      dir: path.dirname(original),
-    });
     await Deno.rename(original, f);
     restore = () => Deno.rename(f, original);
   } catch (e) {
     if (!(e instanceof Deno.errors.NotFound)) {
       throw e;
     }
+    await Deno.remove(f);
     restore = () => Deno.remove(original);
   }
   try {
