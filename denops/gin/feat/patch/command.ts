@@ -33,7 +33,7 @@ export async function command(
     "gin_patch_disable_default_mappings",
     false,
   );
-  unknownutil.ensureBoolean(disableDefaultMappings);
+  unknownutil.assertBoolean(disableDefaultMappings);
 
   let bufnrHead = -1;
   if (!flags["without-head"]) {

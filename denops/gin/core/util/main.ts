@@ -6,12 +6,12 @@ export function main(denops: Denops): void {
   denops.dispatcher = {
     ...denops.dispatcher,
     "util:reload": (bufnr) => {
-      unknownutil.ensureNumber(bufnr);
+      unknownutil.assertNumber(bufnr);
       return buffer.reload(denops, bufnr);
     },
 
     "util:expand": (expr) => {
-      unknownutil.ensureString(expr);
+      unknownutil.assertString(expr);
       return expand(denops, expr);
     },
   };

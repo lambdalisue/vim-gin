@@ -5,7 +5,7 @@ export function main(denops: Denops): void {
   denops.dispatcher = {
     ...denops.dispatcher,
     "command": (args: unknown) => {
-      unknownutil.ensureArray(args, unknownutil.isString);
+      unknownutil.assertArray(args, unknownutil.isString);
       return command(denops, args);
     },
   };

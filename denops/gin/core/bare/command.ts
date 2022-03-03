@@ -31,9 +31,9 @@ export async function command(
       await option.eventignore.get(denops);
     },
   );
-  unknownutil.ensureObject(env, unknownutil.isString);
-  unknownutil.ensureNumber(verbose);
-  unknownutil.ensureString(eventignore);
+  unknownutil.assertObject(env, unknownutil.isString);
+  unknownutil.assertNumber(verbose);
+  unknownutil.assertString(eventignore);
   const [opts, residue] = parseOpts(await normCmdArgs(denops, args));
   validateOpts(opts, [
     "worktree",

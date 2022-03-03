@@ -50,8 +50,8 @@ export async function command(
       await vars.g.get(denops, "gin_chaperon_disable_default_mappings", false);
     },
   );
-  unknownutil.ensureNumber(supplementHeight);
-  unknownutil.ensureBoolean(disableDefaultMappings);
+  unknownutil.assertNumber(supplementHeight);
+  unknownutil.assertBoolean(disableDefaultMappings);
 
   const inProgressAliasHead = await getInProgressAliasHead(worktree);
 

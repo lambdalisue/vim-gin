@@ -192,7 +192,7 @@ function formatTreeish(
   relpath: string,
 ): [] | [string] {
   if (commitish) {
-    unknownutil.ensureString(commitish);
+    unknownutil.assertString(commitish);
     return [`${commitish}:${relpath}`];
   } else {
     return [`:${relpath}`];
