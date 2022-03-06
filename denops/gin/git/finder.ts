@@ -15,8 +15,8 @@ export async function find(cwd: string): Promise<string> {
     } catch (e) {
       result = e;
     }
+    cache.set(cwd, result);
   }
-  cache.set(cwd, result);
   if (result instanceof Error) {
     throw result;
   }
