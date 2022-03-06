@@ -97,6 +97,25 @@ COMMANDS					*gin-commands*
 	Note that users need to install askpass.vim (|gin-askpass|) to open a
 	prompt to input passphrase on "Gin push" or so on.
 
+								*:GinBranch*
+:GinBranch [++worktree={worktree}] [{flags}]
+	Open a "gin-branch" buffer to show a branch list of a {worktree}.
+	If no {worktree} is specified, gin will find the one from the current
+	working directory.
+
+	The following {flags} are available:
+
+	-a, --all
+	-r, --remotes
+	-i, --ignore-case
+	--abbrev={n}
+	--no-abbrev
+		
+	See ":man git-branch(1)" for detail about {flags}.
+
+	Several default mappings are defined in the buffer. Use "help" action
+	to see mappings or disable by |g:gin_branch_disable_default_mappings|.
+
 								*:GinChaperon*
 :GinChaperon [++opt] [++worktree={worktree}] [--without-supplements] {path}
 :GinChaperon [++opt] [++worktree={worktree}] [--without-supplements] 
