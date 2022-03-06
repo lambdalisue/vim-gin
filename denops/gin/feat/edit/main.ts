@@ -8,7 +8,7 @@ export function main(denops: Denops): void {
       unknownutil.assertArray(args, unknownutil.isString);
       return helper.friendlyCall(denops, () => command(denops, args));
     },
-    "edit:read": () => helper.friendlyCall(denops, () => read(denops)),
-    "edit:write": () => helper.friendlyCall(denops, () => write(denops)),
+    "edit:read": () => read(denops),
+    "edit:write": () => write(denops),
   };
 }
