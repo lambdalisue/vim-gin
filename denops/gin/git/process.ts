@@ -5,21 +5,14 @@ export type RunOptions = Omit<Deno.RunOptions, "cmd"> & {
   printCommand?: boolean;
 };
 
-export function run(
-  args: string[],
-  options: RunOptions = {},
-): Deno.Process {
-  const cmd = [
-    "git",
-    "--no-pager",
-    "--literal-pathspecs",
-  ];
+export function run(args: string[], options: RunOptions = {}): Deno.Process {
+  const cmd = ["git", "--no-pager", "--literal-pathspecs"];
   if (options.noOptionalLocks) {
     cmd.push("--no-optional-locks");
   }
   cmd.push(...args);
   if (options.printCommand) {
-    console.debug(`Run '${cmd.join(" ")}'`);
+    console.debug(`Run '${cmd.join(" ")}' on '${options.cwd}'`);
   }
   return Deno.run({
     cmd,
