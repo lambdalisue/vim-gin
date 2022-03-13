@@ -15,6 +15,7 @@ without announcements.**
 ## Features
 
 - `Gin` to call a raw git command
+- `GinBranch` to see `git branch` of a repository
 - `GinChaperon` to solve git conflicts (like `git mergetool`)
 - `GinDiff` to see `git diff` of a file
 - `GinEdit` to see `git show` or local content of a file
