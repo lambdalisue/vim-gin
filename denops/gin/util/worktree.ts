@@ -1,5 +1,5 @@
 import { batch, bufname, Denops, fn, unknownutil } from "../deps.ts";
-import { GIN_FILE_BUFFER_PROTOCOLS } from "../global.ts";
+import { GIN_BUFFER_PROTOCOLS } from "../global.ts";
 import { expand } from "../util/cmd.ts";
 import { Opts } from "../util/args.ts";
 import { find } from "../git/finder.ts";
@@ -14,7 +14,7 @@ async function getWorktree(denops: Denops): Promise<string> {
   if (bname) {
     try {
       const { scheme, expr } = bufname.parse(bname);
-      if (GIN_FILE_BUFFER_PROTOCOLS.includes(scheme)) {
+      if (GIN_BUFFER_PROTOCOLS.includes(scheme)) {
         return unknownutil.ensureString(
           await fn.fnamemodify(denops, expr, ":p"),
         );
