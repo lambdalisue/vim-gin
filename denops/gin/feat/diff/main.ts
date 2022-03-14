@@ -1,5 +1,5 @@
 import { Denops, helper, unknownutil } from "../../deps.ts";
-import { command, read } from "./command.ts";
+import { command, jumpNew, jumpOld, read } from "./command.ts";
 
 export function main(denops: Denops): void {
   denops.dispatcher = {
@@ -9,5 +9,7 @@ export function main(denops: Denops): void {
       return helper.friendlyCall(denops, () => command(denops, args));
     },
     "diff:read": () => read(denops),
+    "diff:jump:new": () => jumpNew(denops),
+    "diff:jump:old": () => jumpOld(denops),
   };
 }

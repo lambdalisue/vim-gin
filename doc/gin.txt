@@ -165,6 +165,17 @@ COMMANDS					*gin-commands*
 	If no {worktree} is specified, gin will find the one from the current
 	working directory.
 
+	Users can use the following mappings in each buffers or disable
+	default mappings by |g:gin_diff_disable_default_mappings|.
+
+	*<Plug>(gin-diffjump-old)*	Jump to the corresponding line of the
+					comparison source.
+					Assigned to "g<CR>" in default.
+
+	*<Plug>(gin-diffjump-new)*	Jump to the corresponding line of the
+					comparison.
+					Assigned to "<CR>" in default.
+
 	The following {flags} are available:
 
 	--cached
@@ -265,6 +276,11 @@ VARIABLES					*gin-variables*
 	|:GinChaperon| command.
 
 	Default: 10
+
+*g:gin_diff_disable_default_mappings*
+	Disable default mappings on buffers shown by `:GinDiff`.
+
+	Default: 0
 
 *g:gin_patch_disable_default_mappings*
 	Disable default mappings on buffers shown by `:GinPatch`.
