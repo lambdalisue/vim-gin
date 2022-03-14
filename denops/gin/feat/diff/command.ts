@@ -4,6 +4,7 @@ import {
   Denops,
   fn,
   helper,
+  mapping,
   option,
   path,
   unknownutil,
@@ -22,6 +23,9 @@ import { normCmdArgs } from "../../util/cmd.ts";
 import { getWorktreeFromOpts } from "../../util/worktree.ts";
 import { decodeUtf8 } from "../../util/text.ts";
 import { run } from "../../git/process.ts";
+import { findJumpNew, findJumpOld } from "./jump.ts";
+import { command as editCommand } from "../edit/command.ts";
+import { INDEX, parseCommitish, WORKTREE } from "./commitish.ts";
 
 export async function command(
   denops: Denops,
@@ -73,6 +77,12 @@ export async function read(denops: Denops): Promise<void> {
       await vars.v.get(denops, "cmdarg");
     }),
   );
+  const disableDefaultMappings = await vars.g.get(
+    denops,
+    "gin_diff_disable_default_mappings",
+    false,
+  );
+  unknownutil.assertBoolean(disableDefaultMappings);
   const { expr, params, fragment } = bufname.parse(bname);
   if (!fragment) {
     throw new Error("A buffer 'gindiff://' requires a fragment part");
@@ -122,6 +132,42 @@ export async function read(denops: Denops): Promise<void> {
       await option.buftype.setLocal(denops, "nofile");
       await option.swapfile.setLocal(denops, false);
       await option.modifiable.setLocal(denops, false);
+      await mapping.map(
+        denops,
+        "<Plug>(gin-diffjump-old)",
+        `<Cmd>call denops#request('gin', 'diff:jump:old', [])<CR>`,
+        {
+          buffer: true,
+          noremap: true,
+        },
+      );
+      await mapping.map(
+        denops,
+        "<Plug>(gin-diffjump-new)",
+        `<Cmd>call denops#request('gin', 'diff:jump:new', [])<CR>`,
+        {
+          buffer: true,
+          noremap: true,
+        },
+      );
+      if (!disableDefaultMappings) {
+        await mapping.map(
+          denops,
+          "g<CR>",
+          "<Plug>(gin-diffjump-old)zv",
+          {
+            buffer: true,
+          },
+        );
+        await mapping.map(
+          denops,
+          "<CR>",
+          "<Plug>(gin-diffjump-new)zv",
+          {
+            buffer: true,
+          },
+        );
+      }
     });
     await buffer.editData(denops, stdout, {
       cmdarg,
@@ -140,4 +186,90 @@ function parseResidue(residue: string[]): [string | undefined, string] {
     default:
       throw new Error("Invalid number of arguments");
   }
+}
+
+export async function jumpOld(denops: Denops): Promise<void> {
+  const [lnum, content, bname] = await batch.gather(
+    denops,
+    async (denops) => {
+      await fn.line(denops, ".");
+      await fn.getline(denops, 1, "$");
+      await fn.bufname(denops, "%");
+    },
+  );
+  unknownutil.assertNumber(lnum);
+  unknownutil.assertArray(content, unknownutil.isString);
+  unknownutil.assertString(bname);
+  const { expr, params } = bufname.parse(bname);
+  const jump = findJumpOld(lnum - 1, content);
+  if (!jump) {
+    // Do nothing
+    return;
+  }
+  const path = jump.path.replace(/^a\//, "");
+  const cached = "cached" in (params ?? {});
+  const commitish = unknownutil.ensureString(params?.commitish ?? "");
+  const [target, _] = parseCommitish(commitish, cached);
+  if (target === INDEX) {
+    await editCommand(denops, [
+      `++worktree=${expr}`,
+      "--cached",
+      path,
+    ]);
+  } else if (target === WORKTREE) {
+    await editCommand(denops, [
+      `++worktree=${expr}`,
+      path,
+    ]);
+  } else {
+    await editCommand(denops, [
+      `++worktree=${expr}`,
+      commitish || "HEAD",
+      path,
+    ]);
+  }
+  await fn.cursor(denops, jump.lnum, 1);
+}
+
+export async function jumpNew(denops: Denops): Promise<void> {
+  const [lnum, content, bname] = await batch.gather(
+    denops,
+    async (denops) => {
+      await fn.line(denops, ".");
+      await fn.getline(denops, 1, "$");
+      await fn.bufname(denops, "%");
+    },
+  );
+  unknownutil.assertNumber(lnum);
+  unknownutil.assertArray(content, unknownutil.isString);
+  unknownutil.assertString(bname);
+  const { expr, params } = bufname.parse(bname);
+  const jump = findJumpNew(lnum - 1, content);
+  if (!jump) {
+    // Do nothing
+    return;
+  }
+  const path = jump.path.replace(/^b\//, "");
+  const cached = "cached" in (params ?? {});
+  const commitish = unknownutil.ensureString(params?.commitish ?? "");
+  const [_, target] = parseCommitish(commitish, cached);
+  if (target === INDEX) {
+    await editCommand(denops, [
+      `++worktree=${expr}`,
+      "--cached",
+      path,
+    ]);
+  } else if (target === WORKTREE) {
+    await editCommand(denops, [
+      `++worktree=${expr}`,
+      path,
+    ]);
+  } else {
+    await editCommand(denops, [
+      `++worktree=${expr}`,
+      commitish || "HEAD",
+      path,
+    ]);
+  }
+  await fn.cursor(denops, jump.lnum, 1);
 }
