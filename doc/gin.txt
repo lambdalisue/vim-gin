@@ -11,6 +11,7 @@ INTRODUCTION			|gin-introduction|
 REQUIREMENTS			|gin-requirements|
 USAGE				|gin-usage|
   ACTION			  |gin-action|
+  PROXY				  |gin-proxy|
 INTERFACE			|gin-interface|
   COMMANDS			  |gin-commands|
   VARIABLES			  |gin-variables|
