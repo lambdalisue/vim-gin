@@ -14,6 +14,7 @@ without announcements.**
 
 ## Features
 
+- Proxy the prompts/editor used by git commands to Vim
 - `Gin` to call a raw git command
 - `GinBranch` to see `git branch` of a repository
 - `GinChaperon` to solve git conflicts (like `git mergetool`)
@@ -29,16 +30,7 @@ Gin is written in denops thus users need to install denops.vim
 - [vim-denops/denops.vim][vim-denops/denops.vim]<br> An ecosystem for writing
   Vim/Neovim plugin in Deno.
 
-Additionally, the following Vim/Neovim plugins are highly recommended to use:
-
-- [lambdalisue/guise.vim][lambdalisue/guise.vim]<br> To open a new tabpage to
-  edit a commit message on `Gin commit`.
-- [lambdalisue/askpass.vim][lambdalisue/askpass.vim]<br> To input SSH key
-  passphrase on `Gin push` or so on.
-
 [vim-denops/denops.vim]: https://github.com/vim-denops/denops.vim
-[lambdalisue/guise.vim]: https://github.com/lambdalisue/guise.vim
-[lambdalisue/askpass.vim]: https://github.com/lambdalisue/askpass.vim
 
 ## Similar projects
 

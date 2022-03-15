@@ -33,18 +33,6 @@ denops.vim~
 	An ecosystem for writing Vim/Neovim plugin in Deno.
 	https://github.com/vim-denops/denops.vim
 
-Additionally, the following Vim/Neovim plugins are highly recommended to use:
-
-							*gin-guise*
-guise.vim~
-	To open a new |tabpage| to edit a commit message on "Gin commit".
-	https://github.com/lambdalisue/guise.vim~
-
-							*gin-askpass*
-askpass.vim~
-	To input SSH key passphrase on "Gin push" or so on.
-	https://github.com/lambdalisue/askpass.vim
-
 
 =============================================================================
 USAGE						*gin-usage*
@@ -71,6 +59,30 @@ Users have to define alternative mappings to disable default mappings like:
 	nmap <buffer> g? <Plug>(gin-action-help)
 
 See |gin-actions| for all actions available.
+
+-----------------------------------------------------------------------------
+PROXY						*gin-proxy*
+
+Gin proxies prompts and editors used by git commands to running Vim by
+overriding "GIT_ASKPASS" and "GIT_EDITOR" environment variables.
+This means that whether you invoke "git commit" via the "Gin" command or via
+the Vim |terminal|, a new buffer will be opened instead of Vim being launched
+nested.
+
+This feature is almost equivalent to askpass.vim and/or guise.vim, but
+simplified to focus on git.
+
+askpass.vim~
+	https://github.com/lambdalisue/askpass.vim
+
+guise.vim~
+	https://github.com/lambdalisue/guise.vim
+
+It can live together with the plugins mentioned above because the environment
+variable names used are different.
+
+Use |g:gin_proxy_disable_askpass| and/or |g:gin_proxy_disable_editor| to
+disable this proxy feature.
 
 
 =============================================================================
@@ -284,6 +296,16 @@ VARIABLES					*gin-variables*
 
 *g:gin_patch_disable_default_mappings*
 	Disable default mappings on buffers shown by `:GinPatch`.
+
+	Default: 0
+
+*g:gin_proxy_disable_askpass*
+	Disable overriding "GIT_ASKPASS" to proxy prompts.
+
+	Default: 0
+
+*g:gin_proxy_disable_editor*
+	Disable overriding "GIT_EDITOR" to proxy editors.
 
 	Default: 0
 

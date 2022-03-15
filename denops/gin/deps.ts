@@ -14,5 +14,7 @@ export * as vars from "https://deno.land/x/denops_std@v3.1.4/variable/mod.ts";
 export * as unknownutil from "https://deno.land/x/unknownutil@v2.0.0/mod.ts";
 
 export * as fs from "https://deno.land/std@0.128.0/fs/mod.ts";
+export * as io from "https://deno.land/std@0.128.0/io/mod.ts";
 export * as path from "https://deno.land/std@0.128.0/path/mod.ts";
-export { deadline } from "https://deno.land/std@0.128.0/async/mod.ts";
+export * as streams from "https://deno.land/std@0.128.0/streams/mod.ts";
+export { deadline, deferred } from "https://deno.land/std@0.128.0/async/mod.ts";
