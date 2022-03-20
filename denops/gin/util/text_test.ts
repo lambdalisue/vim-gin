@@ -1,5 +1,12 @@
 import { assertEquals } from "../deps_test.ts";
-import { decodeUtf8, encodeUtf8, NUL, partition } from "./text.ts";
+import {
+  countCodePoints,
+  countVimBytes,
+  decodeUtf8,
+  encodeUtf8,
+  NUL,
+  partition,
+} from "./text.ts";
 
 Deno.test("encodeUtf8() encodes a string into an UTF8 Uint8Array", () => {
   const input = "Hello world!";
@@ -174,4 +181,35 @@ Deno.test("partition (NUL start/end)", () => {
     new Uint8Array([3, 3, 3]),
     new Uint8Array([]),
   ]);
+});
+
+Deno.test("countCodePoints", async (t) => {
+  const testcases: [string, number][] = [
+    ["", 0],
+    ["Hello", 5],
+    ["こんにちわ", 5],
+    ["🎉🔥✨💯", 4],
+    ["🥃", 1],
+  ];
+  for (const [expr, expected] of testcases) {
+    await t.step(`properly handle "${expr}"`, () => {
+      const actual = countCodePoints(expr);
+      assertEquals(actual, expected);
+    });
+  }
+});
+Deno.test("countVimBytes", async (t) => {
+  const testcases: [string, number][] = [
+    ["", 0],
+    ["Hello", 5],
+    ["こんにちわ", 15],
+    ["🎉🔥✨💯", 15],
+    ["🥃", 4],
+  ];
+  for (const [expr, expected] of testcases) {
+    await t.step(`properly handle "${expr}"`, () => {
+      const actual = countVimBytes(expr);
+      assertEquals(actual, expected);
+    });
+  }
 });
