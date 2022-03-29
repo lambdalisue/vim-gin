@@ -69,6 +69,9 @@ export async function command(
       },
     );
     await buffer.concrete(denops, bufnr);
+    if (denops.meta.host === "vim") {
+      await denops.cmd("redraw");
+    }
   } else {
     if (status.success) {
       await helper.echo(denops, decodeUtf8(stdout) + decodeUtf8(stderr));
