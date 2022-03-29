@@ -40,7 +40,7 @@ function! s:define_highlight() abort
   let colors = s:list_colors()
   for i in range(16)
     execute printf(
-          \ 'highlight default GinColor%d  ctermfg=%d  guifg=%s',
+          \ 'highlight default GinColor%d cterm=bold ctermfg=%d gui=bold guifg=%s',
           \ i,
           \ i,
           \ colors[i],
