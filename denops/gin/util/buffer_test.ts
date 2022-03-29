@@ -3,13 +3,9 @@ import { fn, path } from "../deps.ts";
 import {
   assign,
   concrete,
-  editData,
-  editFile,
   ensure,
   modifiable,
   open,
-  readData,
-  readFile,
   replace,
 } from "./buffer.ts";
 
@@ -299,76 +295,6 @@ test({
       assertEquals(1, await denops.eval("&modifiable"));
     });
     assertEquals(0, await denops.eval("&modifiable"));
-  },
-  prelude: [`set runtimepath^=${runtimepath}`],
-});
-
-test({
-  mode: "all",
-  name: "readFile reads file content into the current buffer",
-  fn: async (denops) => {
-    const f = await Deno.makeTempFile();
-    try {
-      await Deno.writeTextFile(f, "Hello world");
-
-      await denops.cmd("edit foobar");
-      await readFile(denops, f);
-      assertEquals([
-        "",
-        "Hello world",
-      ], await fn.getline(denops, 1, "$"));
-    } finally {
-      await Deno.remove(f);
-    }
-  },
-  prelude: [`set runtimepath^=${runtimepath}`],
-});
-test({
-  mode: "all",
-  name: "readData reads data into the current buffer through a temporary file",
-  fn: async (denops) => {
-    await denops.cmd("edit foobar");
-    await readData(denops, new TextEncoder().encode("Hello world"));
-    assertEquals([
-      "",
-      "Hello world",
-    ], await fn.getline(denops, 1, "$"));
-  },
-  prelude: [`set runtimepath^=${runtimepath}`],
-});
-
-test({
-  mode: "all",
-  name: "editFile reads file content and replace the current buffer with it",
-  fn: async (denops) => {
-    const f = await Deno.makeTempFile();
-    try {
-      await Deno.writeTextFile(f, "Hello world");
-
-      await denops.cmd("edit foobar");
-      await fn.setline(denops, 1, ["Hi"]);
-      await editFile(denops, f);
-      assertEquals([
-        "Hello world",
-      ], await fn.getline(denops, 1, "$"));
-    } finally {
-      await Deno.remove(f);
-    }
-  },
-  prelude: [`set runtimepath^=${runtimepath}`],
-});
-
-test({
-  mode: "all",
-  name:
-    "editData reads data and replace the current buffer with it through a temporary file",
-  fn: async (denops) => {
-    await denops.cmd("edit foobar");
-    await fn.setline(denops, 1, ["Hi"]);
-    await editData(denops, new TextEncoder().encode("Hello world"));
-    assertEquals([
-      "Hello world",
-    ], await fn.getline(denops, 1, "$"));
   },
   prelude: [`set runtimepath^=${runtimepath}`],
 });
