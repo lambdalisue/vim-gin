@@ -15,6 +15,7 @@ import {
   builtinOpts,
   formatOpts,
   parse,
+  parseOpts,
   validateFlags,
   validateOpts,
 } from "../../util/args.ts";
@@ -62,14 +63,30 @@ export async function command(
 }
 
 export async function read(denops: Denops): Promise<void> {
-  const [bufnr, bname, cmdarg] = await batch.gather(denops, async (denops) => {
-    await fn.bufnr(denops, "%");
-    await fn.bufname(denops, "%");
-    await vars.v.get(denops, "cmdarg");
-  });
+  const [env, verbose, bufnr, bname, cmdarg, disableDefaultMappings] =
+    await batch.gather(
+      denops,
+      async (denops) => {
+        await fn.environ(denops);
+        await option.verbose.get(denops);
+        await fn.bufnr(denops, "%");
+        await fn.bufname(denops, "%");
+        await vars.v.get(denops, "cmdarg");
+        await vars.g.get(
+          denops,
+          "gin_diff_disable_default_mappings",
+          false,
+        );
+      },
+    );
+  unknownutil.assertObject(env, unknownutil.isString);
+  unknownutil.assertNumber(verbose);
   unknownutil.assertNumber(bufnr);
   unknownutil.assertString(bname);
   unknownutil.assertString(cmdarg);
+  unknownutil.assertBoolean(disableDefaultMappings);
+  const [opts, _] = parseOpts(cmdarg.split(" "));
+  validateOpts(opts, builtinOpts);
   const { expr, params, fragment } = bufname.parse(bname);
   if (!fragment) {
     throw new Error("A buffer 'ginedit://' requires a fragment part");
@@ -78,12 +95,6 @@ export async function read(denops: Denops): Promise<void> {
     "show",
     ...formatTreeish(params?.commitish, fragment),
   ];
-  const [env, verbose] = await batch.gather(denops, async (denops) => {
-    await fn.environ(denops);
-    await option.verbose.get(denops);
-  });
-  unknownutil.assertObject(env, unknownutil.isString);
-  unknownutil.assertNumber(verbose);
   const proc = run(args, {
     printCommand: !!verbose,
     stdin: "null",
@@ -121,9 +132,10 @@ export async function read(denops: Denops): Promise<void> {
         });
       }
     });
-    await buffer.editData(denops, stdout, {
-      cmdarg,
-    });
+  });
+  await buffer.assign(denops, bufnr, stdout, {
+    fileformat: opts["ff"] ?? opts["fileformat"],
+    fileencoding: opts["enc"] ?? opts["fileencoding"],
   });
   await buffer.concrete(denops, bufnr);
   if (!status.success) {

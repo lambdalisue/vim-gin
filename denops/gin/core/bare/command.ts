@@ -7,12 +7,7 @@ import {
   option,
   unknownutil,
 } from "../../deps.ts";
-import {
-  builtinOpts,
-  formatOpts,
-  parseOpts,
-  validateOpts,
-} from "../../util/args.ts";
+import { builtinOpts, parseOpts, validateOpts } from "../../util/args.ts";
 import { normCmdArgs } from "../../util/cmd.ts";
 import * as buffer from "../../util/buffer.ts";
 import { getWorktreeFromOpts } from "../../util/worktree.ts";
@@ -57,18 +52,22 @@ export async function command(
   ]);
   proc.close();
   if ("buffer" in opts) {
-    const cmdarg = formatOpts(opts, builtinOpts).join(" ");
     await denops.cmd("noswapfile enew");
     const bufnr = await fn.bufnr(denops);
     await buffer.ensure(denops, bufnr, async () => {
       await batch.batch(denops, async (denops) => {
         await option.modifiable.setLocal(denops, false);
       });
-      await buffer.editData(denops, new Uint8Array([...stdout, ...stderr]), {
-        mods: "silent keepalt keepjumps",
-        cmdarg,
-      });
     });
+    await buffer.assign(
+      denops,
+      bufnr,
+      new Uint8Array([...stdout, ...stderr]),
+      {
+        fileformat: (opts["ff"] ?? opts["fileformat"]),
+        fileencoding: opts["enc"] ?? opts["fileencoding"],
+      },
+    );
     await buffer.concrete(denops, bufnr);
   } else {
     if (status.success) {
