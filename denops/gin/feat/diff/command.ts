@@ -206,7 +206,7 @@ export async function jumpOld(denops: Denops): Promise<void> {
     // Do nothing
     return;
   }
-  const path = jump.path.replace(/^a\//, "");
+  const filename = path.join(expr, jump.path.replace(/^a\//, ""));
   const cached = "cached" in (params ?? {});
   const commitish = unknownutil.ensureString(params?.commitish ?? "");
   const [target, _] = parseCommitish(commitish, cached);
@@ -214,18 +214,18 @@ export async function jumpOld(denops: Denops): Promise<void> {
     await editCommand(denops, [
       `++worktree=${expr}`,
       "--cached",
-      path,
+      filename,
     ]);
   } else if (target === WORKTREE) {
     await editCommand(denops, [
       `++worktree=${expr}`,
-      path,
+      filename,
     ]);
   } else {
     await editCommand(denops, [
       `++worktree=${expr}`,
       commitish || "HEAD",
-      path,
+      filename,
     ]);
   }
   await fn.cursor(denops, jump.lnum, 1);
@@ -249,7 +249,7 @@ export async function jumpNew(denops: Denops): Promise<void> {
     // Do nothing
     return;
   }
-  const path = jump.path.replace(/^b\//, "");
+  const filename = path.join(expr, jump.path.replace(/^b\//, ""));
   const cached = "cached" in (params ?? {});
   const commitish = unknownutil.ensureString(params?.commitish ?? "");
   const [_, target] = parseCommitish(commitish, cached);
@@ -257,18 +257,18 @@ export async function jumpNew(denops: Denops): Promise<void> {
     await editCommand(denops, [
       `++worktree=${expr}`,
       "--cached",
-      path,
+      filename,
     ]);
   } else if (target === WORKTREE) {
     await editCommand(denops, [
       `++worktree=${expr}`,
-      path,
+      filename,
     ]);
   } else {
     await editCommand(denops, [
       `++worktree=${expr}`,
       commitish || "HEAD",
-      path,
+      filename,
     ]);
   }
   await fn.cursor(denops, jump.lnum, 1);
