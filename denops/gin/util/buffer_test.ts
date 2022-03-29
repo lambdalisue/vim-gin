@@ -1,14 +1,11 @@
-import { assertEquals, test } from "../deps_test.ts";
+import { assertEquals, Encoding, test } from "../deps_test.ts";
 import { fn, path } from "../deps.ts";
 import {
+  assign,
   concrete,
-  editData,
-  editFile,
   ensure,
   modifiable,
   open,
-  readData,
-  readFile,
   replace,
 } from "./buffer.ts";
 
@@ -108,6 +105,112 @@ test({
 
 test({
   mode: "all",
+  name: "assign assings content to a buffer",
+  fn: async (denops) => {
+    const bufnr = await fn.bufnr(denops);
+    const encoder = new TextEncoder();
+    await assign(
+      denops,
+      bufnr,
+      encoder.encode(
+        "こんにちわ\n世界\n",
+      ),
+    );
+    assertEquals([
+      "こんにちわ",
+      "世界",
+    ], await fn.getline(denops, 1, "$"));
+
+    await assign(
+      denops,
+      bufnr,
+      encoder.encode(
+        "今すぐダウンロー\nド",
+      ),
+    );
+    assertEquals([
+      "今すぐダウンロー",
+      "ド",
+    ], await fn.getline(denops, 1, "$"));
+  },
+  prelude: [`set runtimepath^=${runtimepath}`],
+});
+test({
+  mode: "all",
+  name: "assign assings content to a buffer with specified fileencoding",
+  fn: async (denops) => {
+    const bufnr = await fn.bufnr(denops);
+    const encode = (text: string, encoding: string): Uint8Array => {
+      return new Uint8Array(
+        Encoding.convert(Encoding.stringToCode(text), encoding, "UNICODE"),
+      );
+    };
+    await assign(
+      denops,
+      bufnr,
+      encode("こんにちわ\n世界\n", "sjis"),
+      {
+        fileencoding: "sjis",
+      },
+    );
+    assertEquals([
+      "こんにちわ",
+      "世界",
+    ], await fn.getline(denops, 1, "$"));
+
+    await assign(
+      denops,
+      bufnr,
+      encode("今すぐダウンロー\nド", "euc-jp"),
+      {
+        fileencoding: "euc-jp",
+      },
+    );
+    assertEquals([
+      "今すぐダウンロー",
+      "ド",
+    ], await fn.getline(denops, 1, "$"));
+  },
+  prelude: [`set runtimepath^=${runtimepath}`],
+});
+test({
+  mode: "all",
+  name: "assign assings content to a buffer with specified fileformat",
+  fn: async (denops) => {
+    const bufnr = await fn.bufnr(denops);
+    const encoder = new TextEncoder();
+    await assign(
+      denops,
+      bufnr,
+      encoder.encode(
+        "こんにちわ\r\n世界\r\n",
+      ),
+      {
+        fileformat: "dos",
+      },
+    );
+    assertEquals([
+      "こんにちわ",
+      "世界",
+    ], await fn.getline(denops, 1, "$"));
+
+    await assign(
+      denops,
+      bufnr,
+      encoder.encode(
+        "今すぐダウンロー\r\nド",
+      ),
+    );
+    assertEquals([
+      "今すぐダウンロー",
+      "ド",
+    ], await fn.getline(denops, 1, "$"));
+  },
+  prelude: [`set runtimepath^=${runtimepath}`],
+});
+
+test({
+  mode: "all",
   name: "concrete concretes the buffer and the content become persistent",
   fn: async (denops) => {
     await denops.cmd("edit foobar");
@@ -192,76 +295,6 @@ test({
       assertEquals(1, await denops.eval("&modifiable"));
     });
     assertEquals(0, await denops.eval("&modifiable"));
-  },
-  prelude: [`set runtimepath^=${runtimepath}`],
-});
-
-test({
-  mode: "all",
-  name: "readFile reads file content into the current buffer",
-  fn: async (denops) => {
-    const f = await Deno.makeTempFile();
-    try {
-      await Deno.writeTextFile(f, "Hello world");
-
-      await denops.cmd("edit foobar");
-      await readFile(denops, f);
-      assertEquals([
-        "",
-        "Hello world",
-      ], await fn.getline(denops, 1, "$"));
-    } finally {
-      await Deno.remove(f);
-    }
-  },
-  prelude: [`set runtimepath^=${runtimepath}`],
-});
-test({
-  mode: "all",
-  name: "readData reads data into the current buffer through a temporary file",
-  fn: async (denops) => {
-    await denops.cmd("edit foobar");
-    await readData(denops, new TextEncoder().encode("Hello world"));
-    assertEquals([
-      "",
-      "Hello world",
-    ], await fn.getline(denops, 1, "$"));
-  },
-  prelude: [`set runtimepath^=${runtimepath}`],
-});
-
-test({
-  mode: "all",
-  name: "editFile reads file content and replace the current buffer with it",
-  fn: async (denops) => {
-    const f = await Deno.makeTempFile();
-    try {
-      await Deno.writeTextFile(f, "Hello world");
-
-      await denops.cmd("edit foobar");
-      await fn.setline(denops, 1, ["Hi"]);
-      await editFile(denops, f);
-      assertEquals([
-        "Hello world",
-      ], await fn.getline(denops, 1, "$"));
-    } finally {
-      await Deno.remove(f);
-    }
-  },
-  prelude: [`set runtimepath^=${runtimepath}`],
-});
-
-test({
-  mode: "all",
-  name:
-    "editData reads data and replace the current buffer with it through a temporary file",
-  fn: async (denops) => {
-    await denops.cmd("edit foobar");
-    await fn.setline(denops, 1, ["Hi"]);
-    await editData(denops, new TextEncoder().encode("Hello world"));
-    assertEquals([
-      "Hello world",
-    ], await fn.getline(denops, 1, "$"));
   },
   prelude: [`set runtimepath^=${runtimepath}`],
 });

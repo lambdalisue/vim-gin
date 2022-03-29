@@ -1,4 +1,12 @@
 import { autocmd, batch, Denops, fn, unknownutil } from "../deps.ts";
+import {
+  assertFileFormat,
+  findFileFormat,
+  isFileFormat,
+  maybeFileFormat,
+  splitText,
+} from "./fileformat.ts";
+import { tryDecode } from "./fileencoding.ts";
 
 export type OpenOptions = {
   mods?: string;
@@ -39,6 +47,53 @@ export async function replace(
   repl: string[],
 ): Promise<void> {
   await denops.call("gin#internal#util#buffer#replace", bufnr, repl);
+}
+
+export type AssignOptions = {
+  fileformat?: string;
+  fileencoding?: string;
+};
+
+/**
+ * Assign content to the buffer with given format and encoding.
+ */
+export async function assign(
+  denops: Denops,
+  bufnr: number,
+  content: Uint8Array,
+  options: AssignOptions = {},
+): Promise<void> {
+  const [fileformat, fileformatsStr, fileencodingsStr] = await batch.gather(
+    denops,
+    async (denops) => {
+      await fn.getbufvar(denops, bufnr, "&fileformat");
+      await fn.getbufvar(denops, bufnr, "&fileformats");
+      await fn.getbufvar(denops, bufnr, "&fileencodings");
+    },
+  );
+  assertFileFormat(fileformat);
+  unknownutil.assertString(fileformatsStr);
+  unknownutil.assertString(fileencodingsStr);
+  const fileformats = fileformatsStr.split(",");
+  const fileencodings = fileencodingsStr.split(",");
+  unknownutil.assertArray(fileformats, isFileFormat);
+  unknownutil.assertArray(fileencodings, unknownutil.isString);
+  let enc: string;
+  let text: string;
+  if (options.fileencoding) {
+    enc = options.fileencoding;
+    text = (new TextDecoder(enc)).decode(content);
+  } else {
+    [enc, text] = tryDecode(content, fileencodings);
+  }
+  const ff = maybeFileFormat(options.fileformat) ??
+    findFileFormat(text, fileformats) ?? fileformat;
+  const repl = splitText(text, ff);
+  await batch.batch(denops, async (denops) => {
+    await fn.setbufvar(denops, bufnr, "&fileformat", ff);
+    await fn.setbufvar(denops, bufnr, "&fileencoding", enc);
+    await replace(denops, bufnr, repl);
+  });
 }
 
 /**
@@ -149,108 +204,5 @@ export async function modifiable<T = void>(
       await fn.setbufvar(denops, bufnr, "&modifiable", modifiable);
       await fn.setbufvar(denops, bufnr, "&foldmethod", foldmethod);
     });
-  }
-}
-
-export type ReadFileOptions = {
-  mods?: string;
-  line?: number;
-  cmdarg?: string;
-};
-
-async function readFileInternal(
-  denops: Denops,
-  file: string,
-  options: ReadFileOptions = {},
-): Promise<void> {
-  const mods = options.mods ?? "";
-  const line = options.line ?? "";
-  const cmdarg = options.cmdarg ?? "";
-  if (denops.meta.host === "vim") {
-    // NOTE:
-    // It seems Vim slightly changed behaviors of `read` on empty buffer
-    // thus we need to overwrite the firstline to make sure that the buffer
-    // ends with a newline
-    await denops.cmd("call setline(1, getline(1))");
-  }
-  await denops.cmd(
-    `execute '${mods} ${line}read ${cmdarg}' fnameescape(file)`,
-    {
-      file,
-    },
-  );
-}
-
-/**
- * Read file content into the current buffer
- */
-export async function readFile(
-  denops: Denops,
-  file: string,
-  options: ReadFileOptions = {},
-): Promise<void> {
-  const bufnr = await fn.bufnr(denops);
-  return await modifiable(
-    denops,
-    bufnr,
-    () => readFileInternal(denops, file, options),
-  );
-}
-
-/**
- * Read data into the current buffer through a temporary file
- */
-export async function readData(
-  denops: Denops,
-  data: Uint8Array,
-  options: ReadFileOptions = {},
-): Promise<void> {
-  const f = await Deno.makeTempFile();
-  await Deno.writeFile(f, data);
-  try {
-    await readFile(denops, f, options);
-  } finally {
-    await Deno.remove(f);
-  }
-}
-
-export type EditFileOptions = Omit<ReadFileOptions, "edit">;
-
-/**
- * Read file content and replace the current buffer with it
- */
-export async function editFile(
-  denops: Denops,
-  file: string,
-  options: EditFileOptions = {},
-): Promise<void> {
-  const bufnr = await fn.bufnr(denops);
-  const mods = options.mods ?? "";
-  await modifiable(denops, bufnr, async () => {
-    await batch.batch(denops, async (denops) => {
-      await denops.cmd(`${mods} %delete _`);
-      await readFileInternal(denops, file, {
-        ...options,
-        cmdarg: `++edit ${options.cmdarg ?? ""}`,
-      });
-      await denops.cmd(`${mods} 1delete _`);
-    });
-  });
-}
-
-/**
- * Read  and replace the current buffer with it
- */
-export async function editData(
-  denops: Denops,
-  data: Uint8Array,
-  options: EditFileOptions = {},
-): Promise<void> {
-  const f = await Deno.makeTempFile();
-  await Deno.writeFile(f, data);
-  try {
-    await editFile(denops, f, options);
-  } finally {
-    await Deno.remove(f);
   }
 }
