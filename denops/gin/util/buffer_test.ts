@@ -1,6 +1,7 @@
-import { assertEquals, test } from "../deps_test.ts";
+import { assertEquals, Encoding, test } from "../deps_test.ts";
 import { fn, path } from "../deps.ts";
 import {
+  assign,
   concrete,
   editData,
   editFile,
@@ -102,6 +103,112 @@ test({
       "Joking",
     ], await fn.getline(denops, 1, "$"));
     assertEquals(0, await fn.getbufvar(denops, bufnr, "&modifiable"));
+  },
+  prelude: [`set runtimepath^=${runtimepath}`],
+});
+
+test({
+  mode: "all",
+  name: "assign assings content to a buffer",
+  fn: async (denops) => {
+    const bufnr = await fn.bufnr(denops);
+    const encoder = new TextEncoder();
+    await assign(
+      denops,
+      bufnr,
+      encoder.encode(
+        "こんにちわ\n世界\n",
+      ),
+    );
+    assertEquals([
+      "こんにちわ",
+      "世界",
+    ], await fn.getline(denops, 1, "$"));
+
+    await assign(
+      denops,
+      bufnr,
+      encoder.encode(
+        "今すぐダウンロー\nド",
+      ),
+    );
+    assertEquals([
+      "今すぐダウンロー",
+      "ド",
+    ], await fn.getline(denops, 1, "$"));
+  },
+  prelude: [`set runtimepath^=${runtimepath}`],
+});
+test({
+  mode: "all",
+  name: "assign assings content to a buffer with specified fileencoding",
+  fn: async (denops) => {
+    const bufnr = await fn.bufnr(denops);
+    const encode = (text: string, encoding: string): Uint8Array => {
+      return new Uint8Array(
+        Encoding.convert(Encoding.stringToCode(text), encoding, "UNICODE"),
+      );
+    };
+    await assign(
+      denops,
+      bufnr,
+      encode("こんにちわ\n世界\n", "sjis"),
+      {
+        fileencoding: "sjis",
+      },
+    );
+    assertEquals([
+      "こんにちわ",
+      "世界",
+    ], await fn.getline(denops, 1, "$"));
+
+    await assign(
+      denops,
+      bufnr,
+      encode("今すぐダウンロー\nド", "euc-jp"),
+      {
+        fileencoding: "euc-jp",
+      },
+    );
+    assertEquals([
+      "今すぐダウンロー",
+      "ド",
+    ], await fn.getline(denops, 1, "$"));
+  },
+  prelude: [`set runtimepath^=${runtimepath}`],
+});
+test({
+  mode: "all",
+  name: "assign assings content to a buffer with specified fileformat",
+  fn: async (denops) => {
+    const bufnr = await fn.bufnr(denops);
+    const encoder = new TextEncoder();
+    await assign(
+      denops,
+      bufnr,
+      encoder.encode(
+        "こんにちわ\r\n世界\r\n",
+      ),
+      {
+        fileformat: "dos",
+      },
+    );
+    assertEquals([
+      "こんにちわ",
+      "世界",
+    ], await fn.getline(denops, 1, "$"));
+
+    await assign(
+      denops,
+      bufnr,
+      encoder.encode(
+        "今すぐダウンロー\r\nド",
+      ),
+    );
+    assertEquals([
+      "今すぐダウンロー",
+      "ド",
+    ], await fn.getline(denops, 1, "$"));
   },
   prelude: [`set runtimepath^=${runtimepath}`],
 });

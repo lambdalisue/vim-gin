@@ -1,4 +1,12 @@
 import { autocmd, batch, Denops, fn, unknownutil } from "../deps.ts";
+import {
+  assertFileFormat,
+  findFileFormat,
+  isFileFormat,
+  maybeFileFormat,
+  splitText,
+} from "./fileformat.ts";
+import { tryDecode } from "./fileencoding.ts";
 
 export type OpenOptions = {
   mods?: string;
@@ -39,6 +47,53 @@ export async function replace(
   repl: string[],
 ): Promise<void> {
   await denops.call("gin#internal#util#buffer#replace", bufnr, repl);
+}
+
+export type AssignOptions = {
+  fileformat?: string;
+  fileencoding?: string;
+};
+
+/**
+ * Assign content to the buffer with given format and encoding.
+ */
+export async function assign(
+  denops: Denops,
+  bufnr: number,
+  content: Uint8Array,
+  options: AssignOptions = {},
+): Promise<void> {
+  const [fileformat, fileformatsStr, fileencodingsStr] = await batch.gather(
+    denops,
+    async (denops) => {
+      await fn.getbufvar(denops, bufnr, "&fileformat");
+      await fn.getbufvar(denops, bufnr, "&fileformats");
+      await fn.getbufvar(denops, bufnr, "&fileencodings");
+    },
+  );
+  assertFileFormat(fileformat);
+  unknownutil.assertString(fileformatsStr);
+  unknownutil.assertString(fileencodingsStr);
+  const fileformats = fileformatsStr.split(",");
+  const fileencodings = fileencodingsStr.split(",");
+  unknownutil.assertArray(fileformats, isFileFormat);
+  unknownutil.assertArray(fileencodings, unknownutil.isString);
+  let enc: string;
+  let text: string;
+  if (options.fileencoding) {
+    enc = options.fileencoding;
+    text = (new TextDecoder(enc)).decode(content);
+  } else {
+    [enc, text] = tryDecode(content, fileencodings);
+  }
+  const ff = maybeFileFormat(options.fileformat) ??
+    findFileFormat(text, fileformats) ?? fileformat;
+  const repl = splitText(text, ff);
+  await batch.batch(denops, async (denops) => {
+    await fn.setbufvar(denops, bufnr, "&fileformat", ff);
+    await fn.setbufvar(denops, bufnr, "&fileencoding", enc);
+    await replace(denops, bufnr, repl);
+  });
 }
 
 /**
