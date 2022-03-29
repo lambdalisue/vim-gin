@@ -94,13 +94,15 @@ COMMANDS					*gin-commands*
 
 								*:Gin*
 :Gin[!] [++{option}...] {command} [{args}]
-:Gin[!] [++{option}...] ++buffer {command} [{args}]
+:Gin[!] [++{option}...] ++buffer [++monochrome] {command} [{args}]
 	Call a git raw {command} with {args} asynchronously and echo result.
 	For example, "Gin add %" on "hello.txt" invokes "git add hello.txt".
 	If a bang (!) is specified, it calls command synchronously instead.
 	See |gin-command-options| for available {option}s.
 	If ++buffer option is specified, it opens a |scratch-buffer| to show
 	the result of the command.
+	If ++monochrome option is specified with ++buffer, no color is applied
+	to the result of the command.
 
 	Note that users need to install guise.vim (|gin-guise|) to open a
 	|tabpage| to edit a commit message on "Gin commit" or so on.

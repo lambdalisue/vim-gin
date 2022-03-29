@@ -7,6 +7,7 @@ import {
   splitText,
 } from "./fileformat.ts";
 import { tryDecode } from "./fileencoding.ts";
+import * as decoration from "./decoration.ts";
 
 export type OpenOptions = {
   mods?: string;
@@ -52,6 +53,7 @@ export async function replace(
 export type AssignOptions = {
   fileformat?: string;
   fileencoding?: string;
+  decorateAnsiEscapeCode?: boolean;
 };
 
 /**
@@ -89,11 +91,23 @@ export async function assign(
   const ff = maybeFileFormat(options.fileformat) ??
     findFileFormat(text, fileformats) ?? fileformat;
   const repl = splitText(text, ff);
-  await batch.batch(denops, async (denops) => {
-    await fn.setbufvar(denops, bufnr, "&fileformat", ff);
-    await fn.setbufvar(denops, bufnr, "&fileencoding", enc);
-    await replace(denops, bufnr, repl);
-  });
+
+  if (options.decorateAnsiEscapeCode) {
+    const [trimmed, decorations] = decoration
+      .buildDecorationsFromAnsiEscapeCode(repl);
+    await batch.batch(denops, async (denops) => {
+      await fn.setbufvar(denops, bufnr, "&fileformat", ff);
+      await fn.setbufvar(denops, bufnr, "&fileencoding", enc);
+      await replace(denops, bufnr, trimmed);
+    });
+    await decoration.decorate(denops, bufnr, decorations);
+  } else {
+    await batch.batch(denops, async (denops) => {
+      await fn.setbufvar(denops, bufnr, "&fileformat", ff);
+      await fn.setbufvar(denops, bufnr, "&fileencoding", enc);
+      await replace(denops, bufnr, repl);
+    });
+  }
 }
 
 /**
