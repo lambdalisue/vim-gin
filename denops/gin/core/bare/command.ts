@@ -33,10 +33,16 @@ export async function command(
   validateOpts(opts, [
     "worktree",
     "buffer",
+    "monochrome",
     ...builtinOpts,
   ]);
+  const enableColor = "buffer" in opts && !("monochrome" in opts);
+  const cmd = [
+    ...(enableColor ? ["-c", "color.ui=always"] : []),
+    ...residue,
+  ];
   const worktree = await getWorktreeFromOpts(denops, opts);
-  const proc = run(residue, {
+  const proc = run(cmd, {
     printCommand: !!verbose,
     stdin: "null",
     stdout: "piped",
@@ -66,6 +72,7 @@ export async function command(
       {
         fileformat: (opts["ff"] ?? opts["fileformat"]),
         fileencoding: opts["enc"] ?? opts["fileencoding"],
+        decorateAnsiEscapeCode: enableColor,
       },
     );
     await buffer.concrete(denops, bufnr);
