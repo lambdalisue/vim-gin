@@ -93,14 +93,12 @@ INTERFACE					*gin-interface*
 COMMANDS					*gin-commands*
 
 								*:Gin*
-:Gin[!] [++worktree={worktree}] {command} [{args}]
-:Gin[!] [++opt] [++worktree={worktree}] ++buffer {command} [{args}]
-	Call a git raw {command} with {args} asynchronously and echo result on
-	a {worktree}.
+:Gin[!] [++{option}...] {command} [{args}]
+:Gin[!] [++{option}...] ++buffer {command} [{args}]
+	Call a git raw {command} with {args} asynchronously and echo result.
 	For example, "Gin add %" on "hello.txt" invokes "git add hello.txt".
 	If a bang (!) is specified, it calls command synchronously instead.
-	If no {worktree} is specified, gin will find the one from the current
-	working directory.
+	See |gin-command-options| for available {option}s.
 	If ++buffer option is specified, it opens a |scratch-buffer| to show
 	the result of the command.
 
@@ -111,10 +109,9 @@ COMMANDS					*gin-commands*
 	prompt to input passphrase on "Gin push" or so on.
 
 								*:GinBranch*
-:GinBranch [++worktree={worktree}] [{flags}]
-	Open a "gin-branch" buffer to show a branch list of a {worktree}.
-	If no {worktree} is specified, gin will find the one from the current
-	working directory.
+:GinBranch [++{option}...] [{flags}]
+	Open a "gin-branch" buffer to show a branch list.
+	See |gin-command-options| for available {option}s.
 
 	The following {flags} are available:
 
@@ -130,15 +127,12 @@ COMMANDS					*gin-commands*
 	to see mappings or disable by |g:gin_branch_disable_default_mappings|.
 
 								*:GinChaperon*
-:GinChaperon [++opt] [++worktree={worktree}] [--without-supplements] {path}
-:GinChaperon [++opt] [++worktree={worktree}] [--without-supplements] 
-	--without-theirs {path}
-:GinChaperon [++opt] [++worktree={worktree}] [--without-supplements]
-	--without-ours {path}
+:GinChaperon [++{option}...] [--without-supplements] {path}
+:GinChaperon [++{option}...] [--without-supplements] --without-theirs {path}
+:GinChaperon [++{option}...] [--without-supplements] --without-ours {path}
 	Open three main buffers (THEIRS, WORKTREE, and OURS) and three
-	supplemental buffers to solve conflicts on {path} in a {worktree}. 
-	If no {worktree} is specified, gin will find the one from the current
-	working directory.
+	supplemental buffers to solve conflicts on {path}.
+	See |gin-command-options| for available {option}s.
 	If --without-theirs is specified, it does not open a THEIRS buffer.
 	If --without-ours is specified, it does not open a OURS buffer.
 	If --without-supplements is specified, it does not open supplemental
@@ -171,12 +165,11 @@ COMMANDS					*gin-commands*
 	"Gina chaperon" if you were user of gina.vim.
 
 								*:GinDiff*
-:GinDiff [++opt] [++worktree={worktree}] [{flags}] {path}
-:GinDiff [++opt] [++worktree={worktree}] [{flags}] --cached {path}
-:GinDiff [++opt] [++worktree={worktree}] [{flags}] {commitish} {path}
-	Open a "gin-diff" buffer of a file in a {worktree}.
-	If no {worktree} is specified, gin will find the one from the current
-	working directory.
+:GinDiff [++{option}...] [{flags}] {path}
+:GinDiff [++{option}...] [{flags}] --cached {path}
+:GinDiff [++{option}...] [{flags}] {commitish} {path}
+	Open a "gin-diff" buffer of a file.
+	See |gin-command-options| for available {option}s.
 
 	Users can use the following mappings in each buffers or disable
 	default mappings by |g:gin_diff_disable_default_mappings|.
@@ -206,12 +199,11 @@ COMMANDS					*gin-commands*
 	See ":man git-diff(1)" for detail about {flags}.
 
 								*:GinEdit*
-:GinEdit [++opt] [++worktree={worktree}] {path}
-:GinEdit [++opt] [++worktree={worktree}] --cached {path}
-:GinEdit [++opt] [++worktree={worktree}] {commitish} {path}
+:GinEdit [++{option}...] {path}
+:GinEdit [++{option}...] --cached {path}
+:GinEdit [++{option}...] {commitish} {path}
 	Open a local {path} or "gin-edit" buffer of a file in a {worktree}.
-	If no {worktree} is specified, gin will find the one from the current
-	working directory.
+	See |gin-command-options| for available {option}s.
 
 	If --cached flag is specified, it opens a buffer that shows content
 	in INDEX rather than the local working tree. The buffer is modifiable
@@ -221,13 +213,12 @@ COMMANDS					*gin-commands*
 	in the {commitish} rather than the local working tree.
 
 								*:GinPatch*
-:GinPatch [++opt] [++worktree={worktree}] {path}
-:GinPatch [++opt] [++worktree={worktree}] --without-head {path}
-:GinPatch [++opt] [++worktree={worktree}] --without-worktree {path}
+:GinPatch [++{option}...] {path}
+:GinPatch [++{option}...] --without-head {path}
+:GinPatch [++{option}...] --without-worktree {path}
 	Open three buffers (HEAD, INDEX, and WORKTREE) to patch changes of
-	{path} in a {worktree}. 
-	If no {worktree} is specified, gin will find the one from the current
-	working directory.
+	{path}.
+	See |gin-command-options| for available {option}s.
 	If --without-head is specified, it does not open a HEAD buffer.
 	If --without-worktree is specified, it does not open a WORKTREE
 	buffer.
@@ -258,10 +249,9 @@ COMMANDS					*gin-commands*
 					Assigned to "do" in default.
 
 								*:GinStatus*
-:GinStatus [++worktree={worktree}] [{flags}]
-	Open a "gin-status" buffer to show a status of a {worktree}.
-	If no {worktree} is specified, gin will find the one from the current
-	working directory.
+:GinStatus [++{option}...] [{flags}]
+	Open a "gin-status" buffer to show a status.
+	See |gin-command-options| for available {option}s.
 
 	The following {flags} are available:
 
@@ -275,6 +265,29 @@ COMMANDS					*gin-commands*
 
 	Several default mappings are defined in the buffer. Use "help" action
 	to see mappings or disable by |g:gin_status_disable_default_mappings|.
+
+							*gin-command-options*
+Gin supports several options starts with double plus signs (++) as:
+
+++worktree={worktree}
+	Specify a particular git working tree. If this option is not
+	specified, gin will find the one from the current buffer or the
+	current working directory.
+>
+	:GinStatus ++worktree=/home/john/project\ A
+<
+++enc={encoding}/++encoding={encoding}
+	Specify 'fileencoding' option of the buffer. This option is only
+	available on Gin commands that open buffer(s).
+>
+	:GinEdit ++enc=sjis README.md
+<
+++ff={fileformat}/++fileformat={fileformat}
+	Specify 'fileformat' option of the buffer. This option is only
+	available on Gin commands that open buffer(s).
+>
+	:GinDiff ++ff=mac README.md
+<
 
 -----------------------------------------------------------------------------
 VARIABLES					*gin-variables*

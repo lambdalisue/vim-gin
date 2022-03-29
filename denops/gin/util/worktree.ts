@@ -1,16 +1,18 @@
-import { batch, bufname, Denops, fn, unknownutil } from "../deps.ts";
+import { batch, bufname, Denops, fn, fs, unknownutil } from "../deps.ts";
 import { GIN_BUFFER_PROTOCOLS } from "../global.ts";
 import { expand } from "../util/cmd.ts";
 import { Opts } from "../util/args.ts";
 import { find } from "../git/finder.ts";
 
 async function getWorktree(denops: Denops): Promise<string> {
-  const [cwd, bname] = await batch.gather(denops, async (denops) => {
+  const [cwd, bname, dirname] = await batch.gather(denops, async (denops) => {
     await fn.getcwd(denops);
     await fn.bufname(denops, "%");
+    await fn.expand(denops, "%:h");
   });
   unknownutil.assertString(cwd);
   unknownutil.assertString(bname);
+  unknownutil.assertString(dirname);
   if (bname) {
     try {
       const { scheme, expr } = bufname.parse(bname);
@@ -22,6 +24,9 @@ async function getWorktree(denops: Denops): Promise<string> {
     } catch {
       // Ignore errors
     }
+  }
+  if (dirname && await fs.exists(dirname)) {
+    return await find(dirname);
   }
   return await find(cwd);
 }
