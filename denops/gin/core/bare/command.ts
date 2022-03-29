@@ -58,7 +58,7 @@ export async function command(
   proc.close();
   if ("buffer" in opts) {
     const cmdarg = formatOpts(opts, builtinOpts).join(" ");
-    await denops.cmd("enew");
+    await denops.cmd("noswapfile enew");
     const bufnr = await fn.bufnr(denops);
     await buffer.ensure(denops, bufnr, async () => {
       await batch.batch(denops, async (denops) => {
