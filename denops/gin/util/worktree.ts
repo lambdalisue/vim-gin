@@ -13,7 +13,7 @@ import { expand } from "../util/cmd.ts";
 import { Opts } from "../util/args.ts";
 import { find } from "../git/finder.ts";
 
-async function getWorktree(denops: Denops): Promise<string> {
+export async function getWorktree(denops: Denops): Promise<string> {
   const [cwd, filename, verbose] = await batch.gather(
     denops,
     async (denops) => {
