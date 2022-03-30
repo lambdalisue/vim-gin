@@ -32,6 +32,20 @@ Gin is written in denops thus users need to install denops.vim
 
 [vim-denops/denops.vim]: https://github.com/vim-denops/denops.vim
 
+## Installation
+
+Install [Deno](https://deno.land) then use
+[vim-plug](https://github.com/junegunn/vim-plug) to install like:
+
+```vim
+Plug 'vim-denops/denops.vim'
+Plug 'lambdalisue/gin.vim'`
+```
+
+Or see
+[How to install](https://github.com/lambdalisue/gin.vim/wiki#how-to-install)
+section for other Vim plugin managers.
+
 ## Similar projects
 
 - [tpope/vim-fugitive](https://github.com/tpope/vim-fugitive)<br>A plugin that

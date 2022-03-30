@@ -1,6 +1,6 @@
 *gin.txt*					Gin makes you drunk with Git
 
-Author:  Alisue <lambdalisue@hashnote.net>
+Author:  Alisue <lambdalisue@gmail.com>
 License: MIT License (See LICENSE)
 
 
@@ -16,6 +16,7 @@ INTERFACE			|gin-interface|
   COMMANDS			  |gin-commands|
   VARIABLES			  |gin-variables|
   FUNCTIONS			  |gin-functions|
+  MAPPINGS			  |gin-mappings|
   ACTIONS			  |gin-actions|
 
 
@@ -28,7 +29,7 @@ Gin ( *gin.vim* ) is a plugin to handle git repository from Vim/Neovim.
 =============================================================================
 REQUIREMENTS					*gin-requirements*
 
-Gin is written in denops thus users need to install denops.vim
+Gin is written in denops so users need to install denops.vim
 
 denops.vim~
 	An ecosystem for writing Vim/Neovim plugin in Deno.
@@ -41,13 +42,13 @@ USAGE						*gin-usage*
 -----------------------------------------------------------------------------
 ACTION						*gin-action*
 
-Action is a special mapping which is defined on a gin buffer and looks like:
+Action is a special mapping that is defined on a gin buffer and is looked like:
 
 	<Plug>(gin-action-{name})
 
 where {name} is a name of the action.
 
-							*gin-action-mapping*
+						*gin-action-mapping*
 Gin defines the following mappings for actions:
 
 	"?"	List mappings/actions available
@@ -92,7 +93,7 @@ INTERFACE					*gin-interface*
 -----------------------------------------------------------------------------
 COMMANDS					*gin-commands*
 
-								*:Gin*
+							*:Gin*
 :Gin[!] [++{option}...] {command} [{args}]
 :Gin[!] [++{option}...] ++buffer [++monochrome] {command} [{args}]
 	Call a git raw {command} with {args} asynchronously and echo result.
@@ -104,13 +105,7 @@ COMMANDS					*gin-commands*
 	If ++monochrome option is specified with ++buffer, no color is applied
 	to the result of the command.
 
-	Note that users need to install guise.vim (|gin-guise|) to open a
-	|tabpage| to edit a commit message on "Gin commit" or so on.
-
-	Note that users need to install askpass.vim (|gin-askpass|) to open a
-	prompt to input passphrase on "Gin push" or so on.
-
-								*:GinBranch*
+							*:GinBranch*
 :GinBranch [++{option}...] [{flags}]
 	Open a "gin-branch" buffer to show a branch list.
 	See |gin-command-options| for available {option}s.
@@ -128,7 +123,7 @@ COMMANDS					*gin-commands*
 	Several default mappings are defined in the buffer. Use "help" action
 	to see mappings or disable by |g:gin_branch_disable_default_mappings|.
 
-								*:GinChaperon*
+							*:GinChaperon*
 :GinChaperon [++{option}...] [++plain] {path}
 :GinChaperon [++{option}...] [++plain] ++no-theirs {path}
 :GinChaperon [++{option}...] [++plain] ++no-ours {path}
@@ -146,26 +141,17 @@ COMMANDS					*gin-commands*
 	default mappings by |g:gin_chaperon_disable_default_mappings|.
 
 	THEIRS~
-	|<Plug>(gin-diffput)|		Put a diff chunk to WORKTREE buffer.
-					Assigned to "dp" in default.
+	|<Plug>(gin-diffput)|		Assigned to "dp" in default.
 
 	WORKTREE~
-	|<Plug>(gin-diffget)|		Get a diff chunk from THEIRS or OURS
-					buffer (prefer OURS buffer.)
-					Assigned to "do" in default.
-	|<Plug>(gin-diffget-l)|		Get a diff chunk from THEIRS buffer.
-					Assigned to "dol" in default.
-	|<Plug>(gin-diffget-r)|		Get a diff chunk from OURS buffer.
-					Assigned to "dor" in default.
+	|<Plug>(gin-diffget)|		Assigned to "do" in default.
+	|<Plug>(gin-diffget-l)|		Assigned to "dol" in default.
+	|<Plug>(gin-diffget-r)|		Assigned to "dor" in default.
 
 	OURS~
-	|<Plug>(gin-diffget)|		Get a diff chunk from WORKTREE buffer.
-					Assigned to "do" in default.
+	|<Plug>(gin-diffget)|		Assigned to "do" in default.
 
-	NOTE that the buffers appearance order is opposite from 
-	"Gina chaperon" if you were user of gina.vim.
-
-								*:GinDiff*
+							*:GinDiff*
 :GinDiff [++{option}...] [{flags}] {path}
 :GinDiff [++{option}...] [{flags}] --cached {path}
 :GinDiff [++{option}...] [{flags}] {commitish} {path}
@@ -175,13 +161,8 @@ COMMANDS					*gin-commands*
 	Users can use the following mappings in each buffers or disable
 	default mappings by |g:gin_diff_disable_default_mappings|.
 
-	*<Plug>(gin-diffjump-old)*	Jump to the corresponding line of the
-					comparison source.
-					Assigned to "g<CR>" in default.
-
-	*<Plug>(gin-diffjump-new)*	Jump to the corresponding line of the
-					comparison.
-					Assigned to "<CR>" in default.
+	|<Plug>(gin-diffjump-old)|	Assigned to "g<CR>" in default.
+	|<Plug>(gin-diffjump-new)|	Assigned to "<CR>" in default.
 
 	The following {flags} are available:
 
@@ -199,11 +180,11 @@ COMMANDS					*gin-commands*
 		
 	See ":man git-diff(1)" for detail about {flags}.
 
-								*:GinEdit*
+							*:GinEdit*
 :GinEdit [++{option}...] {path}
 :GinEdit [++{option}...] --cached {path}
 :GinEdit [++{option}...] {commitish} {path}
-	Open a local {path} or "gin-edit" buffer of a file in a {worktree}.
+	Open a local {path} or "gin-edit" buffer of a file.
 	See |gin-command-options| for available {option}s.
 
 	If --cached flag is specified, it opens a buffer that shows content
@@ -213,7 +194,7 @@ COMMANDS					*gin-commands*
 	If {commitish} is specified, it opens a buffer that shows content
 	in the {commitish} rather than the local working tree.
 
-								*:GinPatch*
+							*:GinPatch*
 :GinPatch [++{option}...] {path}
 :GinPatch [++{option}...] ++no-head {path}
 :GinPatch [++{option}...] ++no-worktree {path}
@@ -226,29 +207,20 @@ COMMANDS					*gin-commands*
 	Users can use the following mappings in each buffers or disable
 	default mappings by |g:gin_patch_disable_default_mappings|.
 
-
 	HEAD~
-	|<Plug>(gin-diffput)|		Put a diff chunk to INDEX buffer.
-					Assigned to "dp" in default.
+	|<Plug>(gin-diffput)|		Assigned to "dp" in default.
 
 	INDEX~
-	*<Plug>(gin-diffput)*		Put a diff chunk to WORKTREE buffer.
-					Assigned to "dp" in default.
-	*<Plug>(gin-diffget)*		Get a diff chunk from WORKTREE or HEAD
-					buffer (prefer WORKTREE buffer.)
-					Assigned to "do" in default.
-	*<Plug>(gin-diffget-l)*		Get a diff chunk from HEAD buffer.
-					Assigned to "dol" in default.
-	*<Plug>(gin-diffget-r)*		Get a diff chunk from WORKTREE buffer.
-					Assigned to "dor" in default.
+	|<Plug>(gin-diffput)|		Assigned to "dp" in default.
+	|<Plug>(gin-diffget)|		Assigned to "do" in default.
+	|<Plug>(gin-diffget-l)|		Assigned to "dol" in default.
+	|<Plug>(gin-diffget-r)|		Assigned to "dor" in default.
 
 	WORKTREE~
-	|<Plug>(gin-diffput)|		Put a diff chunk to INDEX buffer.
-					Assigned to "dp" in default.
-	|<Plug>(gin-diffget)|		Get a diff chunk from INDEX buffer.
-					Assigned to "do" in default.
+	|<Plug>(gin-diffput)|		Assigned to "dp" in default.
+	|<Plug>(gin-diffget)|		Assigned to "do" in default.
 
-								*:GinStatus*
+							*:GinStatus*
 :GinStatus [++{option}...] [{flags}]
 	Open a "gin-status" buffer to show a status.
 	See |gin-command-options| for available {option}s.
@@ -298,7 +270,7 @@ Gin supports several options starts with double plus signs (++) as:
 VARIABLES					*gin-variables*
 
 *g:gin_chaperon_disable_default_mappings*
-	Disable default mappings on buffers shown by `:GinChaperon`.
+	Disable default mappings on buffers shown by |:GinChaperon|.
 
 	Default: 0
 
@@ -309,12 +281,12 @@ VARIABLES					*gin-variables*
 	Default: 10
 
 *g:gin_diff_disable_default_mappings*
-	Disable default mappings on buffers shown by `:GinDiff`.
+	Disable default mappings on buffers shown by |:GinDiff|.
 
 	Default: 0
 
 *g:gin_patch_disable_default_mappings*
-	Disable default mappings on buffers shown by `:GinPatch`.
+	Disable default mappings on buffers shown by |:GinPatch|.
 
 	Default: 0
 
@@ -329,7 +301,7 @@ VARIABLES					*gin-variables*
 	Default: 0
 
 *g:gin_status_disable_default_mappings*
-	Disable default mappings on `:GinStatus` buffer.
+	Disable default mappings on |:GinStatus| buffer.
 
 	Default: 0
 
@@ -376,7 +348,32 @@ gin#action#gather_candidates({range})
 	Gather and return candidates of the current buffer in {range}.
 
 -----------------------------------------------------------------------------
+MAPPINGS					*gin-mappings*
+
+*<Plug>(gin-diffput)*
+	Put a diff chunk to WORKTREE buffer.
+
+*<Plug>(gin-diffget)*
+	Get a diff chunk from WORKTREE or HEAD buffer (prefer WORKTREE.)
+
+*<Plug>(gin-diffget-l)*
+	Get a diff chunk from HEAD buffer.
+
+*<Plug>(gin-diffget-r)*
+	Get a diff chunk from WORKTREE buffer.
+
+*<Plug>(gin-diffjump-old)*
+	Jump to the corresponding line of the comparison source.
+
+*<Plug>(gin-diffjump-new)*
+	Jump to the corresponding line of the comparison.
+
+-----------------------------------------------------------------------------
 ACTIONS						*gin-actions*
+
+NOTE that we won't list all actions available here because there are too many
+of them and we cannot maintain correct documentation of that.
+Use the "help" action to check what actions are available on each gin buffer.
 
 *<Plug>(gin-action-echo)*
 	Echo active action candidates for debugging.
@@ -396,143 +393,6 @@ ACTIONS						*gin-actions*
 *<Plug>(gin-action-help:all)*
 	Show action help.
 	It is mapped to "?" in default when no mapping exists.
-
-*<Plug>(gin-action-edit=)*
-*<Plug>(gin-action-edit:edit)*
-*<Plug>(gin-action-edit:split)*
-*<Plug>(gin-action-edit:vsplit)*
-*<Plug>(gin-action-edit:tabedit)*
-*<Plug>(gin-action-edit)*
-	Aliases to |<Plug>(gin-action-edit:local)| variants. Re-define those
-	mappings to change behavior of "edit" action variants
-
-*<Plug>(gin-action-edit:local=)*
-*<Plug>(gin-action-edit:local:edit)*
-*<Plug>(gin-action-edit:local:split)*
-*<Plug>(gin-action-edit:local:vsplit)*
-*<Plug>(gin-action-edit:local:tabedit)*
-*<Plug>(gin-action-edit:local)*
-	Open a new buffer with given command and call |:GinEdit| on active
-	action candidates.
-
-*<Plug>(gin-action-edit:cached=)*
-*<Plug>(gin-action-edit:cached:edit)*
-*<Plug>(gin-action-edit:cached:split)*
-*<Plug>(gin-action-edit:cached:vsplit)*
-*<Plug>(gin-action-edit:cached:tabedit)*
-*<Plug>(gin-action-edit:cached)*
-	Open a new buffer with given command and call |:GinEdit| with the
-	"--cached" option on active action candidates.
-
-*<Plug>(gin-action-edit:HEAD=)*
-*<Plug>(gin-action-edit:HEAD:edit)*
-*<Plug>(gin-action-edit:HEAD:split)*
-*<Plug>(gin-action-edit:HEAD:vsplit)*
-*<Plug>(gin-action-edit:HEAD:tabedit)*
-*<Plug>(gin-action-edit:HEAD)*
-	Open a new buffer with given command and call |:GinEdit| with
-	the commit "HEAD" on active action candidates.
-
-*<Plug>(gin-action-diff=)*
-*<Plug>(gin-action-diff:edit)*
-*<Plug>(gin-action-diff:split)*
-*<Plug>(gin-action-diff:vsplit)*
-*<Plug>(gin-action-diff:tabedit)*
-*<Plug>(gin-action-diff)*
-	Aliases to |<Plug>(gin-action-diff:smart)| variants. Re-define those
-	mappings to change behavior of "diff" action variants
-
-*<Plug>(gin-action-diff:local=)*
-*<Plug>(gin-action-diff:local:edit)*
-*<Plug>(gin-action-diff:local:split)*
-*<Plug>(gin-action-diff:local:vsplit)*
-*<Plug>(gin-action-diff:local:tabedit)*
-*<Plug>(gin-action-diff:local)*
-	Open a new buffer with given command and call |:GinDiff| on active
-	action candidates (INDEX vs WORKTREE).
-
-*<Plug>(gin-action-diff:cached=)*
-*<Plug>(gin-action-diff:cached:edit)*
-*<Plug>(gin-action-diff:cached:split)*
-*<Plug>(gin-action-diff:cached:vsplit)*
-*<Plug>(gin-action-diff:cached:tabedit)*
-*<Plug>(gin-action-diff:cached)*
-	Open a new buffer with given command and call |:GinDiff| with the
-	"--cached" option on active action candidates (HEAD vs INDEX).
-
-*<Plug>(gin-action-diff:HEAD=)*
-*<Plug>(gin-action-diff:HEAD:edit)*
-*<Plug>(gin-action-diff:HEAD:split)*
-*<Plug>(gin-action-diff:HEAD:vsplit)*
-*<Plug>(gin-action-diff:HEAD:tabedit)*
-*<Plug>(gin-action-diff:HEAD)*
-	Open a new buffer with given command and call |:GinDiff| with the
-	commit "HEAD" on active action candidates (HEAD vs WORKTREE).
-
-*<Plug>(gin-action-diff:smart=)*
-*<Plug>(gin-action-diff:smart:edit)*
-*<Plug>(gin-action-diff:smart:split)*
-*<Plug>(gin-action-diff:smart:vsplit)*
-*<Plug>(gin-action-diff:smart:tabedit)*
-*<Plug>(gin-action-diff:smart)*
-	Open a new buffer with given command and call |:GinDiff| on active
-	action candidates.
-	It works like |<Plug>(gin-action-diff)| when there is no staged
-	changes. Otherwise it works like |<Plug>(gin-action-diff:cached)|.
-
-*<Plug>(gin-action-chaperon)*
-*<Plug>(gin-action-chaperon:theirs)*
-*<Plug>(gin-action-chaperon:ours)*
-*<Plug>(gin-action-chaperon:plain)*
-*<Plug>(gin-action-chaperon:plain:theirs)*
-*<Plug>(gin-action-chaperon:plain:ours)*
-	Call |:GinChaperon| on active action candidates to solve conflicts.
-	If ":theirs" or ":ours" variant is used, it call the command with
-	"++no-ours" or "++no-theirs" respectively.
-	If ":plain" variant is used, it call the command with "++plain".
-
-*<Plug>(gin-action-patch)*
-*<Plug>(gin-action-patch:head)*
-*<Plug>(gin-action-patch:worktree)*
-	Call |:GinPatch| on active action candidates to stage changes
-	partially.
-	If ":head" or ":worktree" variant is used, it call the command with
-	"++no-worktree" or "++no-head" respectively.
-
-*<Plug>(gin-action-add)*
-*<Plug>(gin-action-add:intent-to-add)*
-	Call "git add" on active action candidates.
-
-*<Plug>(gin-action-rm)*
-*<Plug>(gin-action-rm:force)*
-	Call "git rm" on active action candidates.
-
-*<Plug>(gin-action-reset)*
-	Call "git reset" on active action candidates.
-
-*<Plug>(gin-action-restore)*
-*<Plug>(gin-action-restore:staged)*
-*<Plug>(gin-action-restore:ours)*
-*<Plug>(gin-action-restore:theirs)*
-*<Plug>(gin-action-restore:conflict)*
-*<Plug>(gin-action-restore:conflict:merge)*
-*<Plug>(gin-action-restore:conflict:diff3)*
-	Call "git restore" on active action candidates.
-
-*<Plug>(gin-action-stage)*
-*<Plug>(gin-action-stage:intent-to-add)*
-	Call "git add" or "git rm" on active action candidates. 
-	The command will be determined from the status of candidates.
-
-*<Plug>(gin-action-unstage)*
-*<Plug>(gin-action-unstage:intent-to-add)*
-	Call "git reset" on active action candidates. If ":intent-to-add"
-	variant is used, the result status on "A " (added) candidates will be
-	" A" (intent to add) instead of "??" (unknown).
-
-*<Plug>(gin-action-stash)*
-*<Plug>(gin-action-stash:keep-index)*
-	Call "git stash" on active action candidates.
 
 
 =============================================================================
