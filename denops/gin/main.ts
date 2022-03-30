@@ -12,6 +12,10 @@ import { main as mainEdit } from "./feat/edit/main.ts";
 import { main as mainPatch } from "./feat/patch/main.ts";
 import { main as mainStatus } from "./feat/status/main.ts";
 
+import { main as mainComponentBranch } from "./component/branch.ts";
+import { main as mainComponentTraffic } from "./component/traffic.ts";
+import { main as mainComponentWorktree } from "./component/worktree.ts";
+
 export function main(denops: Denops): void {
   mainAction(denops);
   mainBare(denops);
@@ -24,4 +28,8 @@ export function main(denops: Denops): void {
   mainEdit(denops);
   mainPatch(denops);
   mainStatus(denops);
+
+  mainComponentBranch(denops);
+  mainComponentTraffic(denops);
+  mainComponentWorktree(denops);
 }
