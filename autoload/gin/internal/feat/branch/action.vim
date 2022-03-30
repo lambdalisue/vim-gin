@@ -18,6 +18,19 @@ function! gin#internal#feat#branch#action#register() abort
         \ <Cmd>call gin#action#fn({ xs -> <SID>delete(v:false, xs) })<CR>
   noremap <buffer> <Plug>(gin-action-delete:force)
         \ <Cmd>call gin#action#fn({ xs -> <SID>delete(v:true, xs) })<CR>
+
+  nnoremap <buffer> <Plug>(gin-action-merge:ff)
+        \ <Cmd>call gin#action#fn({ xs -> <SID>merge("--ff", xs) })<CR>
+  nnoremap <buffer> <Plug>(gin-action-merge:no-ff)
+        \ <Cmd>call gin#action#fn({ xs -> <SID>merge("--no-ff", xs) })<CR>
+  nnoremap <buffer> <Plug>(gin-action-merge:ff-only)
+        \ <Cmd>call gin#action#fn({ xs -> <SID>merge("--ff-only", xs) })<CR>
+  nmap <buffer> <Plug>(gin-action-merge) <Plug>(gin-action-merge:ff)
+
+  nnoremap <buffer> <Plug>(gin-action-rebase)
+        \ <Cmd>call gin#action#fn({ xs -> <SID>rebase("", xs) })<CR>
+  nnoremap <buffer> <Plug>(gin-action-rebase:i)
+        \ <Cmd>call gin#action#fn({ xs -> <SID>rebase_interactive("", xs) })<CR>
 endfunction
 
 function! s:switch(xs) abort
@@ -52,7 +65,7 @@ endfunction
 
 function! s:move(force, xs) abort
   let from = a:xs[0].branch
-  let name = input(printf('Rename (from %s): ', from))
+  let name = input(printf('Rename (from %s): ', from), from)
   redraw | echo ''
   if empty(name)
     echohl WarningMsg
@@ -86,5 +99,44 @@ function! s:delete(force, xs) abort
             \ branch.branch,
             \)
     endif
+  endfor
+endfunction
+
+function! s:merge(prefix, xs) abort
+  for branch in a:xs
+    if branch.kind ==# 'alias'
+      continue
+    endif
+    execute printf(
+          \ 'Gin! merge %s %s',
+          \ a:prefix,
+          \ branch.target,
+          \)
+  endfor
+endfunction
+
+function! s:rebase(prefix, xs) abort
+  for branch in a:xs
+    if branch.kind ==# 'alias'
+      continue
+    endif
+    execute printf(
+          \ 'Gin! rebase %s %s',
+          \ a:prefix,
+          \ branch.target,
+          \)
+  endfor
+endfunction
+
+function! s:rebase_interactive(prefix, xs) abort
+  for branch in a:xs
+    if branch.kind ==# 'alias'
+      continue
+    endif
+    execute printf(
+          \ 'Gin rebase --interactive %s %s',
+          \ a:prefix,
+          \ branch.target,
+          \)
   endfor
 endfunction
