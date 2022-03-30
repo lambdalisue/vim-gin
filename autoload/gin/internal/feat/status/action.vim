@@ -2,29 +2,25 @@ function! gin#internal#feat#status#action#register() abort
   call gin#internal#feat#status#action#edit#register()
   call gin#internal#feat#status#action#diff#register()
 
-  noremap <buffer> <Plug>(gin-action-chaperon:supplements)
+  noremap <buffer> <Plug>(gin-action-chaperon)
         \ <Cmd>call gin#action#fn({ xs -> <SID>chaperon('', xs) })<CR>
-  noremap <buffer> <Plug>(gin-action-chaperon:supplements:theirs)
-        \ <Cmd>call gin#action#fn({ xs -> <SID>chaperon('--without-ours', xs) })<CR>
-  noremap <buffer> <Plug>(gin-action-chaperon:supplements:ours)
-        \ <Cmd>call gin#action#fn({ xs -> <SID>chaperon('--without-theirs', xs) })<CR>
-  noremap <buffer> <Plug>(gin-action-chaperon:nosupplements)
-        \ <Cmd>call gin#action#fn({ xs -> <SID>chaperon('--without-supplements', xs) })<CR>
-  noremap <buffer> <Plug>(gin-action-chaperon:nosupplements:theirs)
-        \ <Cmd>call gin#action#fn({ xs -> <SID>chaperon('--without-supplements --without-ours', xs) })<CR>
-  noremap <buffer> <Plug>(gin-action-chaperon:nosupplements:ours)
-        \ <Cmd>call gin#action#fn({ xs -> <SID>chaperon('--without-supplements --without-theirs', xs) })<CR>
-  map <buffer> <Plug>(gin-action-chaperon) <Plug>(gin-action-chaperon:supplements)
-  map <buffer> <Plug>(gin-action-chaperon:theirs) <Plug>(gin-action-chaperon:supplements:theirs)
-  map <buffer> <Plug>(gin-action-chaperon:ours) <Plug>(gin-action-chaperon:supplements:ours)
-
+  noremap <buffer> <Plug>(gin-action-chaperon:theirs)
+        \ <Cmd>call gin#action#fn({ xs -> <SID>chaperon('++no-ours', xs) })<CR>
+  noremap <buffer> <Plug>(gin-action-chaperon:ours)
+        \ <Cmd>call gin#action#fn({ xs -> <SID>chaperon('++no-theirs', xs) })<CR>
+  noremap <buffer> <Plug>(gin-action-chaperon:plain)
+        \ <Cmd>call gin#action#fn({ xs -> <SID>chaperon('++plain', xs) })<CR>
+  noremap <buffer> <Plug>(gin-action-chaperon:plain:theirs)
+        \ <Cmd>call gin#action#fn({ xs -> <SID>chaperon('++plain ++no-ours', xs) })<CR>
+  noremap <buffer> <Plug>(gin-action-chaperon:plain:ours)
+        \ <Cmd>call gin#action#fn({ xs -> <SID>chaperon('++plain ++no-theirs', xs) })<CR>
 
   noremap <buffer> <Plug>(gin-action-patch)
         \ <Cmd>call gin#action#fn({ xs -> <SID>patch('', xs) })<CR>
   noremap <buffer> <Plug>(gin-action-patch:head)
-        \ <Cmd>call gin#action#fn({ xs -> <SID>patch('--without-worktree', xs) })<CR>
+        \ <Cmd>call gin#action#fn({ xs -> <SID>patch('++no-worktree', xs) })<CR>
   noremap <buffer> <Plug>(gin-action-patch:worktree)
-        \ <Cmd>call gin#action#fn({ xs -> <SID>patch('--without-head', xs) })<CR>
+        \ <Cmd>call gin#action#fn({ xs -> <SID>patch('++no-head', xs) })<CR>
 
   noremap <buffer> <Plug>(gin-action-add)
         \ <Cmd>call gin#action#fn({ xs -> <SID>add('', xs) })<CR>

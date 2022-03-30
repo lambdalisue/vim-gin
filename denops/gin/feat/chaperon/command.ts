@@ -11,7 +11,6 @@ import {
   builtinOpts,
   formatOpts,
   parse,
-  validateFlags,
   validateOpts,
 } from "../../util/args.ts";
 import * as buffer from "../../util/buffer.ts";
@@ -24,24 +23,21 @@ export async function command(
   denops: Denops,
   args: string[],
 ): Promise<void> {
-  const [opts, flags, residue] = parse(await normCmdArgs(denops, args));
+  const [opts, _, residue] = parse(await normCmdArgs(denops, args));
   validateOpts(opts, [
     "worktree",
+    "plain",
+    "no-ours",
+    "no-theirs",
     ...builtinOpts,
   ]);
-  validateFlags(flags, [
-    "without-ours",
-    "without-theirs",
-    "without-supplements",
-  ]);
+  const noSupplements = "plain" in opts;
+  const noOurs = "no-ours" in opts;
+  const noTheirs = "no-theirs" in opts;
   const [abspath] = parseResidue(residue);
   const worktree = await getWorktreeFromOpts(denops, opts);
   const relpath = path.relative(worktree, abspath);
   const leading = formatOpts(opts, builtinOpts);
-
-  const withoutTheirs = "without-theirs" in flags;
-  const withoutOurs = "without-ours" in flags;
-  const withoutSupplements = "without-supplements" in flags;
 
   const [supplementHeight, disableDefaultMappings] = await batch.gather(
     denops,
@@ -56,7 +52,7 @@ export async function command(
   const inProgressAliasHead = await getInProgressAliasHead(worktree);
 
   let bufnrTheirs = -1;
-  if (!withoutTheirs) {
+  if (!noTheirs) {
     await editCommand(denops, [
       ...leading,
       `++worktree=${worktree}`,
@@ -75,7 +71,7 @@ export async function command(
   const bufnrWorktree = await fn.bufnr(denops);
 
   let bufnrOurs = -1;
-  if (!withoutOurs) {
+  if (!noOurs) {
     await denops.cmd("botright vsplit");
     await editCommand(denops, [
       ...leading,
@@ -92,7 +88,7 @@ export async function command(
       denops,
       bufnrTheirs,
       bufnrWorktree,
-      withoutSupplements ? 0 : supplementHeight,
+      noSupplements ? 0 : supplementHeight,
       inProgressAliasHead,
       disableDefaultMappings,
     );
@@ -104,7 +100,7 @@ export async function command(
     bufnrWorktree,
     bufnrTheirs,
     bufnrOurs,
-    withoutSupplements ? 0 : supplementHeight,
+    noSupplements ? 0 : supplementHeight,
     inProgressAliasHead,
     disableDefaultMappings,
   );
@@ -115,7 +111,7 @@ export async function command(
       denops,
       bufnrOurs,
       bufnrWorktree,
-      withoutSupplements ? 0 : supplementHeight,
+      noSupplements ? 0 : supplementHeight,
       disableDefaultMappings,
     );
   }

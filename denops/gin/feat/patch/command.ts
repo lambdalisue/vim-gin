@@ -3,7 +3,6 @@ import {
   builtinOpts,
   formatOpts,
   parse,
-  validateFlags,
   validateOpts,
 } from "../../util/args.ts";
 import * as buffer from "../../util/buffer.ts";
@@ -15,15 +14,15 @@ export async function command(
   denops: Denops,
   args: string[],
 ): Promise<void> {
-  const [opts, flags, residue] = parse(await normCmdArgs(denops, args));
+  const [opts, _, residue] = parse(await normCmdArgs(denops, args));
   validateOpts(opts, [
     "worktree",
+    "no-head",
+    "no-worktree",
     ...builtinOpts,
   ]);
-  validateFlags(flags, [
-    "without-head",
-    "without-worktree",
-  ]);
+  const noHead = "no-head" in opts;
+  const noWorktree = "no-worktree" in opts;
   const [abspath] = parseResidue(residue);
   const worktree = await getWorktreeFromOpts(denops, opts);
   const leading = formatOpts(opts, builtinOpts);
@@ -36,7 +35,7 @@ export async function command(
   unknownutil.assertBoolean(disableDefaultMappings);
 
   let bufnrHead = -1;
-  if (!flags["without-head"]) {
+  if (!noHead) {
     await editCommand(denops, [
       ...leading,
       `++worktree=${worktree}`,
@@ -56,7 +55,7 @@ export async function command(
   const bufnrIndex = await fn.bufnr(denops);
 
   let bufnrWorktree = -1;
-  if (!flags["without-worktree"]) {
+  if (!noWorktree) {
     await denops.cmd("botright vsplit");
     await editCommand(denops, [
       ...leading,
