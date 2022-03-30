@@ -17,8 +17,8 @@ syntax match GinBranchNormalLine /^\s\{2}.*/ display contains=GinBranchNormal
 syntax match GinBranchActiveLine /^\* .*/ display contains=GinBranchActive
 syntax match GinBranchRemoteLine /^\s\{2}remotes\/.*/ display contains=GinBranchRemote
 
-syntax match GinBranchNormal /^\s\{2}\zs\S\+/ contained nextgroup=GinBranchCommitWithTracking skipwhite
-syntax match GinBranchActive /^\* \zs\S\+/ contained nextgroup=GinBranchCommitWithTracking skipwhite
+syntax match GinBranchNormal /^\s\{2}\zs\%((.\{-})\|\S\)\+/ contained nextgroup=GinBranchCommitWithTracking skipwhite
+syntax match GinBranchActive /^\* \zs\%((.\{-})\|\S\)\+/ contained nextgroup=GinBranchCommitWithTracking skipwhite
 syntax match GinBranchRemote /^\s\{2}\zsremotes\/\S\+/ contained nextgroup=GinBranchCommitWithoutTracking skipwhite
 syntax match GinBranchCommitWithTracking /[a-f0-9]\+\ze/ contained nextgroup=GinBranchTracking skipwhite
 syntax match GinBranchCommitWithoutTracking /[a-f0-9]\+\ze/ contained nextgroup=GinBranchMessage skipwhite

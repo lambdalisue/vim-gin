@@ -4,7 +4,7 @@ const branchAliasPattern = /^\s{2}(remotes\/([^\/]+)\/(\S+))\s+-> (\S+)$/;
 const remoteBranchPattern =
   /^\s{2}(remotes\/([^\/]+)\/(\S+))\s+([a-f0-9]+) (.*)$/;
 const localBranchPattern =
-  /^([* ]) (\S+)\s+([a-f0-9]+) (?:\[(\S+)(?:: [^\]]+)?\] )?(.*)$/;
+  /^([* ]) (\(.*?\)|\S+)\s+([a-f0-9]+) (?:\[(\S+)(?:: [^\]]+)?\] )?(.*)$/;
 
 export class GitBranchParseError extends Error {
   constructor(message: string) {
