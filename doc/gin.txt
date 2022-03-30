@@ -129,16 +129,15 @@ COMMANDS					*gin-commands*
 	to see mappings or disable by |g:gin_branch_disable_default_mappings|.
 
 								*:GinChaperon*
-:GinChaperon [++{option}...] [--without-supplements] {path}
-:GinChaperon [++{option}...] [--without-supplements] --without-theirs {path}
-:GinChaperon [++{option}...] [--without-supplements] --without-ours {path}
+:GinChaperon [++{option}...] [++plain] {path}
+:GinChaperon [++{option}...] [++plain] ++no-theirs {path}
+:GinChaperon [++{option}...] [++plain] ++no-ours {path}
 	Open three main buffers (THEIRS, WORKTREE, and OURS) and three
 	supplemental buffers to solve conflicts on {path}.
 	See |gin-command-options| for available {option}s.
-	If --without-theirs is specified, it does not open a THEIRS buffer.
-	If --without-ours is specified, it does not open a OURS buffer.
-	If --without-supplements is specified, it does not open supplemental
-	buffers.
+	If ++plain is specified, it does not open supplemental buffers.
+	If ++no-theirs is specified, it does not open a THEIRS buffer.
+	If ++no-ours is specified, it does not open a OURS buffer.
 
 	Use |g:gin_chaperon_supplement_height| to regulate the height of
 	supplemental buffers.
@@ -216,14 +215,13 @@ COMMANDS					*gin-commands*
 
 								*:GinPatch*
 :GinPatch [++{option}...] {path}
-:GinPatch [++{option}...] --without-head {path}
-:GinPatch [++{option}...] --without-worktree {path}
+:GinPatch [++{option}...] ++no-head {path}
+:GinPatch [++{option}...] ++no-worktree {path}
 	Open three buffers (HEAD, INDEX, and WORKTREE) to patch changes of
 	{path}.
 	See |gin-command-options| for available {option}s.
-	If --without-head is specified, it does not open a HEAD buffer.
-	If --without-worktree is specified, it does not open a WORKTREE
-	buffer.
+	If ++no-head is specified, it does not open a HEAD buffer.
+	If ++no-worktree is specified, it does not open a WORKTREE buffer.
 
 	Users can use the following mappings in each buffers or disable
 	default mappings by |g:gin_patch_disable_default_mappings|.
@@ -485,19 +483,13 @@ ACTIONS						*gin-actions*
 *<Plug>(gin-action-chaperon)*
 *<Plug>(gin-action-chaperon:theirs)*
 *<Plug>(gin-action-chaperon:ours)*
-*<Plug>(gin-action-chaperon:supplements)*
-*<Plug>(gin-action-chaperon:supplements:theirs)*
-*<Plug>(gin-action-chaperon:supplements:ours)*
-*<Plug>(gin-action-chaperon:nosupplements)*
-*<Plug>(gin-action-chaperon:nosupplements:theirs)*
-*<Plug>(gin-action-chaperon:nosupplements:ours)*
+*<Plug>(gin-action-chaperon:plain)*
+*<Plug>(gin-action-chaperon:plain:theirs)*
+*<Plug>(gin-action-chaperon:plain:ours)*
 	Call |:GinChaperon| on active action candidates to solve conflicts.
 	If ":theirs" or ":ours" variant is used, it call the command with
-	"--without-ours" or "--without-theirs" respectively.
-	If ":nosupplements" variant is used, it call the command with
-	"--without-supplements".
-	Variants without ":supplements" or ":nosupplements" are aliased to
-	":supplements" variants.
+	"++no-ours" or "++no-theirs" respectively.
+	If ":plain" variant is used, it call the command with "++plain".
 
 *<Plug>(gin-action-patch)*
 *<Plug>(gin-action-patch:head)*
@@ -505,7 +497,7 @@ ACTIONS						*gin-actions*
 	Call |:GinPatch| on active action candidates to stage changes
 	partially.
 	If ":head" or ":worktree" variant is used, it call the command with
-	"--without-worktree" or "--without-head" respectively.
+	"++no-worktree" or "++no-head" respectively.
 
 *<Plug>(gin-action-add)*
 *<Plug>(gin-action-add:intent-to-add)*
