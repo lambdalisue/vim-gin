@@ -274,7 +274,12 @@ Gin supports several options starts with double plus signs (++) as:
 ++worktree={worktree}
 	Specify a particular git working tree. If this option is not
 	specified, gin will find the one from the current buffer or the
-	current working directory.
+	current working directory. It tries to find a git working tree from
+
+	1. A target working tree of gin associated buffers (e.g. gindiff://)
+	2. A parent directory of a symlink resolved path of the current buffer
+	3. A parent directory of a path of the current buffer
+	4. A current working directory
 >
 	:GinStatus ++worktree=/home/john/project\ A
 <

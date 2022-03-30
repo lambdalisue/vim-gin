@@ -1,21 +1,38 @@
-import { batch, bufname, Denops, fn, fs, unknownutil } from "../deps.ts";
+import {
+  batch,
+  bufname,
+  Denops,
+  fn,
+  fs,
+  option,
+  path,
+  unknownutil,
+} from "../deps.ts";
 import { GIN_BUFFER_PROTOCOLS } from "../global.ts";
 import { expand } from "../util/cmd.ts";
 import { Opts } from "../util/args.ts";
 import { find } from "../git/finder.ts";
 
 async function getWorktree(denops: Denops): Promise<string> {
-  const [cwd, bname, dirname] = await batch.gather(denops, async (denops) => {
-    await fn.getcwd(denops);
-    await fn.bufname(denops, "%");
-    await fn.expand(denops, "%:h");
-  });
+  const [cwd, filename, verbose] = await batch.gather(
+    denops,
+    async (denops) => {
+      await fn.getcwd(denops);
+      await fn.expand(denops, "%:p");
+      await option.verbose.get(denops);
+    },
+  );
   unknownutil.assertString(cwd);
-  unknownutil.assertString(bname);
-  unknownutil.assertString(dirname);
-  if (bname) {
+  unknownutil.assertString(filename);
+  unknownutil.assertNumber(verbose);
+  if (verbose) {
+    console.debug("getWorktree");
+    console.debug(`  cwd: ${cwd}`);
+    console.debug(`  filename: ${filename}`);
+  }
+  if (filename) {
     try {
-      const { scheme, expr } = bufname.parse(bname);
+      const { scheme, expr } = bufname.parse(filename);
       if (GIN_BUFFER_PROTOCOLS.includes(scheme)) {
         return unknownutil.ensureString(
           await fn.fnamemodify(denops, expr, ":p"),
@@ -25,10 +42,31 @@ async function getWorktree(denops: Denops): Promise<string> {
       // Ignore errors
     }
   }
-  if (dirname && await fs.exists(dirname)) {
-    return await find(dirname);
+  let candidates = new Set([cwd]);
+  if (await fs.exists(filename)) {
+    candidates.add(path.dirname(filename));
+    const realpath = await Deno.realPath(filename);
+    candidates.add(path.dirname(realpath));
   }
-  return await find(cwd);
+  candidates = new Set(Array.from(candidates).reverse());
+  if (verbose) {
+    console.debug(`  candidates: ${[...candidates]}`);
+  }
+  for (const c of candidates) {
+    if (verbose) {
+      console.debug(`Trying to find a git repository from '${c}'`);
+    }
+    try {
+      return await find(c);
+    } catch {
+      // Fail silently
+    }
+  }
+  throw new Error(
+    `No git repository found (searched from ${
+      [...candidates.values()].join(", ")
+    })`,
+  );
 }
 
 export async function getWorktreeFromOpts(
