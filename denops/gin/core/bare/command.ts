@@ -10,6 +10,8 @@ import {
 import { builtinOpts, parseOpts, validateOpts } from "../../util/args.ts";
 import { normCmdArgs } from "../../util/cmd.ts";
 import * as buffer from "../../util/buffer.ts";
+import { decorate, Decoration } from "../../util/decoration.ts";
+import { buildDecorationsFromAnsiEscapeCode } from "../../util/ansi_escape_code.ts";
 import { getWorktreeFromOpts } from "../../util/worktree.ts";
 import { decodeUtf8 } from "../../util/text.ts";
 import { run } from "../../git/process.ts";
@@ -58,6 +60,12 @@ export async function command(
   ]);
   proc.close();
   if ("buffer" in opts) {
+    let decorations: Decoration[] = [];
+    const preprocessor = (content: string[]) => {
+      const [trimmed, decos] = buildDecorationsFromAnsiEscapeCode(content);
+      decorations = decos;
+      return trimmed;
+    };
     await denops.cmd("noswapfile enew");
     const bufnr = await fn.bufnr(denops);
     await buffer.ensure(denops, bufnr, async () => {
@@ -72,9 +80,10 @@ export async function command(
       {
         fileformat: (opts["ff"] ?? opts["fileformat"]),
         fileencoding: opts["enc"] ?? opts["fileencoding"],
-        decorateAnsiEscapeCode: enableColor,
+        preprocessor,
       },
     );
+    await decorate(denops, bufnr, decorations);
     await buffer.concrete(denops, bufnr);
     if (denops.meta.host === "vim") {
       await denops.cmd("redraw");
