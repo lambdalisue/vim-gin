@@ -5,8 +5,8 @@ import { main as mainBare } from "./core/bare/main.ts";
 import { main as mainProxy } from "./core/proxy/main.ts";
 import { main as mainUtil } from "./core/util/main.ts";
 
-import { main as mainChaperon } from "./feat/chaperon/main.ts";
 import { main as mainBranch } from "./feat/branch/main.ts";
+import { main as mainChaperon } from "./feat/chaperon/main.ts";
 import { main as mainDiff } from "./feat/diff/main.ts";
 import { main as mainEdit } from "./feat/edit/main.ts";
 import { main as mainPatch } from "./feat/patch/main.ts";
@@ -18,8 +18,8 @@ export function main(denops: Denops): void {
   mainProxy(denops);
   mainUtil(denops);
 
-  mainChaperon(denops);
   mainBranch(denops);
+  mainChaperon(denops);
   mainDiff(denops);
   mainEdit(denops);
   mainPatch(denops);
