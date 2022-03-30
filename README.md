@@ -15,17 +15,20 @@ without announcements.**
 ## Features
 
 - Proxy the prompts/editor used by git commands to Vim
-- `Gin` to call a raw git command
+- `Gin` to call a raw git command and echo the result
+- `Gin ++buffer` to call a raw git command and write the result to a buffer
 - `GinBranch` to see `git branch` of a repository
 - `GinChaperon` to solve git conflicts (like `git mergetool`)
 - `GinDiff` to see `git diff` of a file
 - `GinEdit` to see `git show` or local content of a file
 - `GinPatch` to stage changes partially (like `git add -p`)
 - `GinStatus` to see `git status` of a repository
+- `gin#component#...` to show information on `statusline` and/or `tabline`
 
 ## Requirements
 
-Gin is written in denops thus users need to install denops.vim
+Gin is written in denops thus users need to install [Deno](https://deno.land)
+and denops.vim
 
 - [vim-denops/denops.vim][vim-denops/denops.vim]<br> An ecosystem for writing
   Vim/Neovim plugin in Deno.
