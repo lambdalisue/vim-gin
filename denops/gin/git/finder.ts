@@ -24,6 +24,13 @@ export async function find(cwd: string): Promise<string> {
 }
 
 async function findInternal(cwd: string): Promise<string> {
+  const terms = cwd.split(path.sep);
+  if (terms.includes(".git")) {
+    // `git rev-parse` does not work in a ".git" directory
+    // so use a parent directory of it instead.
+    const index = terms.indexOf(".git");
+    cwd = terms.slice(0, index).join(path.sep);
+  }
   const stdout = await execute(
     [
       "rev-parse",
