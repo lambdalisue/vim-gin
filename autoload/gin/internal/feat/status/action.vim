@@ -18,9 +18,9 @@ function! gin#internal#feat#status#action#register() abort
   noremap <buffer> <Plug>(gin-action-patch)
         \ <Cmd>call gin#action#fn({ xs -> <SID>patch('', xs) })<CR>
   noremap <buffer> <Plug>(gin-action-patch:head)
-        \ <Cmd>call gin#action#fn({ xs -> <SID>patch('--without-worktree', xs) })<CR>
+        \ <Cmd>call gin#action#fn({ xs -> <SID>patch('++no-worktree', xs) })<CR>
   noremap <buffer> <Plug>(gin-action-patch:worktree)
-        \ <Cmd>call gin#action#fn({ xs -> <SID>patch('--without-head', xs) })<CR>
+        \ <Cmd>call gin#action#fn({ xs -> <SID>patch('++no-head', xs) })<CR>
 
   noremap <buffer> <Plug>(gin-action-add)
         \ <Cmd>call gin#action#fn({ xs -> <SID>add('', xs) })<CR>
