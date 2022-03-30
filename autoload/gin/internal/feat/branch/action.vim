@@ -52,7 +52,7 @@ endfunction
 
 function! s:move(force, xs) abort
   let from = a:xs[0].branch
-  let name = input(printf('Rename (from %s): ', from))
+  let name = input(printf('Rename (from %s): ', from), from)
   redraw | echo ''
   if empty(name)
     echohl WarningMsg
