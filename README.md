@@ -15,15 +15,17 @@ without announcements.**
 ## Features
 
 - Proxy the prompts/editor used by git commands to Vim
-- `Gin` to call a raw git command and echo the result
-- `Gin ++buffer` to call a raw git command and write the result to a buffer
+- Components to show information on `statusline` and/or `tabline`
+- `Gin` to call a raw git command and echo the result or open a result buffer
 - `GinBranch` to see `git branch` of a repository
 - `GinChaperon` to solve git conflicts (like `git mergetool`)
 - `GinDiff` to see `git diff` of a file
 - `GinEdit` to see `git show` or local content of a file
 - `GinPatch` to stage changes partially (like `git add -p`)
 - `GinStatus` to see `git status` of a repository
-- `gin#component#...` to show information on `statusline` and/or `tabline`
+
+See [Features](https://github.com/lambdalisue/gin.vim/wiki/Features) in Wiki for
+detail about each features.
 
 ## Requirements
 
@@ -47,7 +49,7 @@ Plug 'lambdalisue/gin.vim'`
 
 Or see
 [How to install](https://github.com/lambdalisue/gin.vim/wiki#how-to-install)
-section for other Vim plugin managers.
+section in Wiki for other Vim plugin managers.
 
 ## Similar projects
 
