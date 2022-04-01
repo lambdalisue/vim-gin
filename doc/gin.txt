@@ -351,24 +351,26 @@ gin#action#gather_candidates({range})
 -----------------------------------------------------------------------------
 COMPONENTS					*gin-components*
 
-Components are |Function| that return a string for |statusline| and |tabline|.
-The function will never throw errors and fail silently.
-Note that the result of function is cached shortly to keep performance.
+Components are |Function| that never fail and always return a string for
+|statusline| and |tabline|.
 If no {worktree} is specified or an empty string, gin tries to find one like
 ++worktree option explained in |gin-command-options|.
+
+Users can use it like:
 >
 	set statusline+=\ %{gin#component#worktree#name()}
 	set statusline+=\ (%{gin#component#branch#ascii()})
 	set statusline+=\ [%{gin#component#traffic#ascii()}]
 <
-Because |statusline| and/or |tabline| is not rendered on |BufEnter|, the
-following configuration is recommended for fast update.
+Note that components update actual values in background and always return
+cached one. Use |User| GinComponentUpdated autocmd event to notice update ASAP
+like:
 >
 	augroup gin_component_fast_update
 	  autocmd!
-	  autocmd BufEnter * ++nested redrawstatusline
+	  autocmd User GinComponentPost ++nested redrawstatusline
 	  " Or if you prefer tabline, use below
-	  "autocmd BufEnter * ++nested redrawtabline
+	  "autocmd User GinComponentPost ++nested redrawtabline
 	augroup END
 <
 					*gin#component#branch#ascii()*
