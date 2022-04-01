@@ -1,32 +1,11 @@
-let s:name = ''
-let s:full = ''
-
-function! gin#component#worktree#full(...) abort
-  let cwd = a:0 ? a:1 : ''
-  call timer_start(0, { -> s:update_full(cwd) })
-  return s:full
+function! gin#component#worktree#name() abort
+  let component = 'component:worktree:name'
+  call gin#internal#component#init(component)
+  return gin#internal#component#get(component)
 endfunction
 
-function! gin#component#worktree#name(...) abort
-  let cwd = a:0 ? a:1 : ''
-  call timer_start(0, { -> s:update_name(cwd) })
-  return s:name
-endfunction
-
-function! s:update_name(cwd) abort
-  try
-    let s:name = denops#request('gin', 'component:worktree:name', [a:cwd])
-  catch
-    let s:name = ''
-  endtry
-  call gin#util#debounce('doautocmd <nomodeline> User GinComponentPost')
-endfunction
-
-function! s:update_full(cwd) abort
-  try
-    let s:full = denops#request('gin', 'component:worktree:full', [a:cwd])
-  catch
-    let s:full = ''
-  endtry
-  call gin#util#debounce('doautocmd <nomodeline> User GinComponentPost')
+function! gin#component#worktree#full() abort
+  let component = 'component:worktree:full'
+  call gin#internal#component#init(component)
+  return gin#internal#component#get(component)
 endfunction

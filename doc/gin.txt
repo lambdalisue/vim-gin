@@ -243,9 +243,11 @@ COMMANDS					*gin-commands*
 Gin supports several options starts with double plus signs (++) as:
 
 ++worktree={worktree}
-	Specify a particular git working tree. If this option is not
-	specified, gin will find the one from the current buffer or the
-	current working directory. It tries to find a git working tree from
+	Specify a particular git working tree. 
+							*gin-worktree*
+	If this option is not specified, gin will find the one from the 
+	current buffer or the current working directory. It tries to find a
+	git working tree from
 
 	1. A target working tree of gin associated buffers (e.g. gindiff://)
 	2. A parent directory of a symlink resolved path of the current buffer
@@ -318,6 +320,11 @@ gin#util#expand([{expr}])
 	Like |expand()| but it extract a target filename if the buffer is
 	gin's file-like buffer.
 
+						*gin#util#debounce()*
+gin#util#debounce({expr}, {delay})
+	Execute {expr} after {delay} milliseconds and debounce all calls
+	within that {delay}.
+
 						*gin#action#fn()*
 gin#action#fn({callback})
 	A wrapper function to make an action mapping.
@@ -352,44 +359,32 @@ gin#action#gather_candidates({range})
 COMPONENTS					*gin-components*
 
 Components are |Function| that never fail and always return a string for
-|statusline| and |tabline|.
-If no {worktree} is specified or an empty string, gin tries to find one like
-++worktree option explained in |gin-command-options|.
+|statusline| and |tabline|. It returns information of a current working tree
+(See |gin-worktree| for detail about how gin find a current working tree.)
 
-Users can use it like:
+Use component functions like:
 >
 	set statusline+=\ %{gin#component#worktree#name()}
 	set statusline+=\ (%{gin#component#branch#ascii()})
 	set statusline+=\ [%{gin#component#traffic#ascii()}]
 <
-Note that components update actual values in background and always return
-cached one. Use |User| GinComponentUpdated autocmd event to notice update ASAP
-like:
->
-	augroup gin_component_fast_update
-	  autocmd!
-	  autocmd User GinComponentPost ++nested redrawstatusline
-	  " Or if you prefer tabline, use below
-	  "autocmd User GinComponentPost ++nested redrawtabline
-	augroup END
-<
 					*gin#component#branch#ascii()*
 					*gin#component#branch#unicode()*
-gin#component#branch#ascii([{worktree}])
-gin#component#branch#unicode([{worktree}])
+gin#component#branch#ascii()
+gin#component#branch#unicode()
 	Return an indicator string of a current and upstream branches.
 
 					*gin#component#traffic#ascii()*
 					*gin#component#traffic#unicode()*
-gin#component#traffic#ascii([{worktree}])
-gin#component#traffic#unicode([{worktree}])
+gin#component#traffic#ascii()
+gin#component#traffic#unicode()
 	Return an indicator string of the number of ahead and behind commits.
 
-					*gin#component#worktree#full()*
 					*gin#component#worktree#name()*
-gin#component#worktree#full([{worktree}])
-gin#component#worktree#name([{worktree}])
-	Return an indicator string of the current worktree.
+					*gin#component#worktree#full()*
+gin#component#worktree#name()
+gin#component#worktree#full()
+	Return an indicator string of the current working tree.
 
 -----------------------------------------------------------------------------
 MAPPINGS					*gin-mappings*

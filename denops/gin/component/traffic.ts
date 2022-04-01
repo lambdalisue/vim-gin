@@ -1,4 +1,4 @@
-import { Cache, Denops, unknownutil } from "../deps.ts";
+import { Cache, Denops } from "../deps.ts";
 import { decodeUtf8 } from "../util/text.ts";
 import { getWorktree } from "../util/worktree.ts";
 import { execute } from "../git/process.ts";
@@ -9,12 +9,11 @@ const cache = new Cache<string, Data>(100);
 
 async function getData(
   denops: Denops,
-  worktree: string,
 ): Promise<Data> {
   if (cache.has("data")) {
     return cache.get("data");
   }
-  const cwd = worktree || await getWorktree(denops);
+  const cwd = await getWorktree(denops);
   const result = await Promise.all([
     getAhead(cwd),
     getBehind(cwd),
@@ -50,9 +49,8 @@ async function getBehind(cwd: string): Promise<number> {
 export function main(denops: Denops): void {
   denops.dispatcher = {
     ...denops.dispatcher,
-    "component:traffic:ascii": async (worktree) => {
-      unknownutil.assertString(worktree);
-      const [ahead, behind] = await getData(denops, worktree);
+    "component:traffic:ascii": async () => {
+      const [ahead, behind] = await getData(denops);
       let component = "";
       if (ahead) {
         component += `^${ahead}`;
@@ -62,9 +60,8 @@ export function main(denops: Denops): void {
       }
       return component;
     },
-    "component:traffic:unicode": async (worktree) => {
-      unknownutil.assertString(worktree);
-      const [ahead, behind] = await getData(denops, worktree);
+    "component:traffic:unicode": async () => {
+      const [ahead, behind] = await getData(denops);
       let component = "";
       if (ahead) {
         component += `↑${ahead}`;

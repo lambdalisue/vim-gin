@@ -1,32 +1,11 @@
-let s:ascii = ''
-let s:unicode = ''
-
-function! gin#component#traffic#ascii(...) abort
-  let cwd = a:0 ? a:1 : ''
-  call timer_start(0, { -> s:update_ascii(cwd) })
-  return s:ascii
+function! gin#component#traffic#ascii() abort
+  let component = 'component:traffic:ascii'
+  call gin#internal#component#init(component)
+  return gin#internal#component#get(component)
 endfunction
 
-function! gin#component#traffic#unicode(...) abort
-  let cwd = a:0 ? a:1 : ''
-  call timer_start(0, { -> s:update_unicode(cwd) })
-  return s:unicode
-endfunction
-
-function! s:update_ascii(cwd) abort
-  try
-    let s:ascii = denops#request('gin', 'component:traffic:ascii', [a:cwd])
-  catch
-    let s:ascii = ''
-  endtry
-  call gin#util#debounce('doautocmd <nomodeline> User GinComponentPost')
-endfunction
-
-function! s:update_unicode(cwd) abort
-  try
-    let s:unicode = denops#request('gin', 'component:traffic:unicode', [a:cwd])
-  catch
-    let s:unicode = ''
-  endtry
-  call gin#util#debounce('doautocmd <nomodeline> User GinComponentPost')
+function! gin#component#traffic#unicode() abort
+  let component = 'component:traffic:unicode'
+  call gin#internal#component#init(component)
+  return gin#internal#component#get(component)
 endfunction
