@@ -6,6 +6,7 @@ let g:loaded_gin = 1
 augroup gin_plugin_internal
   autocmd!
   autocmd User GinCommandPost :
+  autocmd User GinComponentPost :
 augroup END
 
 function! s:command(bang, args) abort

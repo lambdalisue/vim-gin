@@ -19,7 +19,7 @@ function! s:update_name(cwd) abort
   catch
     let s:name = ''
   endtry
-  call gin#util#redraw_components()
+  call gin#util#debounce('doautocmd <nomodeline> User GinComponentPost')
 endfunction
 
 function! s:update_full(cwd) abort
@@ -28,5 +28,5 @@ function! s:update_full(cwd) abort
   catch
     let s:full = ''
   endtry
-  call gin#util#redraw_components()
+  call gin#util#debounce('doautocmd <nomodeline> User GinComponentPost')
 endfunction

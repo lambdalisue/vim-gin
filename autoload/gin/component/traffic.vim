@@ -19,7 +19,7 @@ function! s:update_ascii(cwd) abort
   catch
     let s:ascii = ''
   endtry
-  call gin#util#redraw_components()
+  call gin#util#debounce('doautocmd <nomodeline> User GinComponentPost')
 endfunction
 
 function! s:update_unicode(cwd) abort
@@ -28,5 +28,5 @@ function! s:update_unicode(cwd) abort
   catch
     let s:unicode = ''
   endtry
-  call gin#util#redraw_components()
+  call gin#util#debounce('doautocmd <nomodeline> User GinComponentPost')
 endfunction

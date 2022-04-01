@@ -1,4 +1,4 @@
-let s:redraw_component_timer = 0
+let s:debounce_timers = {}
 
 function! gin#util#reload(...) abort
   let bufnr = a:0 ? a:1 : bufnr()
@@ -19,4 +19,17 @@ function! gin#util#redraw_components() abort
         \)
 endfunction
 
-let g:gin#util#redraw_components_delay = get(g:, 'gin#util#redraw_components_delay', 100)
+function! gin#util#debounce(expr, ...) abort
+  let options = extend({
+        \ 'delay': g:gin#util#debounce_delay,
+        \}, a:0 ? a:1 : {},
+        \)
+  let timer = get(s:debounce_timers, a:expr, 0)
+  silent! call timer_stop(timer)
+  let s:debounce_timers[a:expr] = timer_start(
+        \ options.delay,
+        \ { -> execute(a:expr) },
+        \)
+endfunction
+
+let g:gin#util#debounce_delay = get(g:, 'gin#util#debounce_delay', 100)
