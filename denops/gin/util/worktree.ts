@@ -8,7 +8,7 @@ import * as fs from "https://deno.land/std@0.133.0/fs/mod.ts";
 import * as path from "https://deno.land/std@0.133.0/path/mod.ts";
 import { GIN_BUFFER_PROTOCOLS } from "../global.ts";
 import { expand } from "../util/cmd.ts";
-import { Opts } from "../util/args.ts";
+import { Opts } from "https://deno.land/x/denops_std@v3.3.0/argument/mod.ts";
 import { find } from "../git/finder.ts";
 
 export async function getWorktree(denops: Denops): Promise<string> {

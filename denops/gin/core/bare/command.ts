@@ -5,7 +5,11 @@ import * as fn from "https://deno.land/x/denops_std@v3.3.0/function/mod.ts";
 import * as helper from "https://deno.land/x/denops_std@v3.3.0/helper/mod.ts";
 import * as option from "https://deno.land/x/denops_std@v3.3.0/option/mod.ts";
 import * as unknownutil from "https://deno.land/x/unknownutil@v2.0.0/mod.ts";
-import { builtinOpts, parseOpts, validateOpts } from "../../util/args.ts";
+import {
+  builtinOpts,
+  parseOpts,
+  validateOpts,
+} from "https://deno.land/x/denops_std@v3.3.0/argument/mod.ts";
 import { normCmdArgs } from "../../util/cmd.ts";
 import * as buffer from "../../util/buffer.ts";
 import { decorate, Decoration } from "../../util/decoration.ts";

@@ -12,7 +12,7 @@ import {
   parse,
   validateFlags,
   validateOpts,
-} from "../../util/args.ts";
+} from "https://deno.land/x/denops_std@v3.3.0/argument/mod.ts";
 import * as buffer from "../../util/buffer.ts";
 import { normCmdArgs } from "../../util/cmd.ts";
 import { getWorktreeFromOpts } from "../../util/worktree.ts";
