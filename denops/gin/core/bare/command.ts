@@ -1,16 +1,17 @@
+import type { Denops } from "https://deno.land/x/denops_std@v3.3.0/mod.ts";
+import * as autocmd from "https://deno.land/x/denops_std@v3.3.0/autocmd/mod.ts";
+import * as batch from "https://deno.land/x/denops_std@v3.3.0/batch/mod.ts";
+import * as fn from "https://deno.land/x/denops_std@v3.3.0/function/mod.ts";
+import * as helper from "https://deno.land/x/denops_std@v3.3.0/helper/mod.ts";
+import * as option from "https://deno.land/x/denops_std@v3.3.0/option/mod.ts";
+import * as unknownutil from "https://deno.land/x/unknownutil@v2.0.0/mod.ts";
 import {
-  autocmd,
-  batch,
-  Denops,
-  fn,
-  helper,
-  option,
-  unknownutil,
-} from "../../deps.ts";
-import { builtinOpts, parseOpts, validateOpts } from "../../util/args.ts";
+  builtinOpts,
+  parseOpts,
+  validateOpts,
+} from "https://deno.land/x/denops_std@v3.3.0/argument/mod.ts";
 import { normCmdArgs } from "../../util/cmd.ts";
-import * as buffer from "../../util/buffer.ts";
-import { decorate, Decoration } from "../../util/decoration.ts";
+import * as buffer from "https://deno.land/x/denops_std@v3.3.0/buffer/mod.ts";
 import { buildDecorationsFromAnsiEscapeCode } from "../../util/ansi_escape_code.ts";
 import { getWorktreeFromOpts } from "../../util/worktree.ts";
 import { decodeUtf8 } from "../../util/text.ts";
@@ -60,7 +61,7 @@ export async function command(
   ]);
   proc.close();
   if ("buffer" in opts) {
-    let decorations: Decoration[] = [];
+    let decorations: buffer.Decoration[] = [];
     const preprocessor = (content: string[]) => {
       const [trimmed, decos] = buildDecorationsFromAnsiEscapeCode(content);
       decorations = decos;
@@ -83,7 +84,7 @@ export async function command(
         preprocessor,
       },
     );
-    await decorate(denops, bufnr, decorations);
+    await buffer.decorate(denops, bufnr, decorations);
     await buffer.concrete(denops, bufnr);
     if (denops.meta.host === "vim") {
       await denops.cmd("redraw");

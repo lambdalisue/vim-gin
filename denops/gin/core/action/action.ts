@@ -1,4 +1,7 @@
-import { Denops, helper, mapping, vars } from "../../deps.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v3.3.0/mod.ts";
+import * as helper from "https://deno.land/x/denops_std@v3.3.0/helper/mod.ts";
+import * as mapping from "https://deno.land/x/denops_std@v3.3.0/mapping/mod.ts";
+import * as vars from "https://deno.land/x/denops_std@v3.3.0/variable/mod.ts";
 
 export type Action = {
   name: string;

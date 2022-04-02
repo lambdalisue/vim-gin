@@ -1,11 +1,16 @@
-import { batch, Denops, fn, mapping, unknownutil, vars } from "../../deps.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v3.3.0/mod.ts";
+import * as batch from "https://deno.land/x/denops_std@v3.3.0/batch/mod.ts";
+import * as fn from "https://deno.land/x/denops_std@v3.3.0/function/mod.ts";
+import * as mapping from "https://deno.land/x/denops_std@v3.3.0/mapping/mod.ts";
+import * as vars from "https://deno.land/x/denops_std@v3.3.0/variable/mod.ts";
+import * as unknownutil from "https://deno.land/x/unknownutil@v2.0.0/mod.ts";
 import {
   builtinOpts,
   formatOpts,
   parse,
   validateOpts,
-} from "../../util/args.ts";
-import * as buffer from "../../util/buffer.ts";
+} from "https://deno.land/x/denops_std@v3.3.0/argument/mod.ts";
+import * as buffer from "https://deno.land/x/denops_std@v3.3.0/buffer/mod.ts";
 import { normCmdArgs } from "../../util/cmd.ts";
 import { getWorktreeFromOpts } from "../../util/worktree.ts";
 import { command as editCommand } from "../edit/command.ts";
