@@ -1,4 +1,4 @@
-import { unknownutil } from "../deps.ts";
+import * as unknownutil from "https://deno.land/x/unknownutil@v2.0.0/mod.ts";
 
 export type FileFormat = "unix" | "dos" | "mac";
 

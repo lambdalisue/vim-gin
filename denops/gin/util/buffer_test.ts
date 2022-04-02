@@ -1,5 +1,8 @@
-import { assertEquals, Encoding, test } from "../deps_test.ts";
-import { fn, path } from "../deps.ts";
+import { assertEquals } from "https://deno.land/std@0.130.0/testing/asserts.ts";
+import { default as Encoding } from "https://cdn.skypack.dev/encoding-japanese@v2.0.0";
+import { test } from "https://deno.land/x/denops_std@v3.2.0/test/mod.ts";
+import * as fn from "https://deno.land/x/denops_std@v3.2.0/function/mod.ts";
+import * as path from "https://deno.land/std@0.130.0/path/mod.ts";
 import {
   assign,
   concrete,

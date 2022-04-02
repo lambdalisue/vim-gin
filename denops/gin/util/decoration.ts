@@ -1,11 +1,9 @@
-import {
-  batch,
-  Denops,
-  itertools,
-  nvimFn,
-  unreachable,
-  vimFn,
-} from "../deps.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v3.2.0/mod.ts";
+import * as batch from "https://deno.land/x/denops_std@v3.2.0/batch/mod.ts";
+import * as vimFn from "https://deno.land/x/denops_std@v3.2.0/function/vim/mod.ts";
+import * as nvimFn from "https://deno.land/x/denops_std@v3.2.0/function/nvim/mod.ts";
+import * as itertools from "https://deno.land/x/itertools@v1.0.2/mod.ts";
+import { unreachable } from "https://deno.land/x/unreachable@v0.1.0/mod.ts";
 
 export type Decoration = {
   // Line number
