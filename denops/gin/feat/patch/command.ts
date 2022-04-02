@@ -1,8 +1,8 @@
-import type { Denops } from "https://deno.land/x/denops_std@v3.2.0/mod.ts";
-import * as batch from "https://deno.land/x/denops_std@v3.2.0/batch/mod.ts";
-import * as fn from "https://deno.land/x/denops_std@v3.2.0/function/mod.ts";
-import * as mapping from "https://deno.land/x/denops_std@v3.2.0/mapping/mod.ts";
-import * as vars from "https://deno.land/x/denops_std@v3.2.0/variable/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v3.3.0/mod.ts";
+import * as batch from "https://deno.land/x/denops_std@v3.3.0/batch/mod.ts";
+import * as fn from "https://deno.land/x/denops_std@v3.3.0/function/mod.ts";
+import * as mapping from "https://deno.land/x/denops_std@v3.3.0/mapping/mod.ts";
+import * as vars from "https://deno.land/x/denops_std@v3.3.0/variable/mod.ts";
 import * as unknownutil from "https://deno.land/x/unknownutil@v2.0.0/mod.ts";
 import {
   builtinOpts,

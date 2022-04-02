@@ -1,9 +1,9 @@
-import type { Denops } from "https://deno.land/x/denops_std@v3.2.0/mod.ts";
-import * as autocmd from "https://deno.land/x/denops_std@v3.2.0/autocmd/mod.ts";
-import * as batch from "https://deno.land/x/denops_std@v3.2.0/batch/mod.ts";
-import * as fn from "https://deno.land/x/denops_std@v3.2.0/function/mod.ts";
-import * as helper from "https://deno.land/x/denops_std@v3.2.0/helper/mod.ts";
-import * as option from "https://deno.land/x/denops_std@v3.2.0/option/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v3.3.0/mod.ts";
+import * as autocmd from "https://deno.land/x/denops_std@v3.3.0/autocmd/mod.ts";
+import * as batch from "https://deno.land/x/denops_std@v3.3.0/batch/mod.ts";
+import * as fn from "https://deno.land/x/denops_std@v3.3.0/function/mod.ts";
+import * as helper from "https://deno.land/x/denops_std@v3.3.0/helper/mod.ts";
+import * as option from "https://deno.land/x/denops_std@v3.3.0/option/mod.ts";
 import * as unknownutil from "https://deno.land/x/unknownutil@v2.0.0/mod.ts";
 import { builtinOpts, parseOpts, validateOpts } from "../../util/args.ts";
 import { normCmdArgs } from "../../util/cmd.ts";

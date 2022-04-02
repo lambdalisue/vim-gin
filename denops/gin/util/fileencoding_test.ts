@@ -1,5 +1,5 @@
-import { assertEquals } from "https://deno.land/std@0.130.0/testing/asserts.ts";
-import { default as Encoding } from "https://cdn.skypack.dev/encoding-japanese@v2.0.0";
+import { assertEquals } from "https://deno.land/std@0.133.0/testing/asserts.ts";
+import { default as Encoding } from "https://cdn.skypack.dev/encoding-japanese@2.0.0/";
 import { tryDecode } from "./fileencoding.ts";
 
 function encode(text: string, encoding: string): Uint8Array {
