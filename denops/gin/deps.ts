@@ -21,8 +21,8 @@ export * as ansiEscapeCode from "https://deno.land/x/ansi_escape_code@v0.1.2/mod
 
 export { unreachable } from "https://deno.land/x/unreachable@v0.1.0/mod.ts";
 
-export * as fs from "https://deno.land/std@0.130.0/fs/mod.ts";
-export * as io from "https://deno.land/std@0.130.0/io/mod.ts";
-export * as path from "https://deno.land/std@0.130.0/path/mod.ts";
-export * as streams from "https://deno.land/std@0.130.0/streams/mod.ts";
-export { deadline, deferred } from "https://deno.land/std@0.130.0/async/mod.ts";
+export * as fs from "https://deno.land/std@0.133.0/fs/mod.ts";
+export * as io from "https://deno.land/std@0.133.0/io/mod.ts";
+export * as path from "https://deno.land/std@0.133.0/path/mod.ts";
+export * as streams from "https://deno.land/std@0.133.0/streams/mod.ts";
+export { deadline, deferred } from "https://deno.land/std@0.133.0/async/mod.ts";
