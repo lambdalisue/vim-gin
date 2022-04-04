@@ -8,12 +8,6 @@ function! gin#internal#feat#status#action#register() abort
         \ <Cmd>call gin#action#fn({ xs -> <SID>chaperon('++no-ours', xs) })<CR>
   noremap <buffer> <Plug>(gin-action-chaperon:ours)
         \ <Cmd>call gin#action#fn({ xs -> <SID>chaperon('++no-theirs', xs) })<CR>
-  noremap <buffer> <Plug>(gin-action-chaperon:plain)
-        \ <Cmd>call gin#action#fn({ xs -> <SID>chaperon('++plain', xs) })<CR>
-  noremap <buffer> <Plug>(gin-action-chaperon:plain:theirs)
-        \ <Cmd>call gin#action#fn({ xs -> <SID>chaperon('++plain ++no-ours', xs) })<CR>
-  noremap <buffer> <Plug>(gin-action-chaperon:plain:ours)
-        \ <Cmd>call gin#action#fn({ xs -> <SID>chaperon('++plain ++no-theirs', xs) })<CR>
 
   noremap <buffer> <Plug>(gin-action-patch)
         \ <Cmd>call gin#action#fn({ xs -> <SID>patch('', xs) })<CR>
