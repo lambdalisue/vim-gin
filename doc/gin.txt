@@ -125,16 +125,17 @@ COMMANDS					*gin-commands*
 	to see mappings or disable by |g:gin_branch_disable_default_mappings|.
 
 							*:GinChaperon*
-:GinChaperon [++{option}...] [++plain] {path}
-:GinChaperon [++{option}...] [++plain] ++no-theirs {path}
-:GinChaperon [++{option}...] [++plain] ++no-ours {path}
+:GinChaperon [++{option}...] {path}
+:GinChaperon [++{option}...] ++no-theirs {path}
+:GinChaperon [++{option}...] ++no-ours {path}
 	Open three main buffers (THEIRS, WORKTREE, and OURS) and three
 	supplemental buffers to solve conflicts on {path}.
 	See |gin-command-options| for available {option}s.
-	If ++plain is specified, it does not open supplemental buffers.
 	If ++no-theirs is specified, it does not open a THEIRS buffer.
 	If ++no-ours is specified, it does not open a OURS buffer.
 
+	Use |g:gin_chaperon_supplement_disable| to disable supplemental
+	buffers.
 	Use |g:gin_chaperon_supplement_height| to regulate the height of
 	supplemental buffers.
 
@@ -274,6 +275,11 @@ VARIABLES					*gin-variables*
 
 *g:gin_chaperon_disable_default_mappings*
 	Disable default mappings on buffers shown by |:GinChaperon|.
+
+	Default: 0
+
+*g:gin_chaperon_supplement_disable*
+	Disable supplemental buffers on |:GinChaperon|.
 
 	Default: 0
 

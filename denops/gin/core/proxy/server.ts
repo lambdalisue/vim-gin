@@ -110,7 +110,7 @@ async function edit(
   denops: Denops,
   filename: string,
 ): Promise<void> {
-  await denops.cmd("silent noswapfile tab drop `=filename` | edit", {
+  await denops.cmd("silent noswapfile tabedit `=filename` | edit", {
     filename,
   });
   const [winid, bufnr, winnr, tabpagenr] = await batch.gather(
@@ -136,21 +136,18 @@ async function edit(
   }
   const auname = `gin_editor_${winid}_${bufnr}`;
   const waiter = deferred<void>();
-  const [waiterId] = anonymous.once(denops, async () => {
-    await autocmd.group(denops, auname, (helper) => {
-      helper.remove();
-    });
+  const [waiterId] = anonymous.once(denops, () => {
     waiter.resolve();
   });
   await buffer.ensure(denops, bufnr, async () => {
     await batch.batch(denops, async (denops) => {
       await option.bufhidden.setLocal(denops, "wipe");
       await autocmd.group(denops, auname, (helper) => {
-        helper.remove();
+        helper.remove("*", "<buffer>");
         helper.define(
           ["BufWipeout", "VimLeave"],
-          "*",
-          `call denops#request('gin', '${waiterId}', [])`,
+          "<buffer>",
+          `call denops#notify('gin', '${waiterId}', [])`,
           {
             once: true,
           },

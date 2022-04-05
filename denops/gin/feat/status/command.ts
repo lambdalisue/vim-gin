@@ -131,7 +131,7 @@ async function getCandidates(
   const result = await vars.b.get(denops, "gin_status_result") as
     | GitStatusResult
     | null;
-  if (!result) {
+  if (!result || start < 2 || end < 2) {
     return [];
   }
   start = Math.max(start, 2);

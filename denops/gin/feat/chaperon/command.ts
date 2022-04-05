@@ -24,12 +24,10 @@ export async function command(
   const [opts, _, residue] = parse(await normCmdArgs(denops, args));
   validateOpts(opts, [
     "worktree",
-    "plain",
     "no-ours",
     "no-theirs",
     ...builtinOpts,
   ]);
-  const noSupplements = "plain" in opts;
   const noOurs = "no-ours" in opts;
   const noTheirs = "no-theirs" in opts;
   const [abspath] = parseResidue(residue);
@@ -37,13 +35,20 @@ export async function command(
   const relpath = path.relative(worktree, abspath);
   const leading = formatOpts(opts, builtinOpts);
 
-  const [supplementHeight, disableDefaultMappings] = await batch.gather(
-    denops,
-    async (denops) => {
-      await vars.g.get(denops, "gin_chaperon_supplement_height", 10);
-      await vars.g.get(denops, "gin_chaperon_disable_default_mappings", false);
-    },
-  );
+  const [noSupplements, supplementHeight, disableDefaultMappings] = await batch
+    .gather(
+      denops,
+      async (denops) => {
+        await vars.g.get(denops, "gin_chaperon_supplement_disable", 0);
+        await vars.g.get(denops, "gin_chaperon_supplement_height", 10);
+        await vars.g.get(
+          denops,
+          "gin_chaperon_disable_default_mappings",
+          false,
+        );
+      },
+    );
+  unknownutil.assertNumber(noSupplements);
   unknownutil.assertNumber(supplementHeight);
   unknownutil.assertBoolean(disableDefaultMappings);
 
