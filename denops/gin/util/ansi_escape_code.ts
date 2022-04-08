@@ -2,6 +2,13 @@ import * as ansiEscapeCode from "https://deno.land/x/ansi_escape_code@v0.1.2/mod
 import { Decoration } from "https://deno.land/x/denops_std@v3.3.0/buffer/mod.ts";
 import { countVimBytes } from "./text.ts";
 
+export function removeAnsiEscapeCode(
+  text: string,
+): string {
+  const [t, _] = ansiEscapeCode.trimAndParse(text);
+  return t;
+}
+
 export function buildDecorationsFromAnsiEscapeCode(
   content: string[],
 ): [string[], Decoration[]] {

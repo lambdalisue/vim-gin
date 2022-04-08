@@ -12,7 +12,10 @@ import {
 } from "https://deno.land/x/denops_std@v3.3.0/argument/mod.ts";
 import { normCmdArgs } from "../../util/cmd.ts";
 import * as buffer from "https://deno.land/x/denops_std@v3.3.0/buffer/mod.ts";
-import { buildDecorationsFromAnsiEscapeCode } from "../../util/ansi_escape_code.ts";
+import {
+  buildDecorationsFromAnsiEscapeCode,
+  removeAnsiEscapeCode,
+} from "../../util/ansi_escape_code.ts";
 import { getWorktreeFromOpts } from "../../util/worktree.ts";
 import { decodeUtf8 } from "../../util/text.ts";
 import { run } from "../../git/process.ts";
@@ -91,9 +94,15 @@ export async function command(
     }
   } else {
     if (status.success) {
-      await helper.echo(denops, decodeUtf8(stdout) + decodeUtf8(stderr));
+      await helper.echo(
+        denops,
+        removeAnsiEscapeCode(decodeUtf8(stdout) + decodeUtf8(stderr)),
+      );
     } else {
-      await helper.echoerr(denops, decodeUtf8(stdout) + decodeUtf8(stderr));
+      await helper.echoerr(
+        denops,
+        removeAnsiEscapeCode(decodeUtf8(stdout) + decodeUtf8(stderr)),
+      );
     }
   }
   if (status.success && !eventignore.includes("all")) {
