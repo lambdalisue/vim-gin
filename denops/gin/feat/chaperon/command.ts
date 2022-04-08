@@ -169,7 +169,7 @@ async function initTheirs(
     });
     if (supplementHeight) {
       await denops.cmd(
-        `leftabove ${supplementHeight}split | Gin! ++buffer log -1 ${inProgressAliasHead} -p | set filetype=git`,
+        `leftabove ${supplementHeight}split | setlocal winfixheight | Gin! ++buffer log -1 ${inProgressAliasHead} -p | set filetype=git`,
       );
     }
   });
@@ -207,7 +207,7 @@ async function initOurs(
     });
     if (supplementHeight) {
       await denops.cmd(
-        `leftabove ${supplementHeight}split | Gin! ++buffer log -1 HEAD -p | set filetype=git`,
+        `leftabove ${supplementHeight}split | setlocal winfixheight | Gin! ++buffer log -1 HEAD -p | set filetype=git`,
       );
     }
   });
@@ -304,7 +304,7 @@ async function initWorktree(
     });
     if (supplementHeight) {
       await denops.cmd(
-        `leftabove ${supplementHeight}split | Gin! ++buffer log --oneline --left-right ${inProgressAliasHead}...HEAD | set filetype=diff`,
+        `leftabove ${supplementHeight}split | setlocal winfixheight | Gin! ++buffer log --oneline --left-right ${inProgressAliasHead}...HEAD | set filetype=diff`,
       );
     }
   });
