@@ -3,14 +3,12 @@ import * as anonymous from "https://deno.land/x/denops_std@v3.3.0/anonymous/mod.
 import * as autocmd from "https://deno.land/x/denops_std@v3.3.0/autocmd/mod.ts";
 import * as batch from "https://deno.land/x/denops_std@v3.3.0/batch/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v3.3.0/function/mod.ts";
-import * as option from "https://deno.land/x/denops_std@v3.3.0/option/mod.ts";
 import * as vars from "https://deno.land/x/denops_std@v3.3.0/variable/mod.ts";
 import * as unknownutil from "https://deno.land/x/unknownutil@v2.0.0/mod.ts";
 import * as path from "https://deno.land/std@0.133.0/path/mod.ts";
 import * as streams from "https://deno.land/std@0.133.0/streams/mod.ts";
 import { deferred } from "https://deno.land/std@0.133.0/async/mod.ts";
 import { decodeUtf8, encodeUtf8 } from "../../util/text.ts";
-import * as buffer from "https://deno.land/x/denops_std@v3.3.0/buffer/mod.ts";
 
 const recordPattern = /^([^:]+?):(.*)$/;
 
@@ -110,7 +108,7 @@ async function edit(
   denops: Denops,
   filename: string,
 ): Promise<void> {
-  await denops.cmd("silent noswapfile tabedit `=filename` | edit", {
+  await denops.cmd("silent noswapfile tabedit `=filename`", {
     filename,
   });
   const [winid, bufnr, winnr, tabpagenr] = await batch.gather(
@@ -139,20 +137,18 @@ async function edit(
   const [waiterId] = anonymous.once(denops, () => {
     waiter.resolve();
   });
-  await buffer.ensure(denops, bufnr, async () => {
-    await batch.batch(denops, async (denops) => {
-      await option.bufhidden.setLocal(denops, "wipe");
-      await autocmd.group(denops, auname, (helper) => {
-        helper.remove("*", "<buffer>");
-        helper.define(
-          ["BufWipeout", "VimLeave"],
-          "<buffer>",
-          `call denops#notify('gin', '${waiterId}', [])`,
-          {
-            once: true,
-          },
-        );
-      });
+  await batch.batch(denops, async (denops) => {
+    await fn.setbufvar(denops, bufnr, "&bufhidden", "wipe");
+    await autocmd.group(denops, auname, (helper) => {
+      helper.remove("*", `<buffer=${bufnr}>`);
+      helper.define(
+        ["BufWipeout", "VimLeave"],
+        `<buffer=${bufnr}>`,
+        `call denops#request('gin', '${waiterId}', [])`,
+        {
+          once: true,
+        },
+      );
     });
   });
   await waiter;
