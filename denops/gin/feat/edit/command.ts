@@ -131,11 +131,13 @@ export async function read(denops: Denops): Promise<void> {
       }
     });
   });
-  await buffer.assign(denops, bufnr, stdout, {
-    fileformat: opts["ff"] ?? opts["fileformat"],
-    fileencoding: opts["enc"] ?? opts["fileencoding"],
+  await buffer.modifiable(denops, bufnr, async () => {
+    await buffer.assign(denops, bufnr, stdout, {
+      fileformat: opts["ff"] ?? opts["fileformat"],
+      fileencoding: opts["enc"] ?? opts["fileencoding"],
+    });
+    await buffer.concrete(denops, bufnr);
   });
-  await buffer.concrete(denops, bufnr);
   if (!status.success) {
     await helper.echoerr(denops, decodeUtf8(stderr));
   }
