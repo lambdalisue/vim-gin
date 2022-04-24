@@ -56,7 +56,7 @@ section in Wiki for other Vim plugin managers.
 - [tpope/vim-fugitive](https://github.com/tpope/vim-fugitive)<br>A plugin that
   lead me to the development of gita.vim
 - [lambdalisue/vim-gita](https://github.com/lambdalisue/vim-gita)<br>First git
-  manipulation plugin that I made, works on Vim 7.9
+  manipulation plugin that I made, works on Vim 7.4
 - [lambdalisue/gina.vim](https://github.com/lambdalisue/gina.vim)<br>Second git
   manipulation plugin that I made, works asynchronously on Vim 8.1
 
