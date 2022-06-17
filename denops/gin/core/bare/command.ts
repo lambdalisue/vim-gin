@@ -24,7 +24,7 @@ import { run } from "../../git/process.ts";
 
 export type Options = {
   worktree?: string;
-  buffer?: boolean;
+  buffer?: boolean | string;
   monochrome?: boolean;
   fileformat?: string;
   encoding?: string;
@@ -44,9 +44,10 @@ export async function command(
     "enc",
     "encoding",
   ]);
+  const buffer = opts["buffer"] === "" ? true : opts["buffer"];
   const options = {
     worktree: opts["worktree"],
-    buffer: "buffer" in opts,
+    buffer,
     monochrome: "monochrome" in opts,
     fileformat: opts["ff"] ?? opts["fileformat"],
     encoding: opts["enc"] ?? opts["encoding"],
@@ -104,12 +105,19 @@ export async function exec(
       decorations = decos;
       return trimmed;
     };
-    await denops.cmd("noswapfile enew");
-    const bufnr = await fn.bufnr(denops);
-    await buffer.ensure(denops, bufnr, async () => {
-      await batch.batch(denops, async (denops) => {
-        await option.modifiable.setLocal(denops, false);
-      });
+    let bufnr: number;
+    if (typeof options.buffer === "string") {
+      bufnr = await fn.bufnr(denops, options.buffer);
+      if (bufnr === -1) {
+        bufnr = await fn.bufnr(denops, Number(options.buffer));
+      }
+      await fn.bufload(denops, bufnr);
+    } else {
+      await denops.cmd("noswapfile enew");
+      bufnr = await fn.bufnr(denops);
+    }
+    await batch.batch(denops, async (denops) => {
+      await fn.setbufvar(denops, bufnr, "&modifiable", 0);
     });
     await buffer.assign(
       denops,
