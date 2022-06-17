@@ -21,9 +21,38 @@ import {
 import { command as editCommand } from "../edit/command.ts";
 import { AliasHead, getInProgressAliasHead, stripConflicts } from "./util.ts";
 
+export type Options = {
+  worktree?: string;
+  noOurs?: boolean;
+  noTheirs?: boolean;
+  cmdarg?: string[];
+};
+
 export async function command(
   denops: Denops,
   args: string[],
+): Promise<void> {
+  const [opts, _, residue] = parse(await normCmdArgs(denops, args));
+  validateOpts(opts, [
+    "worktree",
+    "no-ours",
+    "no-theirs",
+    ...builtinOpts,
+  ]);
+  const options = {
+    worktree: opts["worktree"],
+    noOurs: "no-ours" in opts,
+    noTheirs: "no-theirs" in opts,
+    cmdarg: formatOpts(opts, builtinOpts),
+  };
+  const [abspath] = parseResidue(residue);
+  await exec(denops, abspath, options);
+}
+
+export async function exec(
+  denops: Denops,
+  filename: string,
+  options: Options,
 ): Promise<void> {
   const [verbose, noSupplements, supplementHeight, disableDefaultMappings] =
     await batch
@@ -45,31 +74,21 @@ export async function command(
   unknownutil.assertNumber(supplementHeight);
   unknownutil.assertBoolean(disableDefaultMappings);
 
-  const [opts, _, residue] = parse(await normCmdArgs(denops, args));
-  validateOpts(opts, [
-    "worktree",
-    "no-ours",
-    "no-theirs",
-    ...builtinOpts,
-  ]);
-  const noOurs = "no-ours" in opts;
-  const noTheirs = "no-theirs" in opts;
-  const [abspath] = parseResidue(residue);
   const worktree = await findWorktreeFromSuspects(
-    opts["worktree"]
-      ? [await expand(denops, opts["worktree"])]
+    options.worktree
+      ? [await expand(denops, options.worktree)]
       : await listWorktreeSuspectsFromDenops(denops, !!verbose),
     !!verbose,
   );
-  const relpath = path.relative(worktree, abspath);
-  const leading = formatOpts(opts, builtinOpts);
+  const relpath = path.relative(worktree, filename);
 
   const inProgressAliasHead = await getInProgressAliasHead(worktree);
+  const cmdarg = options.cmdarg ?? [];
 
   let bufnrTheirs = -1;
-  if (!noTheirs) {
+  if (!options.noTheirs) {
     await editCommand(denops, [
-      ...leading,
+      ...cmdarg,
       `++worktree=${worktree}`,
       ":3",
       relpath,
@@ -79,17 +98,17 @@ export async function command(
   }
 
   await editCommand(denops, [
-    ...leading,
+    ...cmdarg,
     `++worktree=${worktree}`,
     relpath,
   ]);
   const bufnrWorktree = await fn.bufnr(denops);
 
   let bufnrOurs = -1;
-  if (!noOurs) {
+  if (!options.noOurs) {
     await denops.cmd("botright vsplit");
     await editCommand(denops, [
-      ...leading,
+      ...cmdarg,
       `++worktree=${worktree}`,
       ":2",
       relpath,

@@ -31,18 +31,14 @@ import {
 
 type Candidate = Entry & CandidateBase;
 
+export type Options = {
+  worktree?: string;
+};
+
 export async function command(
   denops: Denops,
   args: string[],
 ): Promise<void> {
-  const [verbose] = await batch.gather(
-    denops,
-    async (denops) => {
-      await option.verbose.get(denops);
-    },
-  );
-  unknownutil.assertNumber(verbose);
-
   const [opts, flags, _] = parse(await normCmdArgs(denops, args));
   validateOpts(opts, [
     "worktree",
@@ -56,9 +52,28 @@ export async function command(
     "no-renames",
     "find-renames",
   ]);
+  const options = {
+    worktree: opts["worktree"],
+  };
+  await exec(denops, flags, options);
+}
+
+export async function exec(
+  denops: Denops,
+  params: bufname.BufnameParams,
+  options: Options = {},
+): Promise<void> {
+  const [verbose] = await batch.gather(
+    denops,
+    async (denops) => {
+      await option.verbose.get(denops);
+    },
+  );
+  unknownutil.assertNumber(verbose);
+
   const worktree = await findWorktreeFromSuspects(
-    opts["worktree"]
-      ? [await expand(denops, opts["worktree"])]
+    options.worktree
+      ? [await expand(denops, options.worktree)]
       : await listWorktreeSuspectsFromDenops(denops, !!verbose),
     !!verbose,
   );
@@ -67,19 +82,22 @@ export async function command(
     expr: worktree,
     params: {
       "untracked-files": "all",
-      ...flags,
+      ...params,
     },
   });
   await buffer.open(denops, bname.toString());
 }
 
 export async function read(denops: Denops): Promise<void> {
-  const [bufnr, bname] = await batch.gather(denops, async (denops) => {
-    await fn.bufnr(denops, "%");
-    await fn.bufname(denops, "%");
-  });
-  unknownutil.assertNumber(bufnr);
-  unknownutil.assertString(bname);
+  const [bufnr, bname, env, verbose] = await batch.gather(
+    denops,
+    async (denops) => {
+      await fn.bufnr(denops, "%");
+      await fn.bufname(denops, "%");
+      await fn.environ(denops);
+      await option.verbose.get(denops);
+    },
+  ) as [number, string, Record<string, string>, number];
   const { expr, params } = bufname.parse(bname);
   const flags = params ?? {};
   const args = [
@@ -90,12 +108,6 @@ export async function read(denops: Denops): Promise<void> {
     "-z",
     ...formatFlags(flags),
   ];
-  const [env, verbose] = await batch.gather(denops, async (denops) => {
-    await fn.environ(denops);
-    await option.verbose.get(denops);
-  });
-  unknownutil.assertObject(env, unknownutil.isString);
-  unknownutil.assertNumber(verbose);
   const stdout = await execute(args, {
     printCommand: !!verbose,
     noOptionalLocks: true,

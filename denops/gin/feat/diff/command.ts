@@ -29,18 +29,15 @@ import { findJumpNew, findJumpOld } from "./jump.ts";
 import { command as editCommand } from "../edit/command.ts";
 import { INDEX, parseCommitish, WORKTREE } from "./commitish.ts";
 
+export type Options = {
+  worktree?: string;
+  cmdarg?: string[];
+};
+
 export async function command(
   denops: Denops,
   args: string[],
 ): Promise<void> {
-  const [verbose] = await batch.gather(
-    denops,
-    async (denops) => {
-      await option.verbose.get(denops);
-    },
-  );
-  unknownutil.assertNumber(verbose);
-
   const [opts, flags, residue] = parse(await normCmdArgs(denops, args));
   validateOpts(opts, [
     "worktree",
@@ -63,24 +60,48 @@ export async function command(
     "ignore-submodules",
   ]);
   const [commitish, abspath] = parseResidue(residue);
+  const options = {
+    worktree: opts["worktree"],
+    cmdarg: formatOpts(opts, builtinOpts),
+  };
+  await exec(denops, abspath, commitish, flags, options);
+}
+
+export async function exec(
+  denops: Denops,
+  filename: string,
+  commitish: string | undefined,
+  params: bufname.BufnameParams,
+  options: Options = {},
+): Promise<void> {
+  const [verbose] = await batch.gather(
+    denops,
+    async (denops) => {
+      await option.verbose.get(denops);
+    },
+  );
+  unknownutil.assertNumber(verbose);
+
   const worktree = await findWorktreeFromSuspects(
-    opts["worktree"]
-      ? [await expand(denops, opts["worktree"])]
+    options.worktree
+      ? [await expand(denops, options.worktree)]
       : await listWorktreeSuspectsFromDenops(denops, !!verbose),
     !!verbose,
   );
-  const relpath = path.relative(worktree, abspath);
-  const cmdarg = formatOpts(opts, builtinOpts).join(" ");
+  const relpath = path.relative(worktree, filename);
+  const cmdarg = (options.cmdarg ?? []).join(" ");
   const bname = bufname.format({
     scheme: "gindiff",
     expr: worktree,
     params: {
-      ...flags,
+      ...params,
       commitish,
     },
     fragment: relpath,
   });
-  await buffer.open(denops, bname.toString(), { cmdarg });
+  await buffer.open(denops, bname.toString(), {
+    cmdarg,
+  });
 }
 
 export async function read(denops: Denops): Promise<void> {
@@ -99,12 +120,7 @@ export async function read(denops: Denops): Promise<void> {
           false,
         );
       },
-    );
-  unknownutil.assertObject(env, unknownutil.isString);
-  unknownutil.assertNumber(verbose);
-  unknownutil.assertNumber(bufnr);
-  unknownutil.assertString(bname);
-  unknownutil.assertString(cmdarg);
+    ) as [Record<string, string>, number, number, string, string, unknown];
   unknownutil.assertBoolean(disableDefaultMappings);
   const [opts, _] = parseOpts(cmdarg.split(" "));
   validateOpts(opts, builtinOpts);
