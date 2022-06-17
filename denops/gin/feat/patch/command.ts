@@ -3,6 +3,7 @@ import * as batch from "https://deno.land/x/denops_std@v3.3.0/batch/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v3.3.0/function/mod.ts";
 import * as mapping from "https://deno.land/x/denops_std@v3.3.0/mapping/mod.ts";
 import * as vars from "https://deno.land/x/denops_std@v3.3.0/variable/mod.ts";
+import * as option from "https://deno.land/x/denops_std@v3.3.0/option/mod.ts";
 import * as unknownutil from "https://deno.land/x/unknownutil@v2.0.0/mod.ts";
 import {
   builtinOpts,
@@ -11,14 +12,31 @@ import {
   validateOpts,
 } from "https://deno.land/x/denops_std@v3.3.0/argument/mod.ts";
 import * as buffer from "https://deno.land/x/denops_std@v3.3.0/buffer/mod.ts";
-import { normCmdArgs } from "../../util/cmd.ts";
-import { getWorktreeFromOpts } from "../../util/worktree.ts";
+import { expand, normCmdArgs } from "../../util/cmd.ts";
+import {
+  findWorktreeFromSuspects,
+  listWorktreeSuspectsFromDenops,
+} from "../../util/worktree.ts";
 import { command as editCommand } from "../edit/command.ts";
 
 export async function command(
   denops: Denops,
   args: string[],
 ): Promise<void> {
+  const [verbose, disableDefaultMappings] = await batch.gather(
+    denops,
+    async (denops) => {
+      await option.verbose.get(denops);
+      await vars.g.get(
+        denops,
+        "gin_patch_disable_default_mappings",
+        false,
+      );
+    },
+  );
+  unknownutil.assertNumber(verbose);
+  unknownutil.assertBoolean(disableDefaultMappings);
+
   const [opts, _, residue] = parse(await normCmdArgs(denops, args));
   validateOpts(opts, [
     "worktree",
@@ -29,15 +47,13 @@ export async function command(
   const noHead = "no-head" in opts;
   const noWorktree = "no-worktree" in opts;
   const [abspath] = parseResidue(residue);
-  const worktree = await getWorktreeFromOpts(denops, opts);
-  const leading = formatOpts(opts, builtinOpts);
-
-  const disableDefaultMappings = await vars.g.get(
-    denops,
-    "gin_patch_disable_default_mappings",
-    false,
+  const worktree = await findWorktreeFromSuspects(
+    opts["worktree"]
+      ? [await expand(denops, opts["worktree"])]
+      : await listWorktreeSuspectsFromDenops(denops, !!verbose),
+    !!verbose,
   );
-  unknownutil.assertBoolean(disableDefaultMappings);
+  const leading = formatOpts(opts, builtinOpts);
 
   let bufnrHead = -1;
   if (!noHead) {

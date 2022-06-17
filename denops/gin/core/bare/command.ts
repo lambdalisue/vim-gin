@@ -10,13 +10,16 @@ import {
   parseOpts,
   validateOpts,
 } from "https://deno.land/x/denops_std@v3.3.0/argument/mod.ts";
-import { normCmdArgs } from "../../util/cmd.ts";
+import { expand, normCmdArgs } from "../../util/cmd.ts";
 import * as buffer from "https://deno.land/x/denops_std@v3.3.0/buffer/mod.ts";
 import {
   buildDecorationsFromAnsiEscapeCode,
   removeAnsiEscapeCode,
 } from "../../util/ansi_escape_code.ts";
-import { getWorktreeFromOpts } from "../../util/worktree.ts";
+import {
+  findWorktreeFromSuspects,
+  listWorktreeSuspectsFromDenops,
+} from "../../util/worktree.ts";
 import { decodeUtf8 } from "../../util/text.ts";
 import { run } from "../../git/process.ts";
 
@@ -24,17 +27,18 @@ export async function command(
   denops: Denops,
   args: string[],
 ): Promise<void> {
-  const [env, verbose, eventignore] = await batch.gather(
+  const [verbose, env, eventignore] = await batch.gather(
     denops,
     async (denops) => {
-      await fn.environ(denops);
       await option.verbose.get(denops);
+      await fn.environ(denops);
       await option.eventignore.get(denops);
     },
   );
-  unknownutil.assertObject(env, unknownutil.isString);
   unknownutil.assertNumber(verbose);
+  unknownutil.assertObject(env, unknownutil.isString);
   unknownutil.assertString(eventignore);
+
   const [opts, residue] = parseOpts(await normCmdArgs(denops, args));
   validateOpts(opts, [
     "worktree",
@@ -47,7 +51,12 @@ export async function command(
     ...(enableColor ? ["-c", "color.ui=always"] : []),
     ...residue,
   ];
-  const worktree = await getWorktreeFromOpts(denops, opts);
+  const worktree = await findWorktreeFromSuspects(
+    opts["worktree"]
+      ? [await expand(denops, opts["worktree"])]
+      : await listWorktreeSuspectsFromDenops(denops, !!verbose),
+    !!verbose,
+  );
   const proc = run(cmd, {
     printCommand: !!verbose,
     stdin: "null",

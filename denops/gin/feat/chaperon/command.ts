@@ -5,6 +5,7 @@ import * as mapping from "https://deno.land/x/denops_std@v3.3.0/mapping/mod.ts";
 import * as vars from "https://deno.land/x/denops_std@v3.3.0/variable/mod.ts";
 import * as unknownutil from "https://deno.land/x/unknownutil@v2.0.0/mod.ts";
 import * as path from "https://deno.land/std@0.133.0/path/mod.ts";
+import * as option from "https://deno.land/x/denops_std@v3.3.0/option/mod.ts";
 import {
   builtinOpts,
   formatOpts,
@@ -12,8 +13,11 @@ import {
   validateOpts,
 } from "https://deno.land/x/denops_std@v3.3.0/argument/mod.ts";
 import * as buffer from "https://deno.land/x/denops_std@v3.3.0/buffer/mod.ts";
-import { normCmdArgs } from "../../util/cmd.ts";
-import { getWorktreeFromOpts } from "../../util/worktree.ts";
+import { expand, normCmdArgs } from "../../util/cmd.ts";
+import {
+  findWorktreeFromSuspects,
+  listWorktreeSuspectsFromDenops,
+} from "../../util/worktree.ts";
 import { command as editCommand } from "../edit/command.ts";
 import { AliasHead, getInProgressAliasHead, stripConflicts } from "./util.ts";
 
@@ -21,6 +25,26 @@ export async function command(
   denops: Denops,
   args: string[],
 ): Promise<void> {
+  const [verbose, noSupplements, supplementHeight, disableDefaultMappings] =
+    await batch
+      .gather(
+        denops,
+        async (denops) => {
+          await option.verbose.get(denops);
+          await vars.g.get(denops, "gin_chaperon_supplement_disable", 0);
+          await vars.g.get(denops, "gin_chaperon_supplement_height", 10);
+          await vars.g.get(
+            denops,
+            "gin_chaperon_disable_default_mappings",
+            false,
+          );
+        },
+      );
+  unknownutil.assertNumber(verbose);
+  unknownutil.assertNumber(noSupplements);
+  unknownutil.assertNumber(supplementHeight);
+  unknownutil.assertBoolean(disableDefaultMappings);
+
   const [opts, _, residue] = parse(await normCmdArgs(denops, args));
   validateOpts(opts, [
     "worktree",
@@ -31,26 +55,14 @@ export async function command(
   const noOurs = "no-ours" in opts;
   const noTheirs = "no-theirs" in opts;
   const [abspath] = parseResidue(residue);
-  const worktree = await getWorktreeFromOpts(denops, opts);
+  const worktree = await findWorktreeFromSuspects(
+    opts["worktree"]
+      ? [await expand(denops, opts["worktree"])]
+      : await listWorktreeSuspectsFromDenops(denops, !!verbose),
+    !!verbose,
+  );
   const relpath = path.relative(worktree, abspath);
   const leading = formatOpts(opts, builtinOpts);
-
-  const [noSupplements, supplementHeight, disableDefaultMappings] = await batch
-    .gather(
-      denops,
-      async (denops) => {
-        await vars.g.get(denops, "gin_chaperon_supplement_disable", 0);
-        await vars.g.get(denops, "gin_chaperon_supplement_height", 10);
-        await vars.g.get(
-          denops,
-          "gin_chaperon_disable_default_mappings",
-          false,
-        );
-      },
-    );
-  unknownutil.assertNumber(noSupplements);
-  unknownutil.assertNumber(supplementHeight);
-  unknownutil.assertBoolean(disableDefaultMappings);
 
   const inProgressAliasHead = await getInProgressAliasHead(worktree);
 

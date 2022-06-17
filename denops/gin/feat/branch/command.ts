@@ -12,8 +12,11 @@ import {
   validateOpts,
 } from "https://deno.land/x/denops_std@v3.3.0/argument/mod.ts";
 import * as buffer from "https://deno.land/x/denops_std@v3.3.0/buffer/mod.ts";
-import { normCmdArgs } from "../../util/cmd.ts";
-import { getWorktreeFromOpts } from "../../util/worktree.ts";
+import { expand, normCmdArgs } from "../../util/cmd.ts";
+import {
+  findWorktreeFromSuspects,
+  listWorktreeSuspectsFromDenops,
+} from "../../util/worktree.ts";
 import { execute } from "../../git/process.ts";
 import { bind } from "../../core/bare/command.ts";
 import { Branch, GitBranchResult, parse as parseBranch } from "./parser.ts";
@@ -27,6 +30,14 @@ import {
 type Candidate = Branch & CandidateBase;
 
 export async function command(denops: Denops, args: string[]): Promise<void> {
+  const [verbose] = await batch.gather(
+    denops,
+    async (denops) => {
+      await option.verbose.get(denops);
+    },
+  );
+  unknownutil.assertNumber(verbose);
+
   const [opts, flags, residues] = parse(await normCmdArgs(denops, args));
   validateOpts(opts, ["worktree"]);
   validateFlags(flags, [
@@ -39,7 +50,12 @@ export async function command(denops: Denops, args: string[]): Promise<void> {
     "abbrev",
     "no-abbrev",
   ]);
-  const worktree = await getWorktreeFromOpts(denops, opts);
+  const worktree = await findWorktreeFromSuspects(
+    opts["worktree"]
+      ? [await expand(denops, opts["worktree"])]
+      : await listWorktreeSuspectsFromDenops(denops, !!verbose),
+    !!verbose,
+  );
   const bname = bufname.format({
     scheme: "ginbranch",
     expr: worktree,

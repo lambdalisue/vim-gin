@@ -18,8 +18,11 @@ import {
   validateOpts,
 } from "https://deno.land/x/denops_std@v3.3.0/argument/mod.ts";
 import * as buffer from "https://deno.land/x/denops_std@v3.3.0/buffer/mod.ts";
-import { normCmdArgs } from "../../util/cmd.ts";
-import { getWorktreeFromOpts } from "../../util/worktree.ts";
+import { expand, normCmdArgs } from "../../util/cmd.ts";
+import {
+  findWorktreeFromSuspects,
+  listWorktreeSuspectsFromDenops,
+} from "../../util/worktree.ts";
 import { decodeUtf8 } from "../../util/text.ts";
 import { run } from "../../git/process.ts";
 import { command as bareCommand } from "../../core/bare/command.ts";
@@ -28,6 +31,14 @@ export async function command(
   denops: Denops,
   args: string[],
 ): Promise<void> {
+  const [verbose] = await batch.gather(
+    denops,
+    async (denops) => {
+      await option.verbose.get(denops);
+    },
+  );
+  unknownutil.assertNumber(verbose);
+
   const [opts, flags, residue] = parse(await normCmdArgs(denops, args));
   validateOpts(opts, [
     "worktree",
@@ -37,7 +48,12 @@ export async function command(
     "cached",
   ]);
   const [commitish, abspath] = parseResidue(residue);
-  const worktree = await getWorktreeFromOpts(denops, opts);
+  const worktree = await findWorktreeFromSuspects(
+    opts["worktree"]
+      ? [await expand(denops, opts["worktree"])]
+      : await listWorktreeSuspectsFromDenops(denops, !!verbose),
+    !!verbose,
+  );
   const relpath = path.relative(worktree, abspath);
   const cmdarg = formatOpts(opts, builtinOpts).join(" ");
 

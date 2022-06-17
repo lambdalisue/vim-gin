@@ -14,8 +14,11 @@ import {
   validateOpts,
 } from "https://deno.land/x/denops_std@v3.3.0/argument/mod.ts";
 import * as buffer from "https://deno.land/x/denops_std@v3.3.0/buffer/mod.ts";
-import { normCmdArgs } from "../../util/cmd.ts";
-import { getWorktreeFromOpts } from "../../util/worktree.ts";
+import { expand, normCmdArgs } from "../../util/cmd.ts";
+import {
+  findWorktreeFromSuspects,
+  listWorktreeSuspectsFromDenops,
+} from "../../util/worktree.ts";
 import { Entry, GitStatusResult, parse as parseStatus } from "./parser.ts";
 import { render } from "./render.ts";
 import { execute } from "../../git/process.ts";
@@ -32,6 +35,14 @@ export async function command(
   denops: Denops,
   args: string[],
 ): Promise<void> {
+  const [verbose] = await batch.gather(
+    denops,
+    async (denops) => {
+      await option.verbose.get(denops);
+    },
+  );
+  unknownutil.assertNumber(verbose);
+
   const [opts, flags, _] = parse(await normCmdArgs(denops, args));
   validateOpts(opts, [
     "worktree",
@@ -45,7 +56,12 @@ export async function command(
     "no-renames",
     "find-renames",
   ]);
-  const worktree = await getWorktreeFromOpts(denops, opts);
+  const worktree = await findWorktreeFromSuspects(
+    opts["worktree"]
+      ? [await expand(denops, opts["worktree"])]
+      : await listWorktreeSuspectsFromDenops(denops, !!verbose),
+    !!verbose,
+  );
   const bname = bufname.format({
     scheme: "ginstatus",
     expr: worktree,
