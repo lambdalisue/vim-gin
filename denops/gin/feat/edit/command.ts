@@ -27,18 +27,16 @@ import { decodeUtf8 } from "../../util/text.ts";
 import { run } from "../../git/process.ts";
 import { command as bareCommand } from "../../core/bare/command.ts";
 
+export type Options = {
+  worktree?: string;
+  cached?: boolean;
+  cmdarg?: string[];
+};
+
 export async function command(
   denops: Denops,
   args: string[],
 ): Promise<void> {
-  const [verbose] = await batch.gather(
-    denops,
-    async (denops) => {
-      await option.verbose.get(denops);
-    },
-  );
-  unknownutil.assertNumber(verbose);
-
   const [opts, flags, residue] = parse(await normCmdArgs(denops, args));
   validateOpts(opts, [
     "worktree",
@@ -48,25 +46,50 @@ export async function command(
     "cached",
   ]);
   const [commitish, abspath] = parseResidue(residue);
+  const options = {
+    worktree: opts["worktree"],
+    cached: "cached" in flags,
+    cmdarg: formatOpts(opts, builtinOpts),
+  };
+  await exec(denops, abspath, commitish, flags, options);
+}
+
+export async function exec(
+  denops: Denops,
+  filename: string,
+  commitish: string | undefined,
+  params: bufname.BufnameParams,
+  options: Options = {},
+): Promise<void> {
+  const [verbose] = await batch.gather(
+    denops,
+    async (denops) => {
+      await option.verbose.get(denops);
+    },
+  );
+  unknownutil.assertNumber(verbose);
+
   const worktree = await findWorktreeFromSuspects(
-    opts["worktree"]
-      ? [await expand(denops, opts["worktree"])]
+    options.worktree
+      ? [await expand(denops, options.worktree)]
       : await listWorktreeSuspectsFromDenops(denops, !!verbose),
     !!verbose,
   );
-  const relpath = path.relative(worktree, abspath);
-  const cmdarg = formatOpts(opts, builtinOpts).join(" ");
+  const relpath = path.relative(worktree, filename);
+  const cmdarg = (options.cmdarg ?? []).join(" ");
 
-  if (!commitish && flags.cached == null) {
+  if (!commitish && !options.cached) {
     // worktree
-    await buffer.open(denops, path.join(worktree, relpath), { cmdarg });
+    await buffer.open(denops, path.join(worktree, relpath), {
+      cmdarg,
+    });
   } else {
     // commitish/cached
     const bname = bufname.format({
       scheme: "ginedit",
       expr: worktree,
       params: {
-        ...flags,
+        ...params,
         cached: undefined,
         commitish,
       },

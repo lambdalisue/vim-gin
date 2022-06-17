@@ -6,7 +6,6 @@ import * as helper from "https://deno.land/x/denops_std@v3.3.0/helper/mod.ts";
 import * as option from "https://deno.land/x/denops_std@v3.3.0/option/mod.ts";
 import * as unknownutil from "https://deno.land/x/unknownutil@v2.0.0/mod.ts";
 import {
-  builtinOpts,
   parseOpts,
   validateOpts,
 } from "https://deno.land/x/denops_std@v3.3.0/argument/mod.ts";
@@ -23,9 +22,42 @@ import {
 import { decodeUtf8 } from "../../util/text.ts";
 import { run } from "../../git/process.ts";
 
+export type Options = {
+  worktree?: string;
+  buffer?: boolean;
+  monochrome?: boolean;
+  fileformat?: string;
+  encoding?: string;
+};
+
 export async function command(
   denops: Denops,
   args: string[],
+): Promise<void> {
+  const [opts, residue] = parseOpts(await normCmdArgs(denops, args));
+  validateOpts(opts, [
+    "worktree",
+    "buffer",
+    "monochrome",
+    "ff",
+    "fileformat",
+    "enc",
+    "encoding",
+  ]);
+  const options = {
+    worktree: opts["worktree"],
+    buffer: "buffer" in opts,
+    monochrome: "monochrome" in opts,
+    fileformat: opts["ff"] ?? opts["fileformat"],
+    encoding: opts["enc"] ?? opts["encoding"],
+  };
+  await exec(denops, residue, options);
+}
+
+export async function exec(
+  denops: Denops,
+  args: string[],
+  options: Options = {},
 ): Promise<void> {
   const [verbose, env, eventignore] = await batch.gather(
     denops,
@@ -39,21 +71,14 @@ export async function command(
   unknownutil.assertObject(env, unknownutil.isString);
   unknownutil.assertString(eventignore);
 
-  const [opts, residue] = parseOpts(await normCmdArgs(denops, args));
-  validateOpts(opts, [
-    "worktree",
-    "buffer",
-    "monochrome",
-    ...builtinOpts,
-  ]);
-  const enableColor = "buffer" in opts && !("monochrome" in opts);
+  const enableColor = options.buffer && !options.monochrome;
   const cmd = [
     ...(enableColor ? ["-c", "color.ui=always"] : []),
-    ...residue,
+    ...args,
   ];
   const worktree = await findWorktreeFromSuspects(
-    opts["worktree"]
-      ? [await expand(denops, opts["worktree"])]
+    options.worktree
+      ? [await expand(denops, options.worktree)]
       : await listWorktreeSuspectsFromDenops(denops, !!verbose),
     !!verbose,
   );
@@ -72,7 +97,7 @@ export async function command(
     proc.stderrOutput(),
   ]);
   proc.close();
-  if ("buffer" in opts) {
+  if (options.buffer) {
     let decorations: buffer.Decoration[] = [];
     const preprocessor = (content: string[]) => {
       const [trimmed, decos] = buildDecorationsFromAnsiEscapeCode(content);
@@ -91,8 +116,8 @@ export async function command(
       bufnr,
       new Uint8Array([...stdout, ...stderr]),
       {
-        fileformat: (opts["ff"] ?? opts["fileformat"]),
-        fileencoding: opts["enc"] ?? opts["fileencoding"],
+        fileformat: options.fileformat,
+        fileencoding: options.encoding,
         preprocessor,
       },
     );

@@ -29,16 +29,13 @@ import {
 
 type Candidate = Branch & CandidateBase;
 
-export async function command(denops: Denops, args: string[]): Promise<void> {
-  const [verbose] = await batch.gather(
-    denops,
-    async (denops) => {
-      await option.verbose.get(denops);
-    },
-  );
-  unknownutil.assertNumber(verbose);
+export type Options = {
+  worktree?: string;
+  extraArgs?: string;
+};
 
-  const [opts, flags, residues] = parse(await normCmdArgs(denops, args));
+export async function command(denops: Denops, args: string[]): Promise<void> {
+  const [opts, flags, residue] = parse(await normCmdArgs(denops, args));
   validateOpts(opts, ["worktree"]);
   validateFlags(flags, [
     "a",
@@ -50,19 +47,37 @@ export async function command(denops: Denops, args: string[]): Promise<void> {
     "abbrev",
     "no-abbrev",
   ]);
+  const options = {
+    worktree: opts["worktree"],
+    extraArgs: residue.join(" "),
+  };
+  await exec(denops, flags, options);
+}
+
+export async function exec(
+  denops: Denops,
+  params: bufname.BufnameParams,
+  options: Options = {},
+): Promise<void> {
+  const [verbose] = await batch.gather(
+    denops,
+    async (denops) => {
+      await option.verbose.get(denops);
+    },
+  );
+  unknownutil.assertNumber(verbose);
+
   const worktree = await findWorktreeFromSuspects(
-    opts["worktree"]
-      ? [await expand(denops, opts["worktree"])]
+    options.worktree
+      ? [await expand(denops, options.worktree)]
       : await listWorktreeSuspectsFromDenops(denops, !!verbose),
     !!verbose,
   );
   const bname = bufname.format({
     scheme: "ginbranch",
     expr: worktree,
-    params: {
-      ...flags,
-    },
-    fragment: residues.join(" "),
+    params,
+    fragment: options.extraArgs,
   });
   await buffer.open(denops, bname.toString());
 }

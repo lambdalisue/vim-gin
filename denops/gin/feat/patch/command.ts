@@ -19,9 +19,38 @@ import {
 } from "../../util/worktree.ts";
 import { command as editCommand } from "../edit/command.ts";
 
+export type Options = {
+  worktree?: string;
+  noHead?: boolean;
+  noWorktree?: boolean;
+  cmdarg?: string[];
+};
+
 export async function command(
   denops: Denops,
   args: string[],
+): Promise<void> {
+  const [opts, _, residue] = parse(await normCmdArgs(denops, args));
+  validateOpts(opts, [
+    "worktree",
+    "no-head",
+    "no-worktree",
+    ...builtinOpts,
+  ]);
+  const options = {
+    worktree: opts["worktree"],
+    noHead: "no-head" in opts,
+    noWorktree: "no-worktree" in opts,
+    cmdarg: formatOpts(opts, builtinOpts),
+  };
+  const [abspath] = parseResidue(residue);
+  await exec(denops, abspath, options);
+}
+
+export async function exec(
+  denops: Denops,
+  filename: string,
+  options: Options = {},
 ): Promise<void> {
   const [verbose, disableDefaultMappings] = await batch.gather(
     denops,
@@ -37,52 +66,42 @@ export async function command(
   unknownutil.assertNumber(verbose);
   unknownutil.assertBoolean(disableDefaultMappings);
 
-  const [opts, _, residue] = parse(await normCmdArgs(denops, args));
-  validateOpts(opts, [
-    "worktree",
-    "no-head",
-    "no-worktree",
-    ...builtinOpts,
-  ]);
-  const noHead = "no-head" in opts;
-  const noWorktree = "no-worktree" in opts;
-  const [abspath] = parseResidue(residue);
   const worktree = await findWorktreeFromSuspects(
-    opts["worktree"]
-      ? [await expand(denops, opts["worktree"])]
+    options.worktree
+      ? [await expand(denops, options.worktree)]
       : await listWorktreeSuspectsFromDenops(denops, !!verbose),
     !!verbose,
   );
-  const leading = formatOpts(opts, builtinOpts);
+  const cmdarg = options.cmdarg ?? [];
 
   let bufnrHead = -1;
-  if (!noHead) {
+  if (!options.noHead) {
     await editCommand(denops, [
-      ...leading,
+      ...cmdarg,
       `++worktree=${worktree}`,
       "HEAD",
-      abspath,
+      filename,
     ]);
     bufnrHead = await fn.bufnr(denops);
     await denops.cmd("botright vsplit");
   }
 
   await editCommand(denops, [
-    ...leading,
+    ...cmdarg,
     `++worktree=${worktree}`,
     "--cached",
-    abspath,
+    filename,
   ]);
   const bufnrIndex = await fn.bufnr(denops);
 
   let bufnrWorktree = -1;
-  if (!noWorktree) {
+  if (!options.noWorktree) {
     await denops.cmd("botright vsplit");
     await editCommand(denops, [
-      ...leading,
+      ...cmdarg,
       `++worktree=${worktree}`,
       "",
-      abspath,
+      filename,
     ]);
     bufnrWorktree = await fn.bufnr(denops);
   }
