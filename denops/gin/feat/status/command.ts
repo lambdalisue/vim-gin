@@ -108,8 +108,8 @@ export async function read(denops: Denops): Promise<void> {
     a.path == b.path ? 0 : a.path > b.path ? 1 : -1
   );
   const content = render(result);
-  await registerGatherer(denops, (denops, range) => {
-    return getCandidates(denops, range, expr);
+  await registerGatherer(denops, bufnr, (denops, bufnr, range) => {
+    return getCandidates(denops, bufnr, range, expr);
   });
   await buffer.ensure(denops, bufnr, async () => {
     await batch.batch(denops, async (denops) => {
@@ -141,10 +141,11 @@ export async function read(denops: Denops): Promise<void> {
 
 async function getCandidates(
   denops: Denops,
+  bufnr: number,
   [start, end]: Range,
   worktree: string,
 ): Promise<Candidate[]> {
-  const result = await vars.b.get(denops, "gin_status_result") as
+  const result = await fn.getbufvar(denops, bufnr, "gin_status_result") as
     | GitStatusResult
     | null;
   if (!result || (start === end && start < 2)) {

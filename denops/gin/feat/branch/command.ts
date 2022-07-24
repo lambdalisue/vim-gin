@@ -101,7 +101,7 @@ export async function read(denops: Denops): Promise<void> {
     a.target == b.target ? 0 : a.target > b.target ? 1 : -1
   );
   const content = render(result);
-  await registerGatherer(denops, getCandidates);
+  await registerGatherer(denops, bufnr, getCandidates);
   await buffer.ensure(denops, bufnr, async () => {
     await batch.batch(denops, async (denops) => {
       await bind(denops, bufnr);
@@ -120,12 +120,12 @@ export async function read(denops: Denops): Promise<void> {
 
 async function getCandidates(
   denops: Denops,
+  bufnr: number,
   [start, end]: Range,
 ): Promise<Candidate[]> {
-  const result = (await vars.b.get(
-    denops,
-    "gin_branch_result",
-  )) as GitBranchResult | null;
+  const result = (await fn.getbufvar(denops, bufnr, "gin_branch_result")) as
+    | GitBranchResult
+    | null;
   if (!result) {
     return [];
   }
