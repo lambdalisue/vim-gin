@@ -354,12 +354,12 @@ gin#action#call({name}, {range})
 	call gin#action#call('my-custom', [1, 1])
 <
 	       				*gin#action#list_action()*
-gin#action#list_actions()
-	List all available actions of the current buffer.
+gin#action#list_actions({bufnr})
+	List all available actions of the buffer {bufnr}.
 
 	       				*gin#action#gather_candidates()*
-gin#action#gather_candidates({range})
-	Gather and return candidates of the current buffer in {range}.
+gin#action#gather_candidates({bufnr}, {range})
+	Gather and return candidates of the buffer {bufnr} in {range}.
 
 -----------------------------------------------------------------------------
 COMPONENTS					*gin-components*
