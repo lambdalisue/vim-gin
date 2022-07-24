@@ -44,7 +44,7 @@ Install [Deno](https://deno.land) then use
 
 ```vim
 Plug 'vim-denops/denops.vim'
-Plug 'lambdalisue/gin.vim'`
+Plug 'lambdalisue/gin.vim'
 ```
 
 Or see
