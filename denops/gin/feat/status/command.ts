@@ -33,10 +33,14 @@ type Candidate = Entry & CandidateBase;
 
 export type Options = {
   worktree?: string;
+  opener?: string;
+  cmdarg?: string;
+  mods?: string;
 };
 
 export async function command(
   denops: Denops,
+  mods: string,
   args: string[],
 ): Promise<void> {
   const [opts, flags, _] = parse(await normCmdArgs(denops, args));
@@ -54,6 +58,7 @@ export async function command(
   ]);
   const options = {
     worktree: opts["worktree"],
+    mods,
   };
   await exec(denops, flags, options);
 }
@@ -62,7 +67,7 @@ export async function exec(
   denops: Denops,
   params: bufname.BufnameParams,
   options: Options = {},
-): Promise<void> {
+): Promise<buffer.OpenResult> {
   const [verbose] = await batch.gather(
     denops,
     async (denops) => {
@@ -85,7 +90,11 @@ export async function exec(
       ...params,
     },
   });
-  await buffer.open(denops, bname.toString());
+  return await buffer.open(denops, bname.toString(), {
+    opener: options.opener,
+    cmdarg: options.cmdarg,
+    mods: options.mods,
+  });
 }
 
 export async function read(denops: Denops): Promise<void> {
