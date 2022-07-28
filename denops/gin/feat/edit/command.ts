@@ -124,12 +124,7 @@ export async function read(denops: Denops): Promise<void> {
           false,
         );
       },
-    );
-  unknownutil.assertObject(env, unknownutil.isString);
-  unknownutil.assertNumber(verbose);
-  unknownutil.assertNumber(bufnr);
-  unknownutil.assertString(bname);
-  unknownutil.assertString(cmdarg);
+    ) as [Record<string, string>, number, number, string, string, unknown];
   unknownutil.assertBoolean(disableDefaultMappings);
   const [opts, _] = parseOpts(cmdarg.split(" "));
   validateOpts(opts, builtinOpts);
@@ -197,10 +192,7 @@ export async function write(denops: Denops): Promise<void> {
       await fn.bufname(denops);
       await fn.getline(denops, 1, "$");
     },
-  );
-  unknownutil.assertNumber(bufnr);
-  unknownutil.assertString(bname);
-  unknownutil.assertArray(content, unknownutil.isString);
+  ) as [number, string, string[]];
   const { expr, fragment } = bufname.parse(bname);
   if (!fragment) {
     throw new Error("A buffer 'ginedit://' requires a fragment part");

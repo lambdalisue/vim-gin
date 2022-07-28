@@ -125,12 +125,7 @@ export async function read(denops: Denops): Promise<void> {
           false,
         );
       },
-    );
-  unknownutil.assertObject(env, unknownutil.isString);
-  unknownutil.assertNumber(verbose);
-  unknownutil.assertNumber(bufnr);
-  unknownutil.assertString(bname);
-  unknownutil.assertString(cmdarg);
+    ) as [Record<string, string>, number, number, string, string, unknown];
   unknownutil.assertBoolean(disableDefaultMappings);
   const [opts, _] = parseOpts(cmdarg.split(" "));
   validateOpts(opts, builtinOpts);

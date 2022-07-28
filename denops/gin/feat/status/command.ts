@@ -98,12 +98,15 @@ export async function exec(
 }
 
 export async function read(denops: Denops): Promise<void> {
-  const [bufnr, bname] = await batch.gather(denops, async (denops) => {
-    await fn.bufnr(denops, "%");
-    await fn.bufname(denops, "%");
-  });
-  unknownutil.assertNumber(bufnr);
-  unknownutil.assertString(bname);
+  const [bufnr, bname, env, verbose] = await batch.gather(
+    denops,
+    async (denops) => {
+      await fn.bufnr(denops, "%");
+      await fn.bufname(denops, "%");
+      await fn.environ(denops);
+      await option.verbose.get(denops);
+    },
+  ) as [number, string, Record<string, string>, number];
   const { expr, params } = bufname.parse(bname);
   const flags = params ?? {};
   const args = [
@@ -114,12 +117,6 @@ export async function read(denops: Denops): Promise<void> {
     "-z",
     ...formatFlags(flags),
   ];
-  const [env, verbose] = await batch.gather(denops, async (denops) => {
-    await fn.environ(denops);
-    await option.verbose.get(denops);
-  });
-  unknownutil.assertObject(env, unknownutil.isString);
-  unknownutil.assertNumber(verbose);
   const stdout = await execute(args, {
     printCommand: !!verbose,
     noOptionalLocks: true,
