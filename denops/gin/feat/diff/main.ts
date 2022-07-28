@@ -12,11 +12,19 @@ export function main(denops: Denops): void {
       unknownutil.assertArray(args, unknownutil.isString);
       const silent = parseSilent(mods);
       return helper.ensureSilent(denops, silent, () => {
-        return helper.friendlyCall(denops, () => command(denops, args));
+        return helper.friendlyCall(denops, () => command(denops, mods, args));
       });
     },
     "diff:read": () => read(denops),
-    "diff:jump:new": () => jumpNew(denops),
-    "diff:jump:old": () => jumpOld(denops),
+    "diff:jump:new": (mods) => {
+      mods = mods ?? "";
+      unknownutil.assertString(mods);
+      return jumpNew(denops, mods);
+    },
+    "diff:jump:old": (mods) => {
+      mods = mods ?? "";
+      unknownutil.assertString(mods);
+      return jumpOld(denops, mods);
+    },
   };
 }

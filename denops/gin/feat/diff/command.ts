@@ -31,11 +31,14 @@ import { INDEX, parseCommitish, WORKTREE } from "./commitish.ts";
 
 export type Options = {
   worktree?: string;
-  cmdarg?: string[];
+  opener?: string;
+  cmdarg?: string;
+  mods?: string;
 };
 
 export async function command(
   denops: Denops,
+  mods: string,
   args: string[],
 ): Promise<void> {
   const [opts, flags, residue] = parse(await normCmdArgs(denops, args));
@@ -62,7 +65,8 @@ export async function command(
   const [commitish, abspath] = parseResidue(residue);
   const options = {
     worktree: opts["worktree"],
-    cmdarg: formatOpts(opts, builtinOpts),
+    cmdarg: formatOpts(opts, builtinOpts).join(" "),
+    mods,
   };
   await exec(denops, abspath, commitish, flags, options);
 }
@@ -73,7 +77,7 @@ export async function exec(
   commitish: string | undefined,
   params: bufname.BufnameParams,
   options: Options = {},
-): Promise<void> {
+): Promise<buffer.OpenResult> {
   const [verbose] = await batch.gather(
     denops,
     async (denops) => {
@@ -89,7 +93,6 @@ export async function exec(
     !!verbose,
   );
   const relpath = path.relative(worktree, filename);
-  const cmdarg = (options.cmdarg ?? []).join(" ");
   const bname = bufname.format({
     scheme: "gindiff",
     expr: worktree,
@@ -99,8 +102,10 @@ export async function exec(
     },
     fragment: relpath,
   });
-  await buffer.open(denops, bname.toString(), {
-    cmdarg,
+  return await buffer.open(denops, bname.toString(), {
+    opener: options.opener,
+    cmdarg: options.cmdarg,
+    mods: options.mods,
   });
 }
 
@@ -224,7 +229,7 @@ function parseResidue(residue: string[]): [string | undefined, string] {
   }
 }
 
-export async function jumpOld(denops: Denops): Promise<void> {
+export async function jumpOld(denops: Denops, mods: string): Promise<void> {
   const [lnum, content, bname] = await batch.gather(
     denops,
     async (denops) => {
@@ -232,10 +237,7 @@ export async function jumpOld(denops: Denops): Promise<void> {
       await fn.getline(denops, 1, "$");
       await fn.bufname(denops, "%");
     },
-  );
-  unknownutil.assertNumber(lnum);
-  unknownutil.assertArray(content, unknownutil.isString);
-  unknownutil.assertString(bname);
+  ) as [number, string[], string];
   const { expr, params } = bufname.parse(bname);
   const jump = findJumpOld(lnum - 1, content);
   if (!jump) {
@@ -247,18 +249,18 @@ export async function jumpOld(denops: Denops): Promise<void> {
   const commitish = unknownutil.ensureString(params?.commitish ?? "");
   const [target, _] = parseCommitish(commitish, cached);
   if (target === INDEX) {
-    await editCommand(denops, [
+    await editCommand(denops, mods, [
       `++worktree=${expr}`,
       "--cached",
       filename,
     ]);
   } else if (target === WORKTREE) {
-    await editCommand(denops, [
+    await editCommand(denops, mods, [
       `++worktree=${expr}`,
       filename,
     ]);
   } else {
-    await editCommand(denops, [
+    await editCommand(denops, mods, [
       `++worktree=${expr}`,
       commitish || "HEAD",
       filename,
@@ -267,7 +269,7 @@ export async function jumpOld(denops: Denops): Promise<void> {
   await fn.cursor(denops, jump.lnum, 1);
 }
 
-export async function jumpNew(denops: Denops): Promise<void> {
+export async function jumpNew(denops: Denops, mods: string): Promise<void> {
   const [lnum, content, bname] = await batch.gather(
     denops,
     async (denops) => {
@@ -275,10 +277,7 @@ export async function jumpNew(denops: Denops): Promise<void> {
       await fn.getline(denops, 1, "$");
       await fn.bufname(denops, "%");
     },
-  );
-  unknownutil.assertNumber(lnum);
-  unknownutil.assertArray(content, unknownutil.isString);
-  unknownutil.assertString(bname);
+  ) as [number, string[], string];
   const { expr, params } = bufname.parse(bname);
   const jump = findJumpNew(lnum - 1, content);
   if (!jump) {
@@ -290,18 +289,18 @@ export async function jumpNew(denops: Denops): Promise<void> {
   const commitish = unknownutil.ensureString(params?.commitish ?? "");
   const [_, target] = parseCommitish(commitish, cached);
   if (target === INDEX) {
-    await editCommand(denops, [
+    await editCommand(denops, mods, [
       `++worktree=${expr}`,
       "--cached",
       filename,
     ]);
   } else if (target === WORKTREE) {
-    await editCommand(denops, [
+    await editCommand(denops, mods, [
       `++worktree=${expr}`,
       filename,
     ]);
   } else {
-    await editCommand(denops, [
+    await editCommand(denops, mods, [
       `++worktree=${expr}`,
       commitish || "HEAD",
       filename,

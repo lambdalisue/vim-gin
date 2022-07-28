@@ -30,11 +30,14 @@ import { command as bareCommand } from "../../core/bare/command.ts";
 export type Options = {
   worktree?: string;
   cached?: boolean;
-  cmdarg?: string[];
+  opener?: string;
+  cmdarg?: string;
+  mods?: string;
 };
 
 export async function command(
   denops: Denops,
+  mods: string,
   args: string[],
 ): Promise<void> {
   const [opts, flags, residue] = parse(await normCmdArgs(denops, args));
@@ -49,7 +52,8 @@ export async function command(
   const options = {
     worktree: opts["worktree"],
     cached: "cached" in flags,
-    cmdarg: formatOpts(opts, builtinOpts),
+    cmdarg: formatOpts(opts, builtinOpts).join(" "),
+    mods,
   };
   await exec(denops, abspath, commitish, flags, options);
 }
@@ -60,7 +64,7 @@ export async function exec(
   commitish: string | undefined,
   params: bufname.BufnameParams,
   options: Options = {},
-): Promise<void> {
+): Promise<buffer.OpenResult> {
   const [verbose] = await batch.gather(
     denops,
     async (denops) => {
@@ -76,12 +80,13 @@ export async function exec(
     !!verbose,
   );
   const relpath = path.relative(worktree, filename);
-  const cmdarg = (options.cmdarg ?? []).join(" ");
 
   if (!commitish && !options.cached) {
     // worktree
-    await buffer.open(denops, path.join(worktree, relpath), {
-      cmdarg,
+    return await buffer.open(denops, path.join(worktree, relpath), {
+      opener: options.opener,
+      cmdarg: options.cmdarg,
+      mods: options.mods,
     });
   } else {
     // commitish/cached
@@ -95,7 +100,11 @@ export async function exec(
       },
       fragment: relpath,
     });
-    await buffer.open(denops, bname.toString(), { cmdarg });
+    return await buffer.open(denops, bname.toString(), {
+      opener: options.opener,
+      cmdarg: options.cmdarg,
+      mods: options.mods,
+    });
   }
 }
 

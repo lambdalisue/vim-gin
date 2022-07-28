@@ -12,7 +12,7 @@ export function main(denops: Denops): void {
       unknownutil.assertArray(args, unknownutil.isString);
       const silent = parseSilent(mods);
       return helper.ensureSilent(denops, silent, () => {
-        return helper.friendlyCall(denops, () => command(denops, args));
+        return helper.friendlyCall(denops, () => command(denops, mods, args));
       });
     },
     "branch:read": () => read(denops),

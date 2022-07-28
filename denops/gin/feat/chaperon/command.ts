@@ -18,18 +18,21 @@ import {
   findWorktreeFromSuspects,
   listWorktreeSuspectsFromDenops,
 } from "../../util/worktree.ts";
-import { command as editCommand } from "../edit/command.ts";
+import { exec as editExec } from "../edit/command.ts";
 import { AliasHead, getInProgressAliasHead, stripConflicts } from "./util.ts";
 
 export type Options = {
   worktree?: string;
   noOurs?: boolean;
   noTheirs?: boolean;
-  cmdarg?: string[];
+  opener?: string;
+  cmdarg?: string;
+  mods?: string;
 };
 
 export async function command(
   denops: Denops,
+  mods: string,
   args: string[],
 ): Promise<void> {
   const [opts, _, residue] = parse(await normCmdArgs(denops, args));
@@ -43,7 +46,8 @@ export async function command(
     worktree: opts["worktree"],
     noOurs: "no-ours" in opts,
     noTheirs: "no-theirs" in opts,
-    cmdarg: formatOpts(opts, builtinOpts),
+    cmdarg: formatOpts(opts, builtinOpts).join(" "),
+    mods,
   };
   const [abspath] = parseResidue(residue);
   await exec(denops, abspath, options);
@@ -68,8 +72,7 @@ export async function exec(
             false,
           );
         },
-      );
-  unknownutil.assertNumber(verbose);
+      ) as [number, unknown, unknown, unknown];
   unknownutil.assertNumber(noSupplements);
   unknownutil.assertNumber(supplementHeight);
   unknownutil.assertBoolean(disableDefaultMappings);
@@ -83,47 +86,41 @@ export async function exec(
   const relpath = path.relative(worktree, filename);
 
   const inProgressAliasHead = await getInProgressAliasHead(worktree);
-  const cmdarg = options.cmdarg ?? [];
 
-  let bufnrTheirs = -1;
+  const infoWorktree = await editExec(denops, relpath, undefined, {}, {
+    worktree,
+    opener: options.opener,
+    cmdarg: options.cmdarg,
+    mods: options.mods,
+  });
+
+  let infoTheirs: buffer.OpenResult | undefined;
   if (!options.noTheirs) {
-    await editCommand(denops, [
-      ...cmdarg,
-      `++worktree=${worktree}`,
-      ":3",
-      relpath,
-    ]);
-    bufnrTheirs = await fn.bufnr(denops);
-    await denops.cmd("botright vsplit");
+    infoTheirs = await editExec(denops, relpath, ":3", {}, {
+      worktree,
+      opener: "topleft vsplit",
+      cmdarg: options.cmdarg,
+      mods: options.mods,
+    });
+    await fn.win_gotoid(denops, infoWorktree.winid);
   }
 
-  await editCommand(denops, [
-    ...cmdarg,
-    `++worktree=${worktree}`,
-    relpath,
-  ]);
-  const bufnrWorktree = await fn.bufnr(denops);
-
-  let bufnrOurs = -1;
+  let infoOurs: buffer.OpenResult | undefined;
   if (!options.noOurs) {
-    await denops.cmd("botright vsplit");
-    await editCommand(denops, [
-      ...cmdarg,
-      `++worktree=${worktree}`,
-      ":2",
-      relpath,
-    ]);
-    bufnrOurs = await fn.bufnr(denops);
+    infoOurs = await editExec(denops, relpath, ":2", {}, {
+      worktree,
+      opener: "botright vsplit",
+      cmdarg: options.cmdarg,
+      mods: options.mods,
+    });
   }
 
   // Theirs
-  if (bufnrTheirs !== -1) {
+  if (infoTheirs) {
     await initTheirs(
       denops,
-      bufnrTheirs,
-      bufnrWorktree,
-      noSupplements ? 0 : supplementHeight,
-      inProgressAliasHead,
+      infoTheirs.bufnr,
+      infoWorktree.bufnr,
       disableDefaultMappings,
     );
   }
@@ -131,28 +128,35 @@ export async function exec(
   // WORKTREE
   await initWorktree(
     denops,
-    bufnrWorktree,
-    bufnrTheirs,
-    bufnrOurs,
-    noSupplements ? 0 : supplementHeight,
-    inProgressAliasHead,
+    infoWorktree.bufnr,
+    infoTheirs?.bufnr,
+    infoOurs?.bufnr,
     disableDefaultMappings,
   );
 
   // Ours
-  if (bufnrOurs !== -1) {
+  if (infoOurs) {
     await initOurs(
       denops,
-      bufnrOurs,
-      bufnrWorktree,
-      noSupplements ? 0 : supplementHeight,
+      infoOurs.bufnr,
+      infoWorktree.bufnr,
       disableDefaultMappings,
     );
   }
 
+  // Supplements
+  if (!noSupplements) {
+    await openSupplements(
+      denops,
+      infoTheirs?.winid,
+      infoWorktree.winid,
+      infoOurs?.winid,
+      supplementHeight,
+      inProgressAliasHead,
+    );
+  }
   // Focus Worktree
-  const winid = await fn.bufwinid(denops, bufnrWorktree);
-  await fn.win_gotoid(denops, winid);
+  await fn.win_gotoid(denops, infoWorktree.winid);
 }
 
 function parseResidue(
@@ -171,8 +175,6 @@ async function initTheirs(
   denops: Denops,
   bufnr: number,
   bufnrWorktree: number,
-  supplementHeight: number,
-  inProgressAliasHead: AliasHead | undefined,
   disableDefaultMappings: boolean,
 ): Promise<void> {
   await buffer.ensure(denops, bufnr, async () => {
@@ -198,66 +200,21 @@ async function initTheirs(
       }
       await denops.cmd("diffthis");
     });
-    if (supplementHeight) {
-      await denops.cmd(
-        `leftabove ${supplementHeight}split | setlocal winfixheight | Gin! ++buffer log -1 ${inProgressAliasHead} -p | set filetype=git`,
-      );
-    }
-  });
-}
-
-async function initOurs(
-  denops: Denops,
-  bufnr: number,
-  bufnrWorktree: number,
-  supplementHeight: number,
-  disableDefaultMappings: boolean,
-): Promise<void> {
-  await buffer.ensure(denops, bufnr, async () => {
-    await batch.batch(denops, async (denops) => {
-      await mapping.map(
-        denops,
-        "<Plug>(gin-diffput)",
-        `<Cmd>diffput ${bufnrWorktree}<CR><Cmd>diffupdate<CR>`,
-        {
-          buffer: true,
-          noremap: true,
-        },
-      );
-      if (!disableDefaultMappings) {
-        await mapping.map(
-          denops,
-          "dp",
-          "<Plug>(gin-diffput)",
-          {
-            buffer: true,
-          },
-        );
-      }
-      await denops.cmd("diffthis");
-    });
-    if (supplementHeight) {
-      await denops.cmd(
-        `leftabove ${supplementHeight}split | setlocal winfixheight | Gin! ++buffer log -1 HEAD -p | set filetype=git`,
-      );
-    }
   });
 }
 
 async function initWorktree(
   denops: Denops,
   bufnr: number,
-  bufnrTheirs: number,
-  bufnrOurs: number,
-  supplementHeight: number,
-  inProgressAliasHead: string | undefined,
+  bufnrTheirs: number | undefined,
+  bufnrOurs: number | undefined,
   disableDefaultMappings: boolean,
 ): Promise<void> {
   await buffer.ensure(denops, bufnr, async () => {
     const content = await fn.getbufline(denops, bufnr, 1, "$");
     await buffer.replace(denops, bufnr, stripConflicts(content));
     await batch.batch(denops, async (denops) => {
-      if (bufnrTheirs !== -1) {
+      if (bufnrTheirs) {
         await mapping.map(
           denops,
           "<Plug>(gin-diffget-l)",
@@ -294,7 +251,7 @@ async function initWorktree(
           );
         }
       }
-      if (bufnrOurs !== -1) {
+      if (bufnrOurs) {
         await mapping.map(
           denops,
           "<Plug>(gin-diffget-r)",
@@ -333,10 +290,78 @@ async function initWorktree(
       }
       await denops.cmd("diffthis");
     });
-    if (supplementHeight) {
-      await denops.cmd(
-        `leftabove ${supplementHeight}split | setlocal winfixheight | Gin! ++buffer log --oneline --left-right ${inProgressAliasHead}...HEAD | set filetype=diff`,
-      );
-    }
   });
+}
+
+async function initOurs(
+  denops: Denops,
+  bufnr: number,
+  bufnrWorktree: number,
+  disableDefaultMappings: boolean,
+): Promise<void> {
+  await buffer.ensure(denops, bufnr, async () => {
+    await batch.batch(denops, async (denops) => {
+      await mapping.map(
+        denops,
+        "<Plug>(gin-diffput)",
+        `<Cmd>diffput ${bufnrWorktree}<CR><Cmd>diffupdate<CR>`,
+        {
+          buffer: true,
+          noremap: true,
+        },
+      );
+      if (!disableDefaultMappings) {
+        await mapping.map(
+          denops,
+          "dp",
+          "<Plug>(gin-diffput)",
+          {
+            buffer: true,
+          },
+        );
+      }
+      await denops.cmd("diffthis");
+    });
+  });
+}
+
+async function openSupplements(
+  denops: Denops,
+  winidTheirs: number | undefined,
+  winidWorktree: number,
+  winidOurs: number | undefined,
+  supplementHeight: number,
+  inProgressAliasHead: AliasHead | undefined,
+) {
+  if (winidTheirs && await fn.winbufnr(denops, winidTheirs) !== -1) {
+    await batch.batch(denops, async (denops) => {
+      await fn.win_gotoid(denops, winidTheirs);
+      await denops.cmd(`rightbelow ${supplementHeight}split`);
+      await denops.cmd(
+        `silent! Gin! ++buffer log -1 ${inProgressAliasHead} -p`,
+      );
+      await option.winfixheight.setLocal(denops, true);
+      await option.filetype.setLocal(denops, "git");
+    });
+  }
+
+  await batch.batch(denops, async (denops) => {
+    await fn.win_gotoid(denops, winidWorktree);
+    await denops.cmd(`rightbelow ${supplementHeight}split`);
+    await denops.cmd(
+      `silent! Gin! ++buffer log --oneline --left-right ${inProgressAliasHead}...HEAD`,
+    );
+    await option.winfixheight.setLocal(denops, true);
+    await option.filetype.setLocal(denops, "diff");
+  });
+
+  if (winidOurs) {
+    await batch.batch(denops, async (denops) => {
+      await fn.win_gotoid(denops, winidOurs);
+      await denops.cmd(`rightbelow ${supplementHeight}split`);
+      await denops.cmd("silent! Gin! ++buffer log -1 HEAD -p");
+      await option.winfixheight.setLocal(denops, true);
+      await option.filetype.setLocal(denops, "git");
+    });
+  }
 }
