@@ -1,13 +1,14 @@
-import type { Denops } from "https://deno.land/x/denops_std@v3.3.0/mod.ts";
-import * as anonymous from "https://deno.land/x/denops_std@v3.3.0/anonymous/mod.ts";
-import * as autocmd from "https://deno.land/x/denops_std@v3.3.0/autocmd/mod.ts";
-import * as batch from "https://deno.land/x/denops_std@v3.3.0/batch/mod.ts";
-import * as fn from "https://deno.land/x/denops_std@v3.3.0/function/mod.ts";
-import * as vars from "https://deno.land/x/denops_std@v3.3.0/variable/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v3.6.0/mod.ts";
+import * as anonymous from "https://deno.land/x/denops_std@v3.6.0/anonymous/mod.ts";
+import * as autocmd from "https://deno.land/x/denops_std@v3.6.0/autocmd/mod.ts";
+import * as batch from "https://deno.land/x/denops_std@v3.6.0/batch/mod.ts";
+import * as buffer from "https://deno.land/x/denops_std@v3.6.0/buffer/mod.ts";
+import * as fn from "https://deno.land/x/denops_std@v3.6.0/function/mod.ts";
+import * as vars from "https://deno.land/x/denops_std@v3.6.0/variable/mod.ts";
 import * as unknownutil from "https://deno.land/x/unknownutil@v2.0.0/mod.ts";
-import * as path from "https://deno.land/std@0.133.0/path/mod.ts";
-import * as streams from "https://deno.land/std@0.133.0/streams/mod.ts";
-import { deferred } from "https://deno.land/std@0.133.0/async/mod.ts";
+import * as path from "https://deno.land/std@0.150.0/path/mod.ts";
+import * as streams from "https://deno.land/std@0.150.0/streams/mod.ts";
+import { deferred } from "https://deno.land/std@0.150.0/async/mod.ts";
 import { decodeUtf8, encodeUtf8 } from "../../util/text.ts";
 
 const recordPattern = /^([^:]+?):(.*)$/;
@@ -108,43 +109,37 @@ async function edit(
   denops: Denops,
   filename: string,
 ): Promise<void> {
-  await denops.cmd("silent noswapfile tabedit `=filename`", {
-    filename,
-  });
-  const [winid, bufnr, winnr, tabpagenr] = await batch.gather(
+  const { winid, bufnr } = await buffer.open(
     denops,
-    async (denops) => {
-      await fn.win_getid(denops);
-      await fn.bufnr(denops);
-      await fn.winnr(denops);
-      await fn.tabpagenr(denops);
+    filename,
+    {
+      mods: "silent noswapfile",
+      opener: "tabedit",
     },
   );
-  unknownutil.assertNumber(winid);
-  unknownutil.assertNumber(bufnr);
-  unknownutil.assertNumber(winnr);
-  unknownutil.assertNumber(tabpagenr);
-  if (winnr === 1 && tabpagenr === 1) {
-    // This is the last buffer and should not be so add new empty tabpage
+
+  // Check if this is the last tabpage or not
+  const tabpagenr = await fn.tabpagenr(denops, "$") as number;
+  if (tabpagenr === 1) {
     await batch.batch(denops, async (denops) => {
       await denops.cmd("noautocmd | tabnew");
       await fn.win_gotoid(denops, winid);
       await denops.cmd("redraw");
     });
   }
+
   const auname = `gin_editor_${winid}_${bufnr}`;
   const waiter = deferred<void>();
   const [waiterId] = anonymous.once(denops, () => {
     waiter.resolve();
   });
   await batch.batch(denops, async (denops) => {
-    await fn.setbufvar(denops, bufnr, "&bufhidden", "wipe");
     await autocmd.group(denops, auname, (helper) => {
       helper.remove("*", `<buffer=${bufnr}>`);
       helper.define(
-        ["BufWipeout", "VimLeave"],
+        ["WinClosed", "BufUnload", "VimLeave"],
         `<buffer=${bufnr}>`,
-        `call denops#request('gin', '${waiterId}', [])`,
+        `call denops#notify('gin', '${waiterId}', [])`,
         {
           once: true,
         },

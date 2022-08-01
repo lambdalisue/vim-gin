@@ -1,13 +1,13 @@
-import type { Denops } from "https://deno.land/x/denops_std@v3.3.0/mod.ts";
-import * as batch from "https://deno.land/x/denops_std@v3.3.0/batch/mod.ts";
-import * as bufname from "https://deno.land/x/denops_std@v3.3.0/bufname/mod.ts";
-import * as fn from "https://deno.land/x/denops_std@v3.3.0/function/mod.ts";
-import * as helper from "https://deno.land/x/denops_std@v3.3.0/helper/mod.ts";
-import * as mapping from "https://deno.land/x/denops_std@v3.3.0/mapping/mod.ts";
-import * as option from "https://deno.land/x/denops_std@v3.3.0/option/mod.ts";
-import * as vars from "https://deno.land/x/denops_std@v3.3.0/variable/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v3.6.0/mod.ts";
+import * as batch from "https://deno.land/x/denops_std@v3.6.0/batch/mod.ts";
+import * as bufname from "https://deno.land/x/denops_std@v3.6.0/bufname/mod.ts";
+import * as fn from "https://deno.land/x/denops_std@v3.6.0/function/mod.ts";
+import * as helper from "https://deno.land/x/denops_std@v3.6.0/helper/mod.ts";
+import * as mapping from "https://deno.land/x/denops_std@v3.6.0/mapping/mod.ts";
+import * as option from "https://deno.land/x/denops_std@v3.6.0/option/mod.ts";
+import * as vars from "https://deno.land/x/denops_std@v3.6.0/variable/mod.ts";
 import * as unknownutil from "https://deno.land/x/unknownutil@v2.0.0/mod.ts";
-import * as path from "https://deno.land/std@0.133.0/path/mod.ts";
+import * as path from "https://deno.land/std@0.150.0/path/mod.ts";
 import {
   builtinOpts,
   formatFlags,
@@ -16,18 +16,29 @@ import {
   parseOpts,
   validateFlags,
   validateOpts,
-} from "https://deno.land/x/denops_std@v3.3.0/argument/mod.ts";
-import * as buffer from "https://deno.land/x/denops_std@v3.3.0/buffer/mod.ts";
-import { normCmdArgs } from "../../util/cmd.ts";
-import { getWorktreeFromOpts } from "../../util/worktree.ts";
+} from "https://deno.land/x/denops_std@v3.6.0/argument/mod.ts";
+import * as buffer from "https://deno.land/x/denops_std@v3.6.0/buffer/mod.ts";
+import { expand, normCmdArgs } from "../../util/cmd.ts";
+import {
+  findWorktreeFromSuspects,
+  listWorktreeSuspectsFromDenops,
+} from "../../util/worktree.ts";
 import { decodeUtf8 } from "../../util/text.ts";
 import { run } from "../../git/process.ts";
 import { findJumpNew, findJumpOld } from "./jump.ts";
 import { command as editCommand } from "../edit/command.ts";
 import { INDEX, parseCommitish, WORKTREE } from "./commitish.ts";
 
+export type Options = {
+  worktree?: string;
+  opener?: string;
+  cmdarg?: string;
+  mods?: string;
+};
+
 export async function command(
   denops: Denops,
+  mods: string,
   args: string[],
 ): Promise<void> {
   const [opts, flags, residue] = parse(await normCmdArgs(denops, args));
@@ -52,19 +63,50 @@ export async function command(
     "ignore-submodules",
   ]);
   const [commitish, abspath] = parseResidue(residue);
-  const worktree = await getWorktreeFromOpts(denops, opts);
-  const relpath = path.relative(worktree, abspath);
-  const cmdarg = formatOpts(opts, builtinOpts).join(" ");
+  const options = {
+    worktree: opts["worktree"],
+    cmdarg: formatOpts(opts, builtinOpts).join(" "),
+    mods,
+  };
+  await exec(denops, abspath, commitish, flags, options);
+}
+
+export async function exec(
+  denops: Denops,
+  filename: string,
+  commitish: string | undefined,
+  params: bufname.BufnameParams,
+  options: Options = {},
+): Promise<buffer.OpenResult> {
+  const [verbose] = await batch.gather(
+    denops,
+    async (denops) => {
+      await option.verbose.get(denops);
+    },
+  );
+  unknownutil.assertNumber(verbose);
+
+  const worktree = await findWorktreeFromSuspects(
+    options.worktree
+      ? [await expand(denops, options.worktree)]
+      : await listWorktreeSuspectsFromDenops(denops, !!verbose),
+    !!verbose,
+  );
+  const relpath = path.relative(worktree, filename);
   const bname = bufname.format({
     scheme: "gindiff",
     expr: worktree,
     params: {
-      ...flags,
+      ...params,
       commitish,
     },
     fragment: relpath,
   });
-  await buffer.open(denops, bname.toString(), { cmdarg });
+  return await buffer.open(denops, bname.toString(), {
+    opener: options.opener,
+    cmdarg: options.cmdarg,
+    mods: options.mods,
+  });
 }
 
 export async function read(denops: Denops): Promise<void> {
@@ -83,12 +125,7 @@ export async function read(denops: Denops): Promise<void> {
           false,
         );
       },
-    );
-  unknownutil.assertObject(env, unknownutil.isString);
-  unknownutil.assertNumber(verbose);
-  unknownutil.assertNumber(bufnr);
-  unknownutil.assertString(bname);
-  unknownutil.assertString(cmdarg);
+    ) as [Record<string, string>, number, number, string, string, unknown];
   unknownutil.assertBoolean(disableDefaultMappings);
   const [opts, _] = parseOpts(cmdarg.split(" "));
   validateOpts(opts, builtinOpts);
@@ -192,7 +229,7 @@ function parseResidue(residue: string[]): [string | undefined, string] {
   }
 }
 
-export async function jumpOld(denops: Denops): Promise<void> {
+export async function jumpOld(denops: Denops, mods: string): Promise<void> {
   const [lnum, content, bname] = await batch.gather(
     denops,
     async (denops) => {
@@ -200,10 +237,7 @@ export async function jumpOld(denops: Denops): Promise<void> {
       await fn.getline(denops, 1, "$");
       await fn.bufname(denops, "%");
     },
-  );
-  unknownutil.assertNumber(lnum);
-  unknownutil.assertArray(content, unknownutil.isString);
-  unknownutil.assertString(bname);
+  ) as [number, string[], string];
   const { expr, params } = bufname.parse(bname);
   const jump = findJumpOld(lnum - 1, content);
   if (!jump) {
@@ -215,18 +249,18 @@ export async function jumpOld(denops: Denops): Promise<void> {
   const commitish = unknownutil.ensureString(params?.commitish ?? "");
   const [target, _] = parseCommitish(commitish, cached);
   if (target === INDEX) {
-    await editCommand(denops, [
+    await editCommand(denops, mods, [
       `++worktree=${expr}`,
       "--cached",
       filename,
     ]);
   } else if (target === WORKTREE) {
-    await editCommand(denops, [
+    await editCommand(denops, mods, [
       `++worktree=${expr}`,
       filename,
     ]);
   } else {
-    await editCommand(denops, [
+    await editCommand(denops, mods, [
       `++worktree=${expr}`,
       commitish || "HEAD",
       filename,
@@ -235,7 +269,7 @@ export async function jumpOld(denops: Denops): Promise<void> {
   await fn.cursor(denops, jump.lnum, 1);
 }
 
-export async function jumpNew(denops: Denops): Promise<void> {
+export async function jumpNew(denops: Denops, mods: string): Promise<void> {
   const [lnum, content, bname] = await batch.gather(
     denops,
     async (denops) => {
@@ -243,10 +277,7 @@ export async function jumpNew(denops: Denops): Promise<void> {
       await fn.getline(denops, 1, "$");
       await fn.bufname(denops, "%");
     },
-  );
-  unknownutil.assertNumber(lnum);
-  unknownutil.assertArray(content, unknownutil.isString);
-  unknownutil.assertString(bname);
+  ) as [number, string[], string];
   const { expr, params } = bufname.parse(bname);
   const jump = findJumpNew(lnum - 1, content);
   if (!jump) {
@@ -258,18 +289,18 @@ export async function jumpNew(denops: Denops): Promise<void> {
   const commitish = unknownutil.ensureString(params?.commitish ?? "");
   const [_, target] = parseCommitish(commitish, cached);
   if (target === INDEX) {
-    await editCommand(denops, [
+    await editCommand(denops, mods, [
       `++worktree=${expr}`,
       "--cached",
       filename,
     ]);
   } else if (target === WORKTREE) {
-    await editCommand(denops, [
+    await editCommand(denops, mods, [
       `++worktree=${expr}`,
       filename,
     ]);
   } else {
-    await editCommand(denops, [
+    await editCommand(denops, mods, [
       `++worktree=${expr}`,
       commitish || "HEAD",
       filename,
