@@ -76,10 +76,9 @@ export async function exec(
     !!verbose,
   );
 
-  const infoIndex = await editExec(denops, filename, undefined, {
-    "cached": "",
-  }, {
+  const infoIndex = await editExec(denops, filename, undefined, {}, {
     worktree,
+    cached: true,
     opener: options.opener,
     cmdarg: options.cmdarg,
     mods: options.mods,
