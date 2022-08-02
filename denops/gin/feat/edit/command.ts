@@ -109,23 +109,16 @@ export async function exec(
 }
 
 export async function read(denops: Denops): Promise<void> {
-  const [env, verbose, bufnr, bname, cmdarg, disableDefaultMappings] =
-    await batch.gather(
-      denops,
-      async (denops) => {
-        await fn.environ(denops);
-        await option.verbose.get(denops);
-        await fn.bufnr(denops, "%");
-        await fn.bufname(denops, "%");
-        await vars.v.get(denops, "cmdarg");
-        await vars.g.get(
-          denops,
-          "gin_diff_disable_default_mappings",
-          false,
-        );
-      },
-    ) as [Record<string, string>, number, number, string, string, unknown];
-  unknownutil.assertBoolean(disableDefaultMappings);
+  const [env, verbose, bufnr, bname, cmdarg] = await batch.gather(
+    denops,
+    async (denops) => {
+      await fn.environ(denops);
+      await option.verbose.get(denops);
+      await fn.bufnr(denops, "%");
+      await fn.bufname(denops, "%");
+      await vars.v.get(denops, "cmdarg");
+    },
+  ) as [Record<string, string>, number, number, string, string, unknown];
   const [opts, _] = parseOpts(cmdarg.split(" "));
   validateOpts(opts, builtinOpts);
   const { expr, params, fragment } = bufname.parse(bname);

@@ -110,23 +110,16 @@ export async function exec(
 }
 
 export async function read(denops: Denops): Promise<void> {
-  const [env, verbose, bufnr, bname, cmdarg, disableDefaultMappings] =
-    await batch.gather(
-      denops,
-      async (denops) => {
-        await fn.environ(denops);
-        await option.verbose.get(denops);
-        await fn.bufnr(denops, "%");
-        await fn.bufname(denops, "%");
-        await vars.v.get(denops, "cmdarg");
-        await vars.g.get(
-          denops,
-          "gin_diff_disable_default_mappings",
-          false,
-        );
-      },
-    ) as [Record<string, string>, number, number, string, string, unknown];
-  unknownutil.assertBoolean(disableDefaultMappings);
+  const [env, verbose, bufnr, bname, cmdarg] = await batch.gather(
+    denops,
+    async (denops) => {
+      await fn.environ(denops);
+      await option.verbose.get(denops);
+      await fn.bufnr(denops, "%");
+      await fn.bufname(denops, "%");
+      await vars.v.get(denops, "cmdarg");
+    },
+  ) as [Record<string, string>, number, number, string, string, unknown];
   const [opts, _] = parseOpts(cmdarg.split(" "));
   validateOpts(opts, builtinOpts);
   const { expr, params, fragment } = bufname.parse(bname);
@@ -167,7 +160,7 @@ export async function read(denops: Denops): Promise<void> {
   }
   await buffer.ensure(denops, bufnr, async () => {
     await batch.batch(denops, async (denops) => {
-      await option.filetype.setLocal(denops, "diff");
+      await option.filetype.setLocal(denops, "gin-diff");
       await option.bufhidden.setLocal(denops, "unload");
       await option.buftype.setLocal(denops, "nofile");
       await option.swapfile.setLocal(denops, false);
@@ -190,24 +183,6 @@ export async function read(denops: Denops): Promise<void> {
           noremap: true,
         },
       );
-      if (!disableDefaultMappings) {
-        await mapping.map(
-          denops,
-          "g<CR>",
-          "<Plug>(gin-diffjump-old)zv",
-          {
-            buffer: true,
-          },
-        );
-        await mapping.map(
-          denops,
-          "<CR>",
-          "<Plug>(gin-diffjump-new)zv",
-          {
-            buffer: true,
-          },
-        );
-      }
     });
   });
   await buffer.assign(denops, bufnr, stdout, {
