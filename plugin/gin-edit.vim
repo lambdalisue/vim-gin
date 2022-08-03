@@ -5,7 +5,8 @@ let g:loaded_gin_edit = 1
 
 augroup gin_plugin_edit_internal
   autocmd!
-  autocmd BufReadCmd ginedit://* call denops#request('gin', 'edit:read', [])
+  autocmd BufReadCmd ginedit://*
+        \ call denops#request('gin', 'edit:read', [bufnr(), expand('<amatch>')])
 augroup END
 
 function! s:command(...) abort

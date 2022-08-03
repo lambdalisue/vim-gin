@@ -15,7 +15,11 @@ export function main(denops: Denops): void {
         return helper.friendlyCall(denops, () => command(denops, mods, args));
       });
     },
-    "diff:read": () => read(denops),
+    "diff:read": (bufnr, bufname) => {
+      unknownutil.assertNumber(bufnr);
+      unknownutil.assertString(bufname);
+      return read(denops, bufnr, bufname);
+    },
     "diff:jump:new": (mods) => {
       mods = mods ?? "";
       unknownutil.assertString(mods);
