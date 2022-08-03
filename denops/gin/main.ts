@@ -1,6 +1,7 @@
 import type { Denops } from "https://deno.land/x/denops_std@v3.7.1/mod.ts";
 
 import { main as mainAction } from "./core/action/main.ts";
+import { main as mainBuffer } from "./core/buffer/main.ts";
 import { main as mainEcho } from "./core/echo/main.ts";
 import { main as mainProxy } from "./core/proxy/main.ts";
 import { main as mainUtil } from "./core/util/main.ts";
@@ -18,6 +19,7 @@ import { main as mainComponentWorktree } from "./component/worktree.ts";
 
 export function main(denops: Denops): void {
   mainAction(denops);
+  mainBuffer(denops);
   mainEcho(denops);
   mainProxy(denops);
   mainUtil(denops);

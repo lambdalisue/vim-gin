@@ -103,6 +103,14 @@ COMMANDS					*gin-commands*
 	If a bang (!) is specified, it calls command synchronously instead.
 	See |gin-command-options| for available {option}s.
 	"Gin" is just an alias of "GinEcho" command.
+	Use |:GinBuffer| to show the result in a buffer.
+
+							*:GinBuffer*
+:GinBuffer[!] [++{option}...] [++monochrome] {command} [{args}]
+	Open a "gin" buffer to show a result of a git raw {command} with
+	{args}. Note that it shows error results as well.
+	See |gin-command-options| for available {option}s.
+	Use |:GinEcho| to just echo the result.
 
 							*:GinBranch*
 :GinBranch [++{option}...] [{flags}]
