@@ -1,6 +1,10 @@
 import type { Denops } from "https://deno.land/x/denops_std@v3.8.1/mod.ts";
 import * as batch from "https://deno.land/x/denops_std@v3.8.1/batch/mod.ts";
-import * as bufname from "https://deno.land/x/denops_std@v3.8.1/bufname/mod.ts";
+import {
+  BufnameParams,
+  format as formatBufname,
+  parse as parseBufname,
+} from "https://deno.land/x/denops_std@v3.8.1/bufname/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v3.8.1/function/mod.ts";
 import * as helper from "https://deno.land/x/denops_std@v3.8.1/helper/mod.ts";
 import * as mapping from "https://deno.land/x/denops_std@v3.8.1/mapping/mod.ts";
@@ -75,7 +79,7 @@ export async function exec(
   denops: Denops,
   filename: string,
   commitish: string | undefined,
-  params: bufname.BufnameParams,
+  params: BufnameParams,
   options: Options = {},
 ): Promise<buffer.OpenResult> {
   const [verbose] = await batch.gather(
@@ -93,7 +97,7 @@ export async function exec(
     !!verbose,
   );
   const relpath = path.relative(worktree, filename);
-  const bname = bufname.format({
+  const bufname = formatBufname({
     scheme: "gindiff",
     expr: worktree,
     params: {
@@ -102,7 +106,7 @@ export async function exec(
     },
     fragment: relpath,
   });
-  return await buffer.open(denops, bname.toString(), {
+  return await buffer.open(denops, bufname.toString(), {
     opener: options.opener,
     cmdarg: options.cmdarg,
     mods: options.mods,
@@ -110,7 +114,7 @@ export async function exec(
 }
 
 export async function read(denops: Denops): Promise<void> {
-  const [env, verbose, bufnr, bname, cmdarg] = await batch.gather(
+  const [env, verbose, bufnr, bufname, cmdarg] = await batch.gather(
     denops,
     async (denops) => {
       await fn.environ(denops);
@@ -122,7 +126,7 @@ export async function read(denops: Denops): Promise<void> {
   ) as [Record<string, string>, number, number, string, string, unknown];
   const [opts, _] = parseOpts(cmdarg.split(" "));
   validateOpts(opts, builtinOpts);
-  const { expr, params, fragment } = bufname.parse(bname);
+  const { expr, params, fragment } = parseBufname(bufname);
   if (!fragment) {
     throw new Error("A buffer 'gindiff://' requires a fragment part");
   }
@@ -205,7 +209,7 @@ function parseResidue(residue: string[]): [string | undefined, string] {
 }
 
 export async function jumpOld(denops: Denops, mods: string): Promise<void> {
-  const [lnum, content, bname] = await batch.gather(
+  const [lnum, content, bufname] = await batch.gather(
     denops,
     async (denops) => {
       await fn.line(denops, ".");
@@ -213,7 +217,7 @@ export async function jumpOld(denops: Denops, mods: string): Promise<void> {
       await fn.bufname(denops, "%");
     },
   ) as [number, string[], string];
-  const { expr, params } = bufname.parse(bname);
+  const { expr, params } = parseBufname(bufname);
   const jump = findJumpOld(lnum - 1, content);
   if (!jump) {
     // Do nothing
@@ -245,7 +249,7 @@ export async function jumpOld(denops: Denops, mods: string): Promise<void> {
 }
 
 export async function jumpNew(denops: Denops, mods: string): Promise<void> {
-  const [lnum, content, bname] = await batch.gather(
+  const [lnum, content, bufname] = await batch.gather(
     denops,
     async (denops) => {
       await fn.line(denops, ".");
@@ -253,7 +257,7 @@ export async function jumpNew(denops: Denops, mods: string): Promise<void> {
       await fn.bufname(denops, "%");
     },
   ) as [number, string[], string];
-  const { expr, params } = bufname.parse(bname);
+  const { expr, params } = parseBufname(bufname);
   const jump = findJumpNew(lnum - 1, content);
   if (!jump) {
     // Do nothing

@@ -1,5 +1,5 @@
 import type { Denops } from "https://deno.land/x/denops_std@v3.8.1/mod.ts";
-import * as bufname from "https://deno.land/x/denops_std@v3.8.1/bufname/mod.ts";
+import { parse as parseBufname } from "https://deno.land/x/denops_std@v3.8.1/bufname/mod.ts";
 import * as unknownutil from "https://deno.land/x/unknownutil@v2.0.0/mod.ts";
 import { Silent } from "https://deno.land/x/denops_std@v3.8.1/helper/mod.ts";
 import { GIN_FILE_BUFFER_PROTOCOLS } from "../global.ts";
@@ -39,18 +39,18 @@ async function normCmdArg(
 }
 
 export async function expand(denops: Denops, expr: string): Promise<string> {
-  const bname = await denops.call(
+  const bufname = await denops.call(
     "gin#internal#util#cmd#expand",
     expr,
   );
-  unknownutil.assertString(bname);
+  unknownutil.assertString(bufname);
   try {
-    const { scheme, fragment } = bufname.parse(bname);
+    const { scheme, fragment } = parseBufname(bufname);
     if (GIN_FILE_BUFFER_PROTOCOLS.includes(scheme)) {
-      return fragment ?? bname;
+      return fragment ?? bufname;
     }
   } catch {
     // Ignore errors
   }
-  return bname;
+  return bufname;
 }
