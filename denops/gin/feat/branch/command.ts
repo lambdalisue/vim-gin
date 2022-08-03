@@ -22,7 +22,7 @@ import {
   listWorktreeSuspectsFromDenops,
 } from "../../util/worktree.ts";
 import { execute } from "../../git/process.ts";
-import { bind } from "../../core/bare/command.ts";
+import { bind } from "../../core/bare.ts";
 import { Branch, GitBranchResult, parse as parseBranch } from "./parser.ts";
 import { render } from "./render.ts";
 import {

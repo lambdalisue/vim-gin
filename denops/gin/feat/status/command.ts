@@ -26,7 +26,7 @@ import {
 import { Entry, GitStatusResult, parse as parseStatus } from "./parser.ts";
 import { render } from "./render.ts";
 import { execute } from "../../git/process.ts";
-import { bind } from "../../core/bare/command.ts";
+import { bind } from "../../core/bare.ts";
 import {
   Candidate as CandidateBase,
   Range,

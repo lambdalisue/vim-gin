@@ -7,7 +7,7 @@ import { command } from "./command.ts";
 export function main(denops: Denops): void {
   denops.dispatcher = {
     ...denops.dispatcher,
-    command: (mods, args) => {
+    "echo:command": (mods, args) => {
       unknownutil.assertString(mods);
       unknownutil.assertArray(args, unknownutil.isString);
       const silent = parseSilent(mods);
