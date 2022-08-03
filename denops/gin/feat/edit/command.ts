@@ -1,7 +1,11 @@
 import type { Denops } from "https://deno.land/x/denops_std@v3.6.0/mod.ts";
 import * as autocmd from "https://deno.land/x/denops_std@v3.6.0/autocmd/mod.ts";
 import * as batch from "https://deno.land/x/denops_std@v3.6.0/batch/mod.ts";
-import * as bufname from "https://deno.land/x/denops_std@v3.6.0/bufname/mod.ts";
+import {
+  BufnameParams,
+  format as formatBufname,
+  parse as parseBufname,
+} from "https://deno.land/x/denops_std@v3.6.0/bufname/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v3.6.0/function/mod.ts";
 import * as helper from "https://deno.land/x/denops_std@v3.6.0/helper/mod.ts";
 import * as option from "https://deno.land/x/denops_std@v3.6.0/option/mod.ts";
@@ -62,7 +66,7 @@ export async function exec(
   denops: Denops,
   filename: string,
   commitish: string | undefined,
-  params: bufname.BufnameParams,
+  params: BufnameParams,
   options: Options = {},
 ): Promise<buffer.OpenResult> {
   const [verbose] = await batch.gather(
@@ -90,7 +94,7 @@ export async function exec(
     });
   } else {
     // commitish/cached
-    const bname = bufname.format({
+    const bufname = formatBufname({
       scheme: "ginedit",
       expr: worktree,
       params: {
@@ -100,7 +104,7 @@ export async function exec(
       },
       fragment: relpath,
     });
-    return await buffer.open(denops, bname.toString(), {
+    return await buffer.open(denops, bufname.toString(), {
       opener: options.opener,
       cmdarg: options.cmdarg,
       mods: options.mods,
@@ -109,7 +113,7 @@ export async function exec(
 }
 
 export async function read(denops: Denops): Promise<void> {
-  const [env, verbose, bufnr, bname, cmdarg] = await batch.gather(
+  const [env, verbose, bufnr, bufname, cmdarg] = await batch.gather(
     denops,
     async (denops) => {
       await fn.environ(denops);
@@ -121,7 +125,7 @@ export async function read(denops: Denops): Promise<void> {
   ) as [Record<string, string>, number, number, string, string, unknown];
   const [opts, _] = parseOpts(cmdarg.split(" "));
   validateOpts(opts, builtinOpts);
-  const { expr, params, fragment } = bufname.parse(bname);
+  const { expr, params, fragment } = parseBufname(bufname);
   if (!fragment) {
     throw new Error("A buffer 'ginedit://' requires a fragment part");
   }
@@ -178,7 +182,7 @@ export async function read(denops: Denops): Promise<void> {
 }
 
 export async function write(denops: Denops): Promise<void> {
-  const [bufnr, bname, content] = await batch.gather(
+  const [bufnr, bufname, content] = await batch.gather(
     denops,
     async (denops) => {
       await fn.bufnr(denops);
@@ -186,7 +190,7 @@ export async function write(denops: Denops): Promise<void> {
       await fn.getline(denops, 1, "$");
     },
   ) as [number, string, string[]];
-  const { expr, fragment } = bufname.parse(bname);
+  const { expr, fragment } = parseBufname(bufname);
   if (!fragment) {
     throw new Error("A buffer 'ginedit://' requires a fragment part");
   }

@@ -1,7 +1,11 @@
 import type { Denops } from "https://deno.land/x/denops_std@v3.6.0/mod.ts";
 import * as autocmd from "https://deno.land/x/denops_std@v3.6.0/autocmd/mod.ts";
 import * as batch from "https://deno.land/x/denops_std@v3.6.0/batch/mod.ts";
-import * as bufname from "https://deno.land/x/denops_std@v3.6.0/bufname/mod.ts";
+import {
+  BufnameParams,
+  format as formatBufname,
+  parse as parseBufname,
+} from "https://deno.land/x/denops_std@v3.6.0/bufname/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v3.6.0/function/mod.ts";
 import * as option from "https://deno.land/x/denops_std@v3.6.0/option/mod.ts";
 import * as vars from "https://deno.land/x/denops_std@v3.6.0/variable/mod.ts";
@@ -65,7 +69,7 @@ export async function command(
 
 export async function exec(
   denops: Denops,
-  params: bufname.BufnameParams,
+  params: BufnameParams,
   options: Options = {},
 ): Promise<buffer.OpenResult> {
   const [verbose] = await batch.gather(
@@ -82,7 +86,7 @@ export async function exec(
       : await listWorktreeSuspectsFromDenops(denops, !!verbose),
     !!verbose,
   );
-  const bname = bufname.format({
+  const bufname = formatBufname({
     scheme: "ginstatus",
     expr: worktree,
     params: {
@@ -90,7 +94,7 @@ export async function exec(
       ...params,
     },
   });
-  return await buffer.open(denops, bname.toString(), {
+  return await buffer.open(denops, bufname.toString(), {
     opener: options.opener,
     cmdarg: options.cmdarg,
     mods: options.mods,
@@ -98,7 +102,7 @@ export async function exec(
 }
 
 export async function read(denops: Denops): Promise<void> {
-  const [bufnr, bname, env, verbose] = await batch.gather(
+  const [bufnr, bufname, env, verbose] = await batch.gather(
     denops,
     async (denops) => {
       await fn.bufnr(denops, "%");
@@ -107,7 +111,7 @@ export async function read(denops: Denops): Promise<void> {
       await option.verbose.get(denops);
     },
   ) as [number, string, Record<string, string>, number];
-  const { expr, params } = bufname.parse(bname);
+  const { expr, params } = parseBufname(bufname);
   const flags = params ?? {};
   const args = [
     "status",
