@@ -18,7 +18,7 @@ export function main(denops: Denops): void {
     "diff:read": (bufnr, bufname) => {
       unknownutil.assertNumber(bufnr);
       unknownutil.assertString(bufname);
-      return read(denops, bufnr, bufname);
+      return helper.friendlyCall(denops, () => read(denops, bufnr, bufname));
     },
     "diff:jump:new": (mods) => {
       mods = mods ?? "";

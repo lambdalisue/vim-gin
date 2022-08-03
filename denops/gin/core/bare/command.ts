@@ -4,7 +4,6 @@ import * as batch from "https://deno.land/x/denops_std@v3.7.1/batch/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v3.7.1/function/mod.ts";
 import * as helper from "https://deno.land/x/denops_std@v3.7.1/helper/mod.ts";
 import * as option from "https://deno.land/x/denops_std@v3.7.1/option/mod.ts";
-import * as unknownutil from "https://deno.land/x/unknownutil@v2.0.0/mod.ts";
 import {
   parseOpts,
   validateOpts,
@@ -60,17 +59,14 @@ export async function exec(
   args: string[],
   options: Options = {},
 ): Promise<void> {
-  const [verbose, env, eventignore] = await batch.gather(
+  const [env, verbose, eventignore] = await batch.gather(
     denops,
     async (denops) => {
-      await option.verbose.get(denops);
       await fn.environ(denops);
+      await option.verbose.get(denops);
       await option.eventignore.get(denops);
     },
-  );
-  unknownutil.assertNumber(verbose);
-  unknownutil.assertObject(env, unknownutil.isString);
-  unknownutil.assertString(eventignore);
+  ) as [Record<string, string>, number, string];
 
   const enableColor = options.buffer && !options.monochrome;
   const cmd = [
@@ -98,13 +94,8 @@ export async function exec(
     proc.stderrOutput(),
   ]);
   proc.close();
+  const result = new Uint8Array([...stdout, ...stderr]);
   if (options.buffer) {
-    let decorations: buffer.Decoration[] = [];
-    const preprocessor = (content: string[]) => {
-      const [trimmed, decos] = buildDecorationsFromAnsiEscapeCode(content);
-      decorations = decos;
-      return trimmed;
-    };
     let bufnr: number;
     if (typeof options.buffer === "string") {
       bufnr = await fn.bufnr(denops, options.buffer);
@@ -116,21 +107,25 @@ export async function exec(
       await denops.cmd("noswapfile enew");
       bufnr = await fn.bufnr(denops);
     }
-    await batch.batch(denops, async (denops) => {
-      await fn.setbufvar(denops, bufnr, "&modifiable", 0);
-    });
-    await buffer.assign(
+    const { content, fileformat, fileencoding } = await buffer.decode(
       denops,
       bufnr,
-      new Uint8Array([...stdout, ...stderr]),
+      result,
       {
         fileformat: options.fileformat,
         fileencoding: options.encoding,
-        preprocessor,
       },
     );
+    const [trimmed, decorations] = buildDecorationsFromAnsiEscapeCode(content);
+    await buffer.replace(denops, bufnr, trimmed, {
+      fileformat,
+      fileencoding,
+    });
     await buffer.decorate(denops, bufnr, decorations);
     await buffer.concrete(denops, bufnr);
+    await batch.batch(denops, async (denops) => {
+      await fn.setbufvar(denops, bufnr, "&modifiable", 0);
+    });
     if (denops.meta.host === "vim") {
       await denops.cmd("redraw");
     }
@@ -138,12 +133,12 @@ export async function exec(
     if (status.success) {
       await helper.echo(
         denops,
-        removeAnsiEscapeCode(decodeUtf8(stdout) + decodeUtf8(stderr)),
+        removeAnsiEscapeCode(decodeUtf8(result)),
       );
     } else {
       await helper.echoerr(
         denops,
-        removeAnsiEscapeCode(decodeUtf8(stdout) + decodeUtf8(stderr)),
+        removeAnsiEscapeCode(decodeUtf8(result)),
       );
     }
   }

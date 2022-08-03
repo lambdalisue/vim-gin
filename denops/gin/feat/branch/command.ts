@@ -131,6 +131,8 @@ export async function read(
     a.target == b.target ? 0 : a.target > b.target ? 1 : -1
   );
   const content = render(result);
+  await buffer.replace(denops, bufnr, content);
+  await buffer.concrete(denops, bufnr);
   await registerGatherer(denops, bufnr, getCandidates);
   await buffer.ensure(denops, bufnr, async () => {
     await batch.batch(denops, async (denops) => {
@@ -144,8 +146,6 @@ export async function read(
       await denops.call("gin#internal#feat#branch#core#init");
     });
   });
-  await buffer.replace(denops, bufnr, content);
-  await buffer.concrete(denops, bufnr);
 }
 
 async function getCandidates(

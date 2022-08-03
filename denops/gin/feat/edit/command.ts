@@ -150,6 +150,23 @@ export async function read(
     proc.stderrOutput(),
   ]);
   proc.close();
+  if (!status.success) {
+    throw new Error(decodeUtf8(stderr));
+  }
+  const { content, fileformat, fileencoding } = await buffer.decode(
+    denops,
+    bufnr,
+    stdout,
+    {
+      fileformat: opts["ff"] ?? opts["fileformat"],
+      fileencoding: opts["enc"] ?? opts["fileencoding"],
+    },
+  );
+  await buffer.replace(denops, bufnr, content, {
+    fileformat,
+    fileencoding,
+  });
+  await buffer.concrete(denops, bufnr);
   await buffer.ensure(denops, bufnr, async () => {
     await batch.batch(denops, async (denops) => {
       await denops.cmd("filetype detect");
@@ -173,14 +190,6 @@ export async function read(
       }
     });
   });
-  await buffer.assign(denops, bufnr, stdout, {
-    fileformat: opts["ff"] ?? opts["fileformat"],
-    fileencoding: opts["enc"] ?? opts["fileencoding"],
-  });
-  await buffer.concrete(denops, bufnr);
-  if (!status.success) {
-    await helper.echoerr(denops, decodeUtf8(stderr));
-  }
 }
 
 export async function write(

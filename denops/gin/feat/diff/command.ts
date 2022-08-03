@@ -6,7 +6,6 @@ import {
   parse as parseBufname,
 } from "https://deno.land/x/denops_std@v3.7.1/bufname/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v3.7.1/function/mod.ts";
-import * as helper from "https://deno.land/x/denops_std@v3.7.1/helper/mod.ts";
 import * as mapping from "https://deno.land/x/denops_std@v3.7.1/mapping/mod.ts";
 import * as option from "https://deno.land/x/denops_std@v3.7.1/option/mod.ts";
 import * as vars from "https://deno.land/x/denops_std@v3.7.1/variable/mod.ts";
@@ -159,11 +158,22 @@ export async function read(
   ]);
   proc.close();
   if (!status.success) {
-    await denops.cmd("echohl Error");
-    await helper.echo(denops, decodeUtf8(stderr));
-    await denops.cmd("echohl None");
-    return;
+    throw new Error(decodeUtf8(stderr));
   }
+  const { content, fileformat, fileencoding } = await buffer.decode(
+    denops,
+    bufnr,
+    stdout,
+    {
+      fileformat: opts["ff"] ?? opts["fileformat"],
+      fileencoding: opts["enc"] ?? opts["fileencoding"],
+    },
+  );
+  await buffer.replace(denops, bufnr, content, {
+    fileformat,
+    fileencoding,
+  });
+  await buffer.concrete(denops, bufnr);
   await buffer.ensure(denops, bufnr, async () => {
     await batch.batch(denops, async (denops) => {
       await option.filetype.setLocal(denops, "gin-diff");
@@ -191,11 +201,6 @@ export async function read(
       );
     });
   });
-  await buffer.assign(denops, bufnr, stdout, {
-    fileformat: opts["ff"] ?? opts["fileformat"],
-    fileencoding: opts["enc"] ?? opts["fileencoding"],
-  });
-  await buffer.concrete(denops, bufnr);
 }
 
 function parseResidue(residue: string[]): [string | undefined, string] {

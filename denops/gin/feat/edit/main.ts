@@ -18,12 +18,12 @@ export function main(denops: Denops): void {
     "edit:read": (bufnr, bufname) => {
       unknownutil.assertNumber(bufnr);
       unknownutil.assertString(bufname);
-      return read(denops, bufnr, bufname);
+      return helper.friendlyCall(denops, () => read(denops, bufnr, bufname));
     },
     "edit:write": (bufnr, bufname) => {
       unknownutil.assertNumber(bufnr);
       unknownutil.assertString(bufname);
-      return write(denops, bufnr, bufname);
+      return helper.friendlyCall(denops, () => write(denops, bufnr, bufname));
     },
   };
 }

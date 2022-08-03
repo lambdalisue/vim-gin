@@ -135,6 +135,8 @@ export async function read(
     a.path == b.path ? 0 : a.path > b.path ? 1 : -1
   );
   const content = render(result);
+  await buffer.replace(denops, bufnr, content);
+  await buffer.concrete(denops, bufnr);
   await registerGatherer(denops, bufnr, (denops, bufnr, range) => {
     return getCandidates(denops, bufnr, range, expr);
   });
@@ -162,8 +164,6 @@ export async function read(
       );
     });
   });
-  await buffer.replace(denops, bufnr, content);
-  await buffer.concrete(denops, bufnr);
 }
 
 async function getCandidates(
