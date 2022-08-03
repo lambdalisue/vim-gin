@@ -1,4 +1,4 @@
-import type { Denops } from "https://deno.land/x/denops_std@v3.6.0/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v3.7.1/mod.ts";
 import { Cache } from "https://deno.land/x/local_cache@1.0/mod.ts";
 import * as path from "https://deno.land/std@0.150.0/path/mod.ts";
 import {

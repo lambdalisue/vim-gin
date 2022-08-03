@@ -1,16 +1,16 @@
-import type { Denops } from "https://deno.land/x/denops_std@v3.6.0/mod.ts";
-import * as autocmd from "https://deno.land/x/denops_std@v3.6.0/autocmd/mod.ts";
-import * as batch from "https://deno.land/x/denops_std@v3.6.0/batch/mod.ts";
-import * as fn from "https://deno.land/x/denops_std@v3.6.0/function/mod.ts";
-import * as helper from "https://deno.land/x/denops_std@v3.6.0/helper/mod.ts";
-import * as option from "https://deno.land/x/denops_std@v3.6.0/option/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v3.7.1/mod.ts";
+import * as autocmd from "https://deno.land/x/denops_std@v3.7.1/autocmd/mod.ts";
+import * as batch from "https://deno.land/x/denops_std@v3.7.1/batch/mod.ts";
+import * as fn from "https://deno.land/x/denops_std@v3.7.1/function/mod.ts";
+import * as helper from "https://deno.land/x/denops_std@v3.7.1/helper/mod.ts";
+import * as option from "https://deno.land/x/denops_std@v3.7.1/option/mod.ts";
 import * as unknownutil from "https://deno.land/x/unknownutil@v2.0.0/mod.ts";
 import {
   parseOpts,
   validateOpts,
-} from "https://deno.land/x/denops_std@v3.6.0/argument/mod.ts";
+} from "https://deno.land/x/denops_std@v3.7.1/argument/mod.ts";
 import { expand, normCmdArgs } from "../../util/cmd.ts";
-import * as buffer from "https://deno.land/x/denops_std@v3.6.0/buffer/mod.ts";
+import * as buffer from "https://deno.land/x/denops_std@v3.7.1/buffer/mod.ts";
 import {
   buildDecorationsFromAnsiEscapeCode,
   removeAnsiEscapeCode,

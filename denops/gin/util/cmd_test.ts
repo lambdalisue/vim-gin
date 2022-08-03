@@ -1,7 +1,7 @@
 import { assertEquals } from "https://deno.land/std@0.150.0/testing/asserts.ts";
-import { test } from "https://deno.land/x/denops_std@v3.6.0/test/mod.ts";
-import * as batch from "https://deno.land/x/denops_std@v3.6.0/batch/mod.ts";
-import * as fn from "https://deno.land/x/denops_std@v3.6.0/function/mod.ts";
+import { test } from "https://deno.land/x/denops_std@v3.7.1/test/mod.ts";
+import * as batch from "https://deno.land/x/denops_std@v3.7.1/batch/mod.ts";
+import * as fn from "https://deno.land/x/denops_std@v3.7.1/function/mod.ts";
 import * as unknownutil from "https://deno.land/x/unknownutil@v2.0.0/mod.ts";
 import * as path from "https://deno.land/std@0.150.0/path/mod.ts";
 import { deadline } from "https://deno.land/std@0.150.0/async/mod.ts";
