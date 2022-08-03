@@ -5,7 +5,8 @@ let g:loaded_gin_status = 1
 
 augroup gin_plugin_status_internal
   autocmd!
-  autocmd BufReadCmd ginstatus://* call denops#request('gin', 'status:read', [])
+  autocmd BufReadCmd ginstatus://*
+        \ call denops#request('gin', 'status:read', [bufnr(), expand('<amatch>')])
 augroup END
 
 function! s:command(...) abort

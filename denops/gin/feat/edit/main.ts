@@ -15,7 +15,15 @@ export function main(denops: Denops): void {
         return helper.friendlyCall(denops, () => command(denops, mods, args));
       });
     },
-    "edit:read": () => read(denops),
-    "edit:write": () => write(denops),
+    "edit:read": (bufnr, bufname) => {
+      unknownutil.assertNumber(bufnr);
+      unknownutil.assertString(bufname);
+      return read(denops, bufnr, bufname);
+    },
+    "edit:write": (bufnr, bufname) => {
+      unknownutil.assertNumber(bufnr);
+      unknownutil.assertString(bufname);
+      return write(denops, bufnr, bufname);
+    },
   };
 }

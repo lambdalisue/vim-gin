@@ -101,16 +101,18 @@ export async function exec(
   });
 }
 
-export async function read(denops: Denops): Promise<void> {
-  const [bufnr, bufname, env, verbose] = await batch.gather(
+export async function read(
+  denops: Denops,
+  bufnr: number,
+  bufname: string,
+): Promise<void> {
+  const [env, verbose] = await batch.gather(
     denops,
     async (denops) => {
-      await fn.bufnr(denops, "%");
-      await fn.bufname(denops, "%");
       await fn.environ(denops);
       await option.verbose.get(denops);
     },
-  ) as [number, string, Record<string, string>, number];
+  ) as [Record<string, string>, number];
   const { expr, params } = parseBufname(bufname);
   const flags = params ?? {};
   const args = [

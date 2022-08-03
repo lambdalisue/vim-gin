@@ -5,7 +5,8 @@ let g:loaded_gin_diff = 1
 
 augroup gin_plugin_diff_internal
   autocmd!
-  autocmd BufReadCmd gindiff://* call denops#request('gin', 'diff:read', [])
+  autocmd BufReadCmd gindiff://*
+        \ call denops#request('gin', 'diff:read', [bufnr(), expand('<amatch>')])
 augroup END
 
 function! s:command(...) abort
