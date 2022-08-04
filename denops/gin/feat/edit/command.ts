@@ -7,7 +7,6 @@ import {
   parse as parseBufname,
 } from "https://deno.land/x/denops_std@v3.7.1/bufname/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v3.7.1/function/mod.ts";
-import * as helper from "https://deno.land/x/denops_std@v3.7.1/helper/mod.ts";
 import * as option from "https://deno.land/x/denops_std@v3.7.1/option/mod.ts";
 import * as vars from "https://deno.land/x/denops_std@v3.7.1/variable/mod.ts";
 import * as unknownutil from "https://deno.land/x/unknownutil@v2.0.0/mod.ts";
@@ -29,7 +28,7 @@ import {
 } from "../../util/worktree.ts";
 import { decodeUtf8 } from "../../util/text.ts";
 import { run } from "../../git/process.ts";
-import { exec as echoExec } from "../../core/echo/command.ts";
+import { exec as execEcho } from "../../core/echo/command.ts";
 
 export type Options = {
   worktree?: string;
@@ -220,7 +219,8 @@ export async function write(
   try {
     await fs.ensureFile(original);
     await Deno.writeTextFile(original, `${content.join("\n")}\n`);
-    await echoExec(denops, [
+    await fn.setbufvar(denops, bufnr, "&modified", 0);
+    await execEcho(denops, [
       "add",
       "--force",
       "--",
@@ -228,8 +228,6 @@ export async function write(
     ], {
       worktree: expr,
     });
-    await fn.setbufvar(denops, bufnr, "&modified", 0);
-    await helper.echo(denops, `[gin] INDEX of '${fragment}' is updated.`);
   } finally {
     await restore();
   }

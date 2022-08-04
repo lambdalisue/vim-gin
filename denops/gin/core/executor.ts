@@ -1,38 +1,56 @@
 import type { Denops } from "https://deno.land/x/denops_std@v3.7.1/mod.ts";
-import * as autocmd from "https://deno.land/x/denops_std@v3.7.1/autocmd/mod.ts";
 import * as batch from "https://deno.land/x/denops_std@v3.7.1/batch/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v3.7.1/function/mod.ts";
 import * as option from "https://deno.land/x/denops_std@v3.7.1/option/mod.ts";
+import { decodeUtf8 } from "../util/text.ts";
 import { expand } from "../util/cmd.ts";
+import { removeAnsiEscapeCode } from "../util/ansi_escape_code.ts";
 import {
   findWorktreeFromSuspects,
   listWorktreeSuspectsFromDenops,
 } from "../util/worktree.ts";
 import { run } from "../git/process.ts";
 
-export type Options = {
+export class ExecuteError extends Error {
+  constructor(message?: string) {
+    super(message);
+
+    Object.defineProperty(this, "name", {
+      configurable: true,
+      enumerable: false,
+      value: this.constructor.name,
+      writable: true,
+    });
+
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, ExecuteError);
+    }
+  }
+}
+
+export type ExecuteOptions = {
   worktree?: string;
+  throwOnError?: boolean;
 };
 
-export type Result = {
-  status: Deno.ProcessStatus;
+export type ExecuteResult = {
+  success: boolean;
   stdout: Uint8Array;
   stderr: Uint8Array;
 };
 
-export async function exec(
+export async function execute(
   denops: Denops,
   args: string[],
-  options: Options = {},
-): Promise<Result> {
-  const [env, verbose, eventignore] = await batch.gather(
+  options: ExecuteOptions = {},
+): Promise<ExecuteResult> {
+  const [env, verbose] = await batch.gather(
     denops,
     async (denops) => {
       await fn.environ(denops);
       await option.verbose.get(denops);
-      await option.eventignore.get(denops);
     },
-  ) as [Record<string, string>, number, string];
+  ) as [Record<string, string>, number];
 
   const worktree = await findWorktreeFromSuspects(
     options.worktree
@@ -40,6 +58,7 @@ export async function exec(
       : await listWorktreeSuspectsFromDenops(denops, !!verbose),
     !!verbose,
   );
+
   const proc = run(args, {
     printCommand: !!verbose,
     stdin: "null",
@@ -49,27 +68,17 @@ export async function exec(
     cwd: worktree,
     env,
   });
+
   const [status, stdout, stderr] = await Promise.all([
     proc.status(),
     proc.output(),
     proc.stderrOutput(),
   ]);
   proc.close();
-  if (status.success && !eventignore.includes("all")) {
-    await autocmd.emit(denops, "User", "GinCommandPost", {
-      nomodeline: true,
-    });
-  }
-  return { status, stdout, stderr };
-}
 
-export async function bind(denops: Denops, bufnr: number): Promise<void> {
-  await autocmd.group(denops, `gin_bare_command_bind_${bufnr}`, (helper) => {
-    helper.remove();
-    helper.define(
-      "User",
-      "GinCommandPost",
-      `call gin#util#reload(${bufnr})`,
-    );
-  });
+  if (options.throwOnError && !status.success) {
+    throw new ExecuteError(removeAnsiEscapeCode(decodeUtf8(stderr)));
+  }
+
+  return { success: status.success, stdout, stderr };
 }

@@ -1,59 +1,61 @@
 import type { Denops } from "https://deno.land/x/denops_std@v3.7.1/mod.ts";
+import * as autocmd from "https://deno.land/x/denops_std@v3.7.1/autocmd/mod.ts";
 import * as helper from "https://deno.land/x/denops_std@v3.7.1/helper/mod.ts";
+import * as option from "https://deno.land/x/denops_std@v3.7.1/option/mod.ts";
+import { removeAnsiEscapeCode } from "../../util/ansi_escape_code.ts";
 import {
   parseOpts,
   validateOpts,
 } from "https://deno.land/x/denops_std@v3.7.1/argument/mod.ts";
 import { normCmdArgs } from "../../util/cmd.ts";
-import { removeAnsiEscapeCode } from "../../util/ansi_escape_code.ts";
-import { exec as bareExec } from "../bare.ts";
+import { execute } from "../executor.ts";
 
-export type Options = {
-  worktree?: string;
-  fileformat?: string;
-  encoding?: string;
-};
-
-export async function command(
-  denops: Denops,
-  args: string[],
-): Promise<void> {
+export async function command(denops: Denops, args: string[]): Promise<void> {
   const [opts, residue] = parseOpts(await normCmdArgs(denops, args));
   validateOpts(opts, [
     "worktree",
-    "ff",
-    "fileformat",
     "enc",
     "encoding",
+    "ff",
+    "fileformat",
   ]);
-  const options = {
-    worktree: opts["worktree"],
-    fileformat: opts["ff"] ?? opts["fileformat"],
-    encoding: opts["enc"] ?? opts["encoding"],
-  };
-  await exec(denops, residue, options);
+  await exec(denops, residue, {
+    worktree: opts.worktree,
+    encoding: opts.enc ?? opts.encoding,
+    fileformat: opts.ff ?? opts.fileformat,
+  });
 }
+
+export type ExecOptions = {
+  worktree?: string;
+  encoding?: string;
+  fileformat?: string;
+};
 
 export async function exec(
   denops: Denops,
   args: string[],
-  options: Options = {},
+  options: ExecOptions,
 ): Promise<void> {
-  const { status, stdout, stderr } = await bareExec(denops, args, options);
-  const result = new Uint8Array([...stdout, ...stderr]);
-  const decoder = new TextDecoder(options.encoding ?? "utf8");
-  const decoded = decoder.decode(result);
-  const text = decoded.split(getSeparator(options.fileformat)).join("\n");
-  if (status.success) {
-    await helper.echo(
-      denops,
-      removeAnsiEscapeCode(text),
-    );
-  } else {
-    await helper.echoerr(
-      denops,
-      removeAnsiEscapeCode(text),
-    );
+  const eventignore = await option.eventignore.get(denops);
+  const { stdout, stderr } = await execute(denops, args, {
+    worktree: options.worktree,
+    throwOnError: true,
+  });
+  const encoding = options.encoding ?? "utf8";
+  const decoder = new TextDecoder(encoding);
+  const text = decoder.decode(new Uint8Array([...stdout, ...stderr]));
+  const content = text.split(
+    getSeparator(options.fileformat),
+  );
+  await helper.echo(
+    denops,
+    removeAnsiEscapeCode(content.join("\n")),
+  );
+  if (!eventignore.includes("all")) {
+    await autocmd.emit(denops, "User", "GinCommandPost", {
+      nomodeline: true,
+    });
   }
 }
 
@@ -68,4 +70,19 @@ function getSeparator(fileformat: string | undefined): RegExp {
     default:
       return /\r?\n/g;
   }
+}
+
+export async function bind(denops: Denops, bufnr: number): Promise<void> {
+  await autocmd.group(
+    denops,
+    `gin_core_echo_command_bind_${bufnr}`,
+    (helper) => {
+      helper.remove();
+      helper.define(
+        "User",
+        "GinCommandPost",
+        `call gin#util#reload(${bufnr})`,
+      );
+    },
+  );
 }

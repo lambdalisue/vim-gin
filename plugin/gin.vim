@@ -8,6 +8,8 @@ augroup gin_plugin_internal
   autocmd User GinCommandPost :
   autocmd User GinComponentPost :
   autocmd BufReadCmd gin://*
+        \ call denops#request('gin', 'buffer:edit', [bufnr(), expand('<amatch>')])
+  autocmd FileReadCmd gin://*
         \ call denops#request('gin', 'buffer:read', [bufnr(), expand('<amatch>')])
 augroup END
 
