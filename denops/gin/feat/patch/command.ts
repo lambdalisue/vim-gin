@@ -17,7 +17,7 @@ import {
   findWorktreeFromSuspects,
   listWorktreeSuspectsFromDenops,
 } from "../../util/worktree.ts";
-import { exec as editExec } from "../edit/command.ts";
+import { exec as execEdit } from "../edit/command.ts";
 
 export type Options = {
   worktree?: string;
@@ -76,7 +76,7 @@ export async function exec(
     !!verbose,
   );
 
-  const infoIndex = await editExec(denops, filename, undefined, {}, {
+  const infoIndex = await execEdit(denops, filename, {
     worktree,
     cached: true,
     opener: options.opener,
@@ -86,8 +86,9 @@ export async function exec(
 
   let infoHead: buffer.OpenResult | undefined;
   if (!options.noHead) {
-    infoHead = await editExec(denops, filename, "HEAD", {}, {
+    infoHead = await execEdit(denops, filename, {
       worktree,
+      commitish: "HEAD",
       opener: "topleft vsplit",
       cmdarg: options.cmdarg,
       mods: options.mods,
@@ -97,7 +98,7 @@ export async function exec(
 
   let infoWorktree: buffer.OpenResult | undefined;
   if (!options.noWorktree) {
-    infoWorktree = await editExec(denops, filename, undefined, {}, {
+    infoWorktree = await execEdit(denops, filename, {
       worktree,
       opener: "botright vsplit",
       cmdarg: options.cmdarg,

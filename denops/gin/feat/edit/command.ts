@@ -1,42 +1,23 @@
 import type { Denops } from "https://deno.land/x/denops_std@v3.7.1/mod.ts";
-import * as autocmd from "https://deno.land/x/denops_std@v3.7.1/autocmd/mod.ts";
-import * as batch from "https://deno.land/x/denops_std@v3.7.1/batch/mod.ts";
-import {
-  BufnameParams,
-  format as formatBufname,
-  parse as parseBufname,
-} from "https://deno.land/x/denops_std@v3.7.1/bufname/mod.ts";
-import * as fn from "https://deno.land/x/denops_std@v3.7.1/function/mod.ts";
-import * as option from "https://deno.land/x/denops_std@v3.7.1/option/mod.ts";
-import * as vars from "https://deno.land/x/denops_std@v3.7.1/variable/mod.ts";
-import * as unknownutil from "https://deno.land/x/unknownutil@v2.0.0/mod.ts";
-import * as fs from "https://deno.land/std@0.150.0/fs/mod.ts";
 import * as path from "https://deno.land/std@0.150.0/path/mod.ts";
+import { unnullish } from "https://deno.land/x/unnullish@v0.1.0/mod.ts";
+import * as buffer from "https://deno.land/x/denops_std@v3.7.1/buffer/mod.ts";
+import * as option from "https://deno.land/x/denops_std@v3.7.1/option/mod.ts";
 import {
   builtinOpts,
   formatOpts,
   parse,
-  parseOpts,
   validateFlags,
   validateOpts,
 } from "https://deno.land/x/denops_std@v3.7.1/argument/mod.ts";
-import * as buffer from "https://deno.land/x/denops_std@v3.7.1/buffer/mod.ts";
+import {
+  format as formatBufname,
+} from "https://deno.land/x/denops_std@v3.7.1/bufname/mod.ts";
 import { expand, normCmdArgs } from "../../util/cmd.ts";
 import {
   findWorktreeFromSuspects,
   listWorktreeSuspectsFromDenops,
 } from "../../util/worktree.ts";
-import { decodeUtf8 } from "../../util/text.ts";
-import { run } from "../../git/process.ts";
-import { exec as execEcho } from "../../core/echo/command.ts";
-
-export type Options = {
-  worktree?: string;
-  cached?: boolean;
-  opener?: string;
-  cmdarg?: string;
-  mods?: string;
-};
 
 export async function command(
   denops: Denops,
@@ -52,29 +33,30 @@ export async function command(
     "cached",
   ]);
   const [commitish, abspath] = parseResidue(residue);
-  const options = {
-    worktree: opts["worktree"],
+  await exec(denops, abspath, {
+    worktree: opts.worktree,
+    commitish,
     cached: "cached" in flags,
     cmdarg: formatOpts(opts, builtinOpts).join(" "),
     mods,
-  };
-  await exec(denops, abspath, commitish, flags, options);
+  });
 }
+
+export type ExecOptions = {
+  worktree?: string;
+  commitish?: string;
+  cached?: boolean;
+  opener?: string;
+  cmdarg?: string;
+  mods?: string;
+};
 
 export async function exec(
   denops: Denops,
   filename: string,
-  commitish: string | undefined,
-  params: BufnameParams,
-  options: Options = {},
+  options: ExecOptions,
 ): Promise<buffer.OpenResult> {
-  const [verbose] = await batch.gather(
-    denops,
-    async (denops) => {
-      await option.verbose.get(denops);
-    },
-  );
-  unknownutil.assertNumber(verbose);
+  const verbose = await option.verbose.get(denops);
 
   const worktree = await findWorktreeFromSuspects(
     options.worktree
@@ -82,9 +64,10 @@ export async function exec(
       : await listWorktreeSuspectsFromDenops(denops, !!verbose),
     !!verbose,
   );
+
   const relpath = path.relative(worktree, filename);
 
-  if (!commitish && !options.cached) {
+  if (!options.commitish && !options.cached) {
     // worktree
     return await buffer.open(denops, path.join(worktree, relpath), {
       opener: options.opener,
@@ -97,9 +80,8 @@ export async function exec(
       scheme: "ginedit",
       expr: worktree,
       params: {
-        ...params,
-        cached: undefined,
-        commitish,
+        cached: unnullish(options.cached, () => "") ?? undefined,
+        commitish: options.commitish,
       },
       fragment: relpath,
     });
@@ -108,128 +90,6 @@ export async function exec(
       cmdarg: options.cmdarg,
       mods: options.mods,
     });
-  }
-}
-
-export async function read(
-  denops: Denops,
-  bufnr: number,
-  bufname: string,
-): Promise<void> {
-  const [env, verbose, cmdarg] = await batch.gather(
-    denops,
-    async (denops) => {
-      await fn.environ(denops);
-      await option.verbose.get(denops);
-      await vars.v.get(denops, "cmdarg");
-    },
-  ) as [Record<string, string>, number, string];
-  const [opts, _] = parseOpts(cmdarg.split(" "));
-  validateOpts(opts, builtinOpts);
-  const { expr, params, fragment } = parseBufname(bufname);
-  if (!fragment) {
-    throw new Error("A buffer 'ginedit://' requires a fragment part");
-  }
-  const args = [
-    "show",
-    ...formatTreeish(params?.commitish, fragment),
-  ];
-  const proc = run(args, {
-    printCommand: !!verbose,
-    stdin: "null",
-    stdout: "piped",
-    stderr: "piped",
-    noOptionalLocks: true,
-    cwd: expr,
-    env,
-  });
-  const [status, stdout, stderr] = await Promise.all([
-    proc.status(),
-    proc.output(),
-    proc.stderrOutput(),
-  ]);
-  proc.close();
-  if (!status.success) {
-    throw new Error(decodeUtf8(stderr));
-  }
-  const { content, fileformat, fileencoding } = await buffer.decode(
-    denops,
-    bufnr,
-    stdout,
-    {
-      fileformat: opts["ff"] ?? opts["fileformat"],
-      fileencoding: opts["enc"] ?? opts["fileencoding"],
-    },
-  );
-  await buffer.replace(denops, bufnr, content, {
-    fileformat,
-    fileencoding,
-  });
-  await buffer.concrete(denops, bufnr);
-  await buffer.ensure(denops, bufnr, async () => {
-    await batch.batch(denops, async (denops) => {
-      await denops.cmd("filetype detect");
-      await option.swapfile.setLocal(denops, false);
-      await option.bufhidden.setLocal(denops, "unload");
-      if (params?.commitish) {
-        await option.buftype.setLocal(denops, "nowrite");
-      } else {
-        await option.buftype.setLocal(denops, "acwrite");
-        await autocmd.group(denops, "gitedit_read_internal", (helper) => {
-          helper.remove("*", "<buffer>");
-          helper.define(
-            "BufWriteCmd",
-            "<buffer>",
-            `call denops#request('gin', 'edit:write', [bufnr(), expand('<amatch>')])`,
-            {
-              nested: true,
-            },
-          );
-        });
-      }
-    });
-  });
-}
-
-export async function write(
-  denops: Denops,
-  bufnr: number,
-  bufname: string,
-): Promise<void> {
-  const content = await fn.getline(denops, 1, "$");
-  const { expr, fragment } = parseBufname(bufname);
-  if (!fragment) {
-    throw new Error("A buffer 'ginedit://' requires a fragment part");
-  }
-  const original = path.join(expr, fragment);
-  let restore: () => Promise<void>;
-  const f = await Deno.makeTempFile({
-    dir: path.dirname(original),
-  });
-  try {
-    await Deno.rename(original, f);
-    restore = () => Deno.rename(f, original);
-  } catch (e) {
-    if (!(e instanceof Deno.errors.NotFound)) {
-      throw e;
-    }
-    await Deno.remove(f);
-    restore = () => Deno.remove(original);
-  }
-  try {
-    await fs.ensureFile(original);
-    await Deno.writeTextFile(original, `${content.join("\n")}\n`);
-    await fn.setbufvar(denops, bufnr, "&modified", 0);
-    await execEcho(denops, [
-      "add",
-      "--force",
-      "--",
-      fragment,
-    ], {
-      worktree: expr,
-    });
-  } finally {
-    await restore();
   }
 }
 
@@ -246,17 +106,5 @@ function parseResidue(
       return [residue[0].toString(), residue[1].toString()];
     default:
       throw new Error("Invalid number of arguments");
-  }
-}
-
-function formatTreeish(
-  commitish: string | string[] | undefined,
-  relpath: string,
-): [] | [string] {
-  if (commitish) {
-    unknownutil.assertString(commitish);
-    return [`${commitish}:${relpath}`];
-  } else {
-    return [`:${relpath}`];
   }
 }
