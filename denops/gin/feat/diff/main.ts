@@ -1,8 +1,11 @@
 import type { Denops } from "https://deno.land/x/denops_std@v3.7.1/mod.ts";
-import * as helper from "https://deno.land/x/denops_std@v3.7.1/helper/mod.ts";
 import * as unknownutil from "https://deno.land/x/unknownutil@v2.0.0/mod.ts";
+import * as helper from "https://deno.land/x/denops_std@v3.7.1/helper/mod.ts";
 import { parseSilent } from "../../util/cmd.ts";
-import { command, jumpNew, jumpOld, read } from "./command.ts";
+import { command } from "./command.ts";
+import { edit } from "./edit.ts";
+import { read } from "./read.ts";
+import { jumpNew, jumpOld } from "./jump.ts";
 
 export function main(denops: Denops): void {
   denops.dispatcher = {
@@ -14,6 +17,11 @@ export function main(denops: Denops): void {
       return helper.ensureSilent(denops, silent, () => {
         return helper.friendlyCall(denops, () => command(denops, mods, args));
       });
+    },
+    "diff:edit": (bufnr, bufname) => {
+      unknownutil.assertNumber(bufnr);
+      unknownutil.assertString(bufname);
+      return helper.friendlyCall(denops, () => edit(denops, bufnr, bufname));
     },
     "diff:read": (bufnr, bufname) => {
       unknownutil.assertNumber(bufnr);
