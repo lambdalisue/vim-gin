@@ -21,15 +21,6 @@ import {
 import { exec as execEdit } from "../edit/command.ts";
 import { AliasHead, getInProgressAliasHead, stripConflicts } from "./util.ts";
 
-export type Options = {
-  worktree?: string;
-  noOurs?: boolean;
-  noTheirs?: boolean;
-  opener?: string;
-  cmdarg?: string;
-  mods?: string;
-};
-
 export async function command(
   denops: Denops,
   mods: string,
@@ -42,21 +33,29 @@ export async function command(
     "no-theirs",
     ...builtinOpts,
   ]);
-  const options = {
-    worktree: opts["worktree"],
+  const [abspath] = parseResidue(residue);
+  await exec(denops, abspath, {
+    worktree: opts.worktree,
     noOurs: "no-ours" in opts,
     noTheirs: "no-theirs" in opts,
     cmdarg: formatOpts(opts, builtinOpts).join(" "),
     mods,
-  };
-  const [abspath] = parseResidue(residue);
-  await exec(denops, abspath, options);
+  });
 }
+
+export type ExecOptions = {
+  worktree?: string;
+  noOurs?: boolean;
+  noTheirs?: boolean;
+  opener?: string;
+  cmdarg?: string;
+  mods?: string;
+};
 
 export async function exec(
   denops: Denops,
   filename: string,
-  options: Options,
+  options: ExecOptions,
 ): Promise<void> {
   const [verbose, noSupplements, supplementHeight, disableDefaultMappings] =
     await batch

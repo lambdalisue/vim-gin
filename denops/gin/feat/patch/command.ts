@@ -19,15 +19,6 @@ import {
 } from "../../util/worktree.ts";
 import { exec as execEdit } from "../edit/command.ts";
 
-export type Options = {
-  worktree?: string;
-  noHead?: boolean;
-  noWorktree?: boolean;
-  opener?: string;
-  cmdarg?: string;
-  mods?: string;
-};
-
 export async function command(
   denops: Denops,
   mods: string,
@@ -40,21 +31,29 @@ export async function command(
     "no-worktree",
     ...builtinOpts,
   ]);
-  const options = {
-    worktree: opts["worktree"],
+  const [abspath] = parseResidue(residue);
+  await exec(denops, abspath, {
+    worktree: opts.worktree,
     noHead: "no-head" in opts,
     noWorktree: "no-worktree" in opts,
     cmdarg: formatOpts(opts, builtinOpts).join(" "),
     mods,
-  };
-  const [abspath] = parseResidue(residue);
-  await exec(denops, abspath, options);
+  });
 }
+
+export type ExecOptions = {
+  worktree?: string;
+  noHead?: boolean;
+  noWorktree?: boolean;
+  opener?: string;
+  cmdarg?: string;
+  mods?: string;
+};
 
 export async function exec(
   denops: Denops,
   filename: string,
-  options: Options = {},
+  options: ExecOptions,
 ): Promise<void> {
   const [verbose, disableDefaultMappings] = await batch.gather(
     denops,
