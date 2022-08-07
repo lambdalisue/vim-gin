@@ -29,7 +29,7 @@ export async function edit(
 ): Promise<void> {
   const [cmdarg, postProcessor] = await batch.gather(denops, async (denops) => {
     await vars.v.get(denops, "cmdarg");
-    await vars.g.get(denops, "gin_diff_post_processor");
+    await vars.g.get(denops, "gin_diff_post_processor", []);
   }) as [string, unknown];
   assertArray(postProcessor, isString);
   const [opts, _] = parseOpts(cmdarg.split(" "));
