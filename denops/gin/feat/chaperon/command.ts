@@ -15,7 +15,7 @@ import {
 import * as buffer from "https://deno.land/x/denops_std@v3.8.1/buffer/mod.ts";
 import { normCmdArgs } from "../../util/cmd.ts";
 import { findWorktreeFromDenops } from "../../util/worktree.ts";
-import { exec as editExec } from "../edit/command.ts";
+import { exec as execEdit } from "../edit/command.ts";
 import { AliasHead, getInProgressAliasHead, stripConflicts } from "./util.ts";
 
 export type Options = {
@@ -82,7 +82,7 @@ export async function exec(
 
   const inProgressAliasHead = await getInProgressAliasHead(worktree);
 
-  const infoWorktree = await editExec(denops, relpath, undefined, {}, {
+  const infoWorktree = await execEdit(denops, relpath, {
     worktree,
     opener: options.opener,
     cmdarg: options.cmdarg,
@@ -91,8 +91,9 @@ export async function exec(
 
   let infoTheirs: buffer.OpenResult | undefined;
   if (!options.noTheirs) {
-    infoTheirs = await editExec(denops, relpath, ":3", {}, {
+    infoTheirs = await execEdit(denops, relpath, {
       worktree,
+      commitish: ":3",
       opener: "topleft vsplit",
       cmdarg: options.cmdarg,
       mods: options.mods,
@@ -102,8 +103,9 @@ export async function exec(
 
   let infoOurs: buffer.OpenResult | undefined;
   if (!options.noOurs) {
-    infoOurs = await editExec(denops, relpath, ":2", {}, {
+    infoOurs = await execEdit(denops, relpath, {
       worktree,
+      commitish: ":2",
       opener: "botright vsplit",
       cmdarg: options.cmdarg,
       mods: options.mods,
