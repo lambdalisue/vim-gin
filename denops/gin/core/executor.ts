@@ -101,12 +101,14 @@ export async function execute(
     cwd: worktree,
     env,
   });
-  await writeAll(procPost.stdin, stdout);
-  procPost.stdin.close();
-  const [statusPost, stdoutPost, stderrPost] = await Promise.all([
+  const [statusPost, stdoutPost, stderrPost, _] = await Promise.all([
     procPost.status(),
     procPost.output(),
     procPost.stderrOutput(),
+    (async () => {
+      await writeAll(procPost.stdin, stdout);
+      procPost.stdin.close();
+    })(),
   ]);
   procPost.close();
 
