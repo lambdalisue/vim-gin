@@ -36,6 +36,7 @@ export async function read(
 }
 
 export type ExecOptions = {
+  postProcessor?: string[];
   worktree?: string;
   encoding?: string;
   fileformat?: string;
@@ -49,6 +50,7 @@ export async function exec(
   options: ExecOptions,
 ): Promise<void> {
   const { stdout } = await execute(denops, args, {
+    postProcessor: options.postProcessor,
     worktree: options.worktree,
     throwOnError: true,
   });

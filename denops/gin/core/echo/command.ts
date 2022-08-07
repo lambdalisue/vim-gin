@@ -27,6 +27,7 @@ export async function command(denops: Denops, args: string[]): Promise<void> {
 }
 
 export type ExecOptions = {
+  postProcessor?: string[];
   worktree?: string;
   encoding?: string;
   fileformat?: string;
@@ -39,6 +40,7 @@ export async function exec(
 ): Promise<void> {
   const eventignore = await option.eventignore.get(denops);
   const { stdout, stderr } = await execute(denops, args, {
+    postProcessor: options.postProcessor,
     worktree: options.worktree,
     throwOnError: true,
   });

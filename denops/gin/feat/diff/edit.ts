@@ -1,6 +1,10 @@
 import type { Denops } from "https://deno.land/x/denops_std@v3.8.1/mod.ts";
 import { unnullish } from "https://deno.land/x/unnullish@v0.1.0/mod.ts";
-import { ensureString } from "https://deno.land/x/unknownutil@v2.0.0/mod.ts";
+import {
+  assertArray,
+  ensureString,
+  isString,
+} from "https://deno.land/x/unknownutil@v2.0.0/mod.ts";
 import * as batch from "https://deno.land/x/denops_std@v3.8.1/batch/mod.ts";
 import * as mapping from "https://deno.land/x/denops_std@v3.8.1/mapping/mod.ts";
 import * as option from "https://deno.land/x/denops_std@v3.8.1/option/mod.ts";
@@ -23,7 +27,11 @@ export async function edit(
   bufnr: number,
   bufname: string,
 ): Promise<void> {
-  const cmdarg = await vars.v.get(denops, "cmdarg") as string;
+  const [cmdarg, postProcessor] = await batch.gather(denops, async (denops) => {
+    await vars.v.get(denops, "cmdarg");
+    await vars.g.get(denops, "gin_diff_post_processor");
+  }) as [string, unknown];
+  assertArray(postProcessor, isString);
   const [opts, _] = parseOpts(cmdarg.split(" "));
   validateOpts(opts, builtinOpts);
   const { scheme, expr, params, fragment } = parseBufname(bufname);
@@ -31,6 +39,7 @@ export async function edit(
     throw new Error(`A buffer '${scheme}://' requires a fragment part`);
   }
   await exec(denops, bufnr, fragment, {
+    postProcessor,
     worktree: expr,
     commitish: unnullish(params?.commitish, ensureString) ?? undefined,
     flags: {
@@ -43,6 +52,7 @@ export async function edit(
 }
 
 export type ExecOptions = {
+  postProcessor?: string[];
   worktree?: string;
   commitish?: string;
   flags?: Flags;
@@ -63,6 +73,7 @@ export async function exec(
     relpath,
   ];
   await execBuffer(denops, bufnr, args, {
+    postProcessor: options.postProcessor,
     worktree: options.worktree,
     encoding: options.encoding,
     fileformat: options.fileformat,

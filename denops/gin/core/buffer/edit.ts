@@ -42,6 +42,7 @@ export async function edit(
 }
 
 export type ExecOptions = {
+  postProcessor?: string[];
   worktree?: string;
   monochrome?: boolean;
   encoding?: string;
@@ -59,6 +60,7 @@ export async function exec(
     ...args,
   ];
   const { stdout } = await execute(denops, args, {
+    postProcessor: options.postProcessor,
     worktree: options.worktree,
     throwOnError: true,
   });
@@ -71,7 +73,10 @@ export async function exec(
       fileencoding: options.encoding,
     },
   );
-  const [trimmed, decorations] = buildDecorationsFromAnsiEscapeCode(content);
+  const [trimmed, decorations] = await buildDecorationsFromAnsiEscapeCode(
+    denops,
+    content,
+  );
   await buffer.replace(denops, bufnr, trimmed, {
     fileformat,
     fileencoding,
