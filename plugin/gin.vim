@@ -14,22 +14,23 @@ augroup gin_plugin_internal
 augroup END
 
 function! s:command(bang, mods, args) abort
-  if a:bang ==# '!'
+  let args = filter(copy(a:args), { -> v:val !=# '++wait' })
+  if index(a:args, '++wait') isnot# -1
     if denops#plugin#wait('gin')
       return
     endif
-    call denops#request('gin', 'command', [a:mods, a:args])
+    call denops#request('gin', 'command', [a:mods, args])
   else
     let l:Callback = function('denops#notify', [
           \ 'gin',
           \ 'command',
-          \ [a:mods, a:args],
+          \ [a:mods, args],
           \])
     call denops#plugin#wait_async('gin', l:Callback)
   endif
 endfunction
 
-command! -bang -bar -nargs=* Gin call s:command(<q-bang>, <q-mods>, [<f-args>])
+command! -bar -nargs=* Gin call s:command(<q-bang>, <q-mods>, [<f-args>])
 
 function! s:buffer_command(...) abort
   if denops#plugin#wait('gin')

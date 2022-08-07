@@ -35,7 +35,7 @@ endfunction
 
 function! s:switch(xs) abort
   let branch = a:xs[0]
-  execute printf('Gin! switch %s', branch.branch)
+  execute printf('Gin ++wait switch %s', branch.branch)
 endfunction
 
 function! s:new(suffix, xs) abort
@@ -48,7 +48,7 @@ function! s:new(suffix, xs) abort
     echohl None
     return
   endif
-  execute printf('Gin! switch %s %s %s', a:suffix, name, from)
+  execute printf('Gin ++wait switch %s %s %s', a:suffix, name, from)
 endfunction
 
 function! s:new_orphan(xs) abort
@@ -60,7 +60,7 @@ function! s:new_orphan(xs) abort
     echohl None
     return
   endif
-  execute printf('Gin! switch --orphan %s', name)
+  execute printf('Gin ++wait switch --orphan %s', name)
 endfunction
 
 function! s:move(force, xs) abort
@@ -74,7 +74,7 @@ function! s:move(force, xs) abort
     return
   endif
   execute printf(
-        \ 'Gin! branch --move %s %s %s',
+        \ 'Gin ++wait branch --move %s %s %s',
         \ a:force ? '--force' : '',
         \ from,
         \ name,
@@ -88,13 +88,13 @@ function! s:delete(force, xs) abort
     endif
     if branch.kind ==# 'remote'
       execute printf(
-            \ 'Gin! push --delete %s %s',
+            \ 'Gin ++wait push --delete %s %s',
             \ branch.remote,
             \ branch.branch,
             \)
     else
       execute printf(
-            \ 'Gin! branch %s %s',
+            \ 'Gin ++wait branch %s %s',
             \ a:force ? '-D' : '-d',
             \ branch.branch,
             \)
@@ -108,7 +108,7 @@ function! s:merge(prefix, xs) abort
       continue
     endif
     execute printf(
-          \ 'Gin! merge %s %s',
+          \ 'Gin ++wait merge %s %s',
           \ a:prefix,
           \ branch.target,
           \)
@@ -121,7 +121,7 @@ function! s:rebase(prefix, xs) abort
       continue
     endif
     execute printf(
-          \ 'Gin! rebase %s %s',
+          \ 'Gin ++wait rebase %s %s',
           \ a:prefix,
           \ branch.target,
           \)

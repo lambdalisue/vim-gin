@@ -95,10 +95,10 @@ INTERFACE					*gin-interface*
 COMMANDS					*gin-commands*
 
 							*:Gin*
-:Gin[!] [++{option}...] {command} [{args}]
+:Gin [++{option}...] [++wait] {command} [{args}]
 	Call a git raw {command} with {args} asynchronously and echo result.
 	For example, "Gin add %" on "hello.txt" invokes "git add hello.txt".
-	If a bang (!) is specified, it calls command synchronously instead.
+	If ++wait is specified, it calls command synchronously instead.
 	See |gin-command-options| for available {option}s.
 	Use |:GinBuffer| to show the result in a buffer.
 

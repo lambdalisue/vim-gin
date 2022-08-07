@@ -75,22 +75,22 @@ endfunction
 
 function! s:add(suffix, xs) abort
   call s:norm_xs(a:xs)
-  execute printf('Gin! add --ignore-errors --force %s -- %s', a:suffix, join(a:xs, ' '))
+  execute printf('Gin ++wait add --ignore-errors --force %s -- %s', a:suffix, join(a:xs, ' '))
 endfunction
 
 function! s:rm(suffix, xs) abort
   call s:norm_xs(a:xs)
-  execute printf('Gin! rm --quiet --ignore-unmatch --cached %s -- %s', a:suffix, join(a:xs, ' '))
+  execute printf('Gin ++wait rm --quiet --ignore-unmatch --cached %s -- %s', a:suffix, join(a:xs, ' '))
 endfunction
 
 function! s:reset(xs) abort
   call s:norm_xs(a:xs)
-  execute printf('Gin! reset --quiet -- %s', join(a:xs, ' '))
+  execute printf('Gin ++wait reset --quiet -- %s', join(a:xs, ' '))
 endfunction
 
 function! s:restore(suffix, xs) abort
   call s:norm_xs(a:xs)
-  execute printf('Gin! restore --quiet %s -- %s', a:suffix, join(a:xs, ' '))
+  execute printf('Gin ++wait restore --quiet %s -- %s', a:suffix, join(a:xs, ' '))
 endfunction
 
 function! s:stage(xs) abort
@@ -143,5 +143,5 @@ endfunction
 
 function! s:stash(suffix, xs) abort
   call s:norm_xs(a:xs)
-  execute printf('Gin! stash push --all %s -- %s', a:suffix, join(a:xs, ' '))
+  execute printf('Gin ++wait stash push --all %s -- %s', a:suffix, join(a:xs, ' '))
 endfunction
