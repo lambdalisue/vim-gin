@@ -1,7 +1,7 @@
-import type { Denops } from "https://deno.land/x/denops_std@v3.6.0/mod.ts";
-import * as bufname from "https://deno.land/x/denops_std@v3.6.0/bufname/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v3.8.1/mod.ts";
+import * as bufname from "https://deno.land/x/denops_std@v3.8.1/bufname/mod.ts";
 import * as unknownutil from "https://deno.land/x/unknownutil@v2.0.0/mod.ts";
-import { Silent } from "https://deno.land/x/denops_std@v3.6.0/helper/mod.ts";
+import { Silent } from "https://deno.land/x/denops_std@v3.8.1/helper/mod.ts";
 import { GIN_FILE_BUFFER_PROTOCOLS } from "../global.ts";
 
 export function parseSilent(mods: string): Silent {
