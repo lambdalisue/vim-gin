@@ -29,7 +29,7 @@ import {
 } from "../../util/worktree.ts";
 import { decodeUtf8 } from "../../util/text.ts";
 import { run } from "../../git/process.ts";
-import { command as bareCommand } from "../../core/bare/command.ts";
+import { exec as execBare } from "../../core/bare/command.ts";
 
 export type Options = {
   worktree?: string;
@@ -211,15 +211,15 @@ export async function write(
   try {
     await fs.ensureFile(original);
     await Deno.writeTextFile(original, `${content.join("\n")}\n`);
-    await bareCommand(denops, [
-      `++worktree=${expr}`,
+    await fn.setbufvar(denops, bufnr, "&modified", 0);
+    await execBare(denops, [
       "add",
       "--force",
       "--",
       fragment,
-    ]);
-    await fn.setbufvar(denops, bufnr, "&modified", 0);
-    await helper.echo(denops, `[gin] INDEX of '${fragment}' is updated.`);
+    ], {
+      worktree: expr,
+    });
   } finally {
     await restore();
   }

@@ -1,172 +1,88 @@
 import type { Denops } from "https://deno.land/x/denops_std@v3.8.1/mod.ts";
 import * as autocmd from "https://deno.land/x/denops_std@v3.8.1/autocmd/mod.ts";
-import * as batch from "https://deno.land/x/denops_std@v3.8.1/batch/mod.ts";
-import * as fn from "https://deno.land/x/denops_std@v3.8.1/function/mod.ts";
 import * as helper from "https://deno.land/x/denops_std@v3.8.1/helper/mod.ts";
 import * as option from "https://deno.land/x/denops_std@v3.8.1/option/mod.ts";
-import * as unknownutil from "https://deno.land/x/unknownutil@v2.0.0/mod.ts";
+import { removeAnsiEscapeCode } from "../../util/ansi_escape_code.ts";
 import {
   parseOpts,
   validateOpts,
 } from "https://deno.land/x/denops_std@v3.8.1/argument/mod.ts";
-import { expand, normCmdArgs } from "../../util/cmd.ts";
-import * as buffer from "https://deno.land/x/denops_std@v3.8.1/buffer/mod.ts";
-import {
-  buildDecorationsFromAnsiEscapeCode,
-  removeAnsiEscapeCode,
-} from "../../util/ansi_escape_code.ts";
-import {
-  findWorktreeFromSuspects,
-  listWorktreeSuspectsFromDenops,
-} from "../../util/worktree.ts";
-import { decodeUtf8 } from "../../util/text.ts";
-import { run } from "../../git/process.ts";
+import { normCmdArgs } from "../../util/cmd.ts";
+import { execute } from "../executor.ts";
 
-export type Options = {
-  worktree?: string;
-  buffer?: boolean | string;
-  monochrome?: boolean;
-  fileformat?: string;
-  encoding?: string;
-};
-
-export async function command(
-  denops: Denops,
-  args: string[],
-): Promise<void> {
+export async function command(denops: Denops, args: string[]): Promise<void> {
   const [opts, residue] = parseOpts(await normCmdArgs(denops, args));
   validateOpts(opts, [
     "worktree",
-    "buffer",
-    "monochrome",
-    "ff",
-    "fileformat",
     "enc",
     "encoding",
+    "ff",
+    "fileformat",
   ]);
-  const buffer = opts["buffer"] === "" ? true : opts["buffer"];
-  const options = {
-    worktree: opts["worktree"],
-    buffer,
-    monochrome: "monochrome" in opts,
-    fileformat: opts["ff"] ?? opts["fileformat"],
-    encoding: opts["enc"] ?? opts["encoding"],
-  };
-  await exec(denops, residue, options);
+  await exec(denops, residue, {
+    worktree: opts.worktree,
+    encoding: opts.enc ?? opts.encoding,
+    fileformat: opts.ff ?? opts.fileformat,
+  });
 }
+
+export type ExecOptions = {
+  worktree?: string;
+  encoding?: string;
+  fileformat?: string;
+};
 
 export async function exec(
   denops: Denops,
   args: string[],
-  options: Options = {},
+  options: ExecOptions,
 ): Promise<void> {
-  const [verbose, env, eventignore] = await batch.gather(
-    denops,
-    async (denops) => {
-      await option.verbose.get(denops);
-      await fn.environ(denops);
-      await option.eventignore.get(denops);
-    },
-  );
-  unknownutil.assertNumber(verbose);
-  unknownutil.assertObject(env, unknownutil.isString);
-  unknownutil.assertString(eventignore);
-
-  const enableColor = options.buffer && !options.monochrome;
-  const cmd = [
-    ...(enableColor ? ["-c", "color.ui=always"] : []),
-    ...args,
-  ];
-  const worktree = await findWorktreeFromSuspects(
-    options.worktree
-      ? [await expand(denops, options.worktree)]
-      : await listWorktreeSuspectsFromDenops(denops, !!verbose),
-    !!verbose,
-  );
-  const proc = run(cmd, {
-    printCommand: !!verbose,
-    stdin: "null",
-    stdout: "piped",
-    stderr: "piped",
-    noOptionalLocks: true,
-    cwd: worktree,
-    env,
+  const eventignore = await option.eventignore.get(denops);
+  const { stdout, stderr } = await execute(denops, args, {
+    worktree: options.worktree,
+    throwOnError: true,
   });
-  const [status, stdout, stderr] = await Promise.all([
-    proc.status(),
-    proc.output(),
-    proc.stderrOutput(),
-  ]);
-  proc.close();
-  if (options.buffer) {
-    let bufnr: number;
-    if (typeof options.buffer === "string") {
-      bufnr = await fn.bufnr(denops, options.buffer);
-      if (bufnr === -1) {
-        bufnr = await fn.bufnr(denops, Number(options.buffer));
-      }
-      await fn.bufload(denops, bufnr);
-    } else {
-      await denops.cmd("noswapfile enew");
-      bufnr = await fn.bufnr(denops);
-    }
-    await batch.batch(denops, async (denops) => {
-      await fn.setbufvar(denops, bufnr, "&modifiable", 0);
-    });
-    const { content, fileformat, fileencoding } = await buffer.decode(
-      denops,
-      bufnr,
-      new Uint8Array([...stdout, ...stderr]),
-      {
-        fileformat: options.fileformat,
-        fileencoding: options.encoding,
-      },
-    );
-    const [trimmed, decorations] = await buildDecorationsFromAnsiEscapeCode(
-      denops,
-      content,
-    );
-    await buffer.replace(
-      denops,
-      bufnr,
-      trimmed,
-      {
-        fileformat,
-        fileencoding,
-      },
-    );
-    await buffer.decorate(denops, bufnr, decorations);
-    await buffer.concrete(denops, bufnr);
-    if (denops.meta.host === "vim") {
-      await denops.cmd("redraw");
-    }
-  } else {
-    if (status.success) {
-      await helper.echo(
-        denops,
-        removeAnsiEscapeCode(decodeUtf8(stdout) + decodeUtf8(stderr)),
-      );
-    } else {
-      await helper.echoerr(
-        denops,
-        removeAnsiEscapeCode(decodeUtf8(stdout) + decodeUtf8(stderr)),
-      );
-    }
-  }
-  if (status.success && !eventignore.includes("all")) {
+  const encoding = options.encoding ?? "utf8";
+  const decoder = new TextDecoder(encoding);
+  const text = decoder.decode(new Uint8Array([...stdout, ...stderr]));
+  const content = text.split(
+    getSeparator(options.fileformat),
+  );
+  await helper.echo(
+    denops,
+    removeAnsiEscapeCode(content.join("\n")),
+  );
+  if (!eventignore.includes("all")) {
     await autocmd.emit(denops, "User", "GinCommandPost", {
       nomodeline: true,
     });
   }
 }
 
+function getSeparator(fileformat: string | undefined): RegExp {
+  switch (fileformat) {
+    case "dos":
+      return /\r\n/g;
+    case "unix":
+      return /\n/g;
+    case "mac":
+      return /\r/g;
+    default:
+      return /\r?\n/g;
+  }
+}
+
 export async function bind(denops: Denops, bufnr: number): Promise<void> {
-  await autocmd.group(denops, `gin_bare_command_bind_${bufnr}`, (helper) => {
-    helper.remove();
-    helper.define(
-      "User",
-      "GinCommandPost",
-      `call gin#util#reload(${bufnr})`,
-    );
-  });
+  await autocmd.group(
+    denops,
+    `gin_core_echo_command_bind_${bufnr}`,
+    (helper) => {
+      helper.remove();
+      helper.define(
+        "User",
+        "GinCommandPost",
+        `call gin#util#reload(${bufnr})`,
+      );
+    },
+  );
 }

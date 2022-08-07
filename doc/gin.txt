@@ -96,15 +96,11 @@ COMMANDS					*gin-commands*
 
 							*:Gin*
 :Gin[!] [++{option}...] {command} [{args}]
-:Gin[!] [++{option}...] ++buffer[={expr}] [++monochrome] {command} [{args}]
 	Call a git raw {command} with {args} asynchronously and echo result.
 	For example, "Gin add %" on "hello.txt" invokes "git add hello.txt".
 	If a bang (!) is specified, it calls command synchronously instead.
 	See |gin-command-options| for available {option}s.
-	If ++buffer option is specified, it opens a |scratch-buffer| or render
-	to {expr} buffer to show the result of the command.
-	If ++monochrome option is specified with ++buffer, no color is applied
-	to the result of the command.
+	Use |:GinBuffer| to show the result in a buffer.
 
 							*:GinBuffer*
 :GinBuffer[!] [++{option}...] [++monochrome] {command} [{args}]
