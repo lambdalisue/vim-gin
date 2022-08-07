@@ -338,7 +338,7 @@ async function openSupplements(
       await fn.win_gotoid(denops, winidTheirs);
       await denops.cmd(`rightbelow ${supplementHeight}split`);
       await denops.cmd(
-        `silent! Gin! ++buffer log -1 ${inProgressAliasHead} -p`,
+        `silent! GinBuffer log -1 ${inProgressAliasHead} -p`,
       );
       await option.winfixheight.setLocal(denops, true);
       await option.filetype.setLocal(denops, "git");
@@ -349,7 +349,7 @@ async function openSupplements(
     await fn.win_gotoid(denops, winidWorktree);
     await denops.cmd(`rightbelow ${supplementHeight}split`);
     await denops.cmd(
-      `silent! Gin! ++buffer log --oneline --left-right ${inProgressAliasHead}...HEAD`,
+      `silent! GinBuffer log --oneline --left-right ${inProgressAliasHead}...HEAD`,
     );
     await option.winfixheight.setLocal(denops, true);
     await option.filetype.setLocal(denops, "diff");
@@ -359,7 +359,7 @@ async function openSupplements(
     await batch.batch(denops, async (denops) => {
       await fn.win_gotoid(denops, winidOurs);
       await denops.cmd(`rightbelow ${supplementHeight}split`);
-      await denops.cmd("silent! Gin! ++buffer log -1 HEAD -p");
+      await denops.cmd("silent! GinBuffer log -1 HEAD -p");
       await option.winfixheight.setLocal(denops, true);
       await option.filetype.setLocal(denops, "git");
     });

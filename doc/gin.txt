@@ -106,6 +106,13 @@ COMMANDS					*gin-commands*
 	If ++monochrome option is specified with ++buffer, no color is applied
 	to the result of the command.
 
+							*:GinBuffer*
+:GinBuffer[!] [++{option}...] [++monochrome] {command} [{args}]
+	Open a "gin" buffer to show a result of a git raw {command} with
+	{args}. Note that it shows error results as well.
+	See |gin-command-options| for available {option}s.
+	Use |:Gin| to just echo the result.
+
 							*:GinBranch*
 :GinBranch [++{option}...] [{flags}]
 	Open a "gin-branch" buffer to show a branch list.
