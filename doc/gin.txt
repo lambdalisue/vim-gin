@@ -110,7 +110,7 @@ COMMANDS					*gin-commands*
 	Use |:Gin| to just echo the result.
 
 							*:GinBranch*
-:GinBranch [++{option}...] [{flags}]
+:GinBranch [++{option}...] [{flags}] [-- {pattern}...]
 	Open a "gin-branch" buffer to show a branch list.
 	See |gin-command-options| for available {option}s.
 
