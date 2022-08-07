@@ -27,6 +27,7 @@ export async function read(
     throw new Error(`A buffer '${scheme}://' requires a fragment part`);
   }
   await exec(denops, bufnr, fragment, {
+    processor: unnullish(opts.processor, (v) => v.split(" ")),
     worktree: expr,
     commitish: unnullish(params?.commitish, ensureString),
     flags: {
@@ -39,6 +40,7 @@ export async function read(
 }
 
 export type ExecOptions = {
+  processor?: string[];
   worktree?: string;
   commitish?: string;
   flags?: Flags;
@@ -59,6 +61,7 @@ export async function exec(
     relpath,
   ];
   await execBuffer(denops, bufnr, args, {
+    processor: options.processor,
     worktree: options.worktree,
     encoding: options.encoding,
     fileformat: options.fileformat,

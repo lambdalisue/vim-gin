@@ -103,10 +103,17 @@ COMMANDS					*gin-commands*
 	Use |:GinBuffer| to show the result in a buffer.
 
 							*:GinBuffer*
-:GinBuffer[!] [++{option}...] [++monochrome] {command} [{args}]
+:GinBuffer[!] [++{option}...] [++monochrome] [++processor={processor}] {command} [{args}]
 	Open a "gin" buffer to show a result of a git raw {command} with
 	{args}. Note that it shows error results as well.
 	See |gin-command-options| for available {option}s.
+
+	If ++processor is specified, the output of the command is passed to
+	the processor command through stdin and the result of the processor is
+	used as the output.
+>
+	:GinBuffer ++processor=delta blame README.md
+<
 	Use |:Gin| to just echo the result.
 
 							*:GinBranch*
@@ -157,9 +164,9 @@ COMMANDS					*gin-commands*
 	|<Plug>(gin-diffget)|		Assigned to "do" in default.
 
 							*:GinDiff*
-:GinDiff [++{option}...] [{flags}] {path}
-:GinDiff [++{option}...] [{flags}] --cached {path}
-:GinDiff [++{option}...] [{flags}] {commitish} {path}
+:GinDiff [++{option}...] [++processor={processor}] [{flags}] {path}
+:GinDiff [++{option}...] [++processor={processor}] [{flags}] --cached {path}
+:GinDiff [++{option}...] [++processor={processor}] [{flags}] {commitish} {path}
 	Open a "gin-diff" buffer of a file.
 	See |gin-command-options| for available {option}s.
 
@@ -169,6 +176,12 @@ COMMANDS					*gin-commands*
 	|<Plug>(gin-diffjump-old)|	Assigned to "g<CR>" in default.
 	|<Plug>(gin-diffjump-new)|	Assigned to "<CR>" in default.
 
+	If ++processor is specified, the output of the command is passed to
+	the processor command through stdin and the result of the processor is
+	used as the output.
+>
+	:GinDiff ++processor=delta\ --diff-highlight\ --keep-plus-minus-markers HEAD %
+<
 	The following {flags} are available:
 
 	--cached

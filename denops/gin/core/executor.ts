@@ -1,4 +1,5 @@
 import type { Denops } from "https://deno.land/x/denops_std@v3.8.1/mod.ts";
+import { writeAll } from "https://deno.land/std@0.151.0/streams/mod.ts";
 import * as batch from "https://deno.land/x/denops_std@v3.8.1/batch/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v3.8.1/function/mod.ts";
 import * as option from "https://deno.land/x/denops_std@v3.8.1/option/mod.ts";
@@ -27,6 +28,7 @@ export class ExecuteError extends Error {
 export type ExecuteOptions = {
   worktree?: string;
   throwOnError?: boolean;
+  processor?: string[];
 };
 
 export type ExecuteResult = {
@@ -70,9 +72,47 @@ export async function execute(
   ]);
   proc.close();
 
-  if (options.throwOnError && !status.success) {
-    throw new ExecuteError(removeAnsiEscapeCode(decodeUtf8(stderr)));
+  // Early return when execution has failed
+  if (!status.success) {
+    if (options.throwOnError) {
+      throw new ExecuteError(removeAnsiEscapeCode(decodeUtf8(stderr)));
+    }
+    return { success: status.success, stdout, stderr };
   }
 
-  return { success: status.success, stdout, stderr };
+  // Return when no post-processor is specified
+  const processor = options.processor ?? [];
+  if (!processor.length) {
+    return { success: status.success, stdout, stderr };
+  }
+
+  // Run post-processor
+  const procPost = Deno.run({
+    cmd: processor,
+    stdin: "piped",
+    stdout: "piped",
+    stderr: "piped",
+    cwd: worktree,
+    env,
+  });
+  const [statusPost, stdoutPost, stderrPost, _] = await Promise.all([
+    procPost.status(),
+    procPost.output(),
+    procPost.stderrOutput(),
+    (async () => {
+      await writeAll(procPost.stdin, stdout);
+      procPost.stdin.close();
+    })(),
+  ]);
+  procPost.close();
+
+  if (options.throwOnError && !statusPost.success) {
+    throw new ExecuteError(removeAnsiEscapeCode(decodeUtf8(stderrPost)));
+  }
+
+  return {
+    success: statusPost.success,
+    stdout: stdoutPost,
+    stderr: stderrPost,
+  };
 }

@@ -1,4 +1,5 @@
 import type { Denops } from "https://deno.land/x/denops_std@v3.8.1/mod.ts";
+import { unnullish } from "https://deno.land/x/unnullish@v0.2.0/mod.ts";
 import * as path from "https://deno.land/std@0.151.0/path/mod.ts";
 import * as buffer from "https://deno.land/x/denops_std@v3.8.1/buffer/mod.ts";
 import * as option from "https://deno.land/x/denops_std@v3.8.1/option/mod.ts";
@@ -40,12 +41,14 @@ export async function command(
 ): Promise<void> {
   const [opts, flags, residue] = parse(await normCmdArgs(denops, args));
   validateOpts(opts, [
+    "processor",
     "worktree",
     ...builtinOpts,
   ]);
   validateFlags(flags, allowedFlags);
   const [commitish, abspath] = parseResidue(residue);
   await exec(denops, abspath, {
+    processor: opts.processor?.split(" "),
     worktree: opts.worktree,
     commitish,
     flags,
@@ -55,6 +58,7 @@ export async function command(
 }
 
 export type ExecOptions = {
+  processor?: string[];
   worktree?: string;
   commitish?: string;
   flags?: Flags;
@@ -81,6 +85,7 @@ export async function exec(
     expr: worktree,
     params: {
       ...options.flags ?? {},
+      processor: unnullish(options.processor, (v) => v.join(" ")),
       commitish: options.commitish,
     },
     fragment: relpath,

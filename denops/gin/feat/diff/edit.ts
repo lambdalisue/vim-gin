@@ -31,10 +31,12 @@ export async function edit(
     throw new Error(`A buffer '${scheme}://' requires a fragment part`);
   }
   await exec(denops, bufnr, fragment, {
+    processor: unnullish(params?.processor, (v) => ensureString(v).split(" ")),
     worktree: expr,
     commitish: unnullish(params?.commitish, ensureString),
     flags: {
       ...params,
+      processor: undefined,
       commitish: undefined,
     },
     encoding: opts.enc ?? opts.encoding,
@@ -43,6 +45,7 @@ export async function edit(
 }
 
 export type ExecOptions = {
+  processor?: string[];
   worktree?: string;
   commitish?: string;
   flags?: Flags;
@@ -64,6 +67,7 @@ export async function exec(
     relpath,
   ];
   await execBuffer(denops, bufnr, args, {
+    processor: options.processor,
     worktree: options.worktree,
     encoding: options.encoding,
     fileformat: options.fileformat,

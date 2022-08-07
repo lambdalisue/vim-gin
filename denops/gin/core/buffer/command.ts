@@ -21,11 +21,13 @@ export async function command(
 ): Promise<buffer.OpenResult> {
   const [opts, residue] = parseOpts(await normCmdArgs(denops, args));
   validateOpts(opts, [
+    "processor",
     "worktree",
     "monochrome",
     ...builtinOpts,
   ]);
   return exec(denops, residue, {
+    processor: opts.processor?.split(" "),
     worktree: opts.worktree,
     monochrome: unnullish(opts.monochrome, () => true),
     cmdarg: formatOpts(opts, builtinOpts).join(" "),
@@ -34,6 +36,7 @@ export async function command(
 }
 
 export type ExecOptions = {
+  processor?: string[];
   worktree?: string;
   monochrome?: boolean;
   cmdarg?: string;
@@ -54,6 +57,7 @@ export async function exec(
     scheme: "gin",
     expr: worktree,
     params: {
+      processor: unnullish(options.processor, (v) => v.join(" ")),
       monochrome: unnullish(options.monochrome, () => ""),
     },
     fragment: `${args.join(" ")}$`,

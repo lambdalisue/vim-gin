@@ -1,4 +1,5 @@
 import type { Denops } from "https://deno.land/x/denops_std@v3.8.1/mod.ts";
+import { unnullish } from "https://deno.land/x/unnullish@v0.2.0/mod.ts";
 import * as unknownutil from "https://deno.land/x/unknownutil@v2.0.0/mod.ts";
 import * as buffer from "https://deno.land/x/denops_std@v3.8.1/buffer/mod.ts";
 import * as vars from "https://deno.land/x/denops_std@v3.8.1/variable/mod.ts";
@@ -20,7 +21,7 @@ export async function read(
   const cmdarg = await vars.v.get(denops, "cmdarg") as string;
   const [opts, _] = parseOpts(cmdarg.split(" "));
   validateOpts(opts, builtinOpts);
-  const { scheme, expr, fragment } = parseBufname(bufname);
+  const { scheme, expr, params, fragment } = parseBufname(bufname);
   if (!fragment) {
     throw new Error(`A buffer '${scheme}://' requires a fragment part`);
   }
@@ -29,6 +30,10 @@ export async function read(
     unknownutil.isString,
   );
   await exec(denops, bufnr, args, {
+    processor: unnullish(
+      params?.processor,
+      (v) => unknownutil.ensureString(v).split(" "),
+    ),
     worktree: expr,
     encoding: opts.enc ?? opts.encoding,
     fileformat: opts.ff ?? opts.fileformat,
@@ -36,6 +41,7 @@ export async function read(
 }
 
 export type ExecOptions = {
+  processor?: string[];
   worktree?: string;
   encoding?: string;
   fileformat?: string;
@@ -49,6 +55,7 @@ export async function exec(
   options: ExecOptions,
 ): Promise<void> {
   const { stdout } = await execute(denops, args, {
+    processor: options.processor,
     worktree: options.worktree,
     throwOnError: true,
   });

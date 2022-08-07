@@ -1,4 +1,5 @@
 import type { Denops } from "https://deno.land/x/denops_std@v3.8.1/mod.ts";
+import { unnullish } from "https://deno.land/x/unnullish@v0.2.0/mod.ts";
 import * as unknownutil from "https://deno.land/x/unknownutil@v2.0.0/mod.ts";
 import * as batch from "https://deno.land/x/denops_std@v3.8.1/batch/mod.ts";
 import * as buffer from "https://deno.land/x/denops_std@v3.8.1/buffer/mod.ts";
@@ -34,6 +35,10 @@ export async function edit(
     unknownutil.isString,
   );
   await exec(denops, bufnr, args, {
+    processor: unnullish(
+      params?.processor,
+      (v) => unknownutil.ensureString(v).split(" "),
+    ),
     worktree: expr,
     monochrome: "monochrome" in (params ?? {}),
     encoding: opts.enc ?? opts.encoding,
@@ -42,6 +47,7 @@ export async function edit(
 }
 
 export type ExecOptions = {
+  processor?: string[];
   worktree?: string;
   monochrome?: boolean;
   encoding?: string;
@@ -59,6 +65,7 @@ export async function exec(
     ...args,
   ];
   const { stdout } = await execute(denops, args, {
+    processor: options.processor,
     worktree: options.worktree,
     throwOnError: true,
   });
