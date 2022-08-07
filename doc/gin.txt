@@ -226,7 +226,7 @@ COMMANDS					*gin-commands*
 	|<Plug>(gin-diffget)|		Assigned to "do" in default.
 
 							*:GinStatus*
-:GinStatus [++{option}...] [{flags}]
+:GinStatus [++{option}...] [{flags}] [-- {pathspec}...]
 	Open a "gin-status" buffer to show a status.
 	See |gin-command-options| for available {option}s.
 
