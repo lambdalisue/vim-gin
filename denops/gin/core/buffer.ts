@@ -1,9 +1,9 @@
-import type { Denops } from "https://deno.land/x/denops_std@v3.7.1/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v3.8.1/mod.ts";
 import { unnullish } from "https://deno.land/x/unnullish@v0.1.0/mod.ts";
-import * as option from "https://deno.land/x/denops_std@v3.7.1/option/mod.ts";
+import * as option from "https://deno.land/x/denops_std@v3.8.1/option/mod.ts";
 import {
   format as formatBufname,
-} from "https://deno.land/x/denops_std@v3.7.1/bufname/mod.ts";
+} from "https://deno.land/x/denops_std@v3.8.1/bufname/mod.ts";
 import { expand } from "../util/cmd.ts";
 import {
   findWorktreeFromSuspects,

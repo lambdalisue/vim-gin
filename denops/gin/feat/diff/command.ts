@@ -1,10 +1,10 @@
-import type { Denops } from "https://deno.land/x/denops_std@v3.7.1/mod.ts";
-import * as path from "https://deno.land/std@0.150.0/path/mod.ts";
-import * as buffer from "https://deno.land/x/denops_std@v3.7.1/buffer/mod.ts";
-import * as option from "https://deno.land/x/denops_std@v3.7.1/option/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v3.8.1/mod.ts";
+import * as path from "https://deno.land/std@0.151.0/path/mod.ts";
+import * as buffer from "https://deno.land/x/denops_std@v3.8.1/buffer/mod.ts";
+import * as option from "https://deno.land/x/denops_std@v3.8.1/option/mod.ts";
 import {
   format as formatBufname,
-} from "https://deno.land/x/denops_std@v3.7.1/bufname/mod.ts";
+} from "https://deno.land/x/denops_std@v3.8.1/bufname/mod.ts";
 import {
   builtinOpts,
   Flags,
@@ -12,7 +12,7 @@ import {
   parse,
   validateFlags,
   validateOpts,
-} from "https://deno.land/x/denops_std@v3.7.1/argument/mod.ts";
+} from "https://deno.land/x/denops_std@v3.8.1/argument/mod.ts";
 import { expand, normCmdArgs } from "../../util/cmd.ts";
 import {
   findWorktreeFromSuspects,
