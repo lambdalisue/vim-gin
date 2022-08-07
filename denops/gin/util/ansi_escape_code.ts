@@ -1,4 +1,13 @@
+import type { Denops } from "https://deno.land/x/denops_std@v3.8.1/mod.ts";
+import {
+  assertArray,
+  isNumber,
+  isString,
+} from "https://deno.land/x/unknownutil@v2.0.0/mod.ts";
+import { unnullish } from "https://deno.land/x/unnullish@v0.1.0/mod.ts";
+import * as itertools from "https://deno.land/x/itertools@v1.0.2/mod.ts";
 import * as ansiEscapeCode from "https://deno.land/x/ansi_escape_code@v0.1.2/mod.ts";
+import * as batch from "https://deno.land/x/denops_std@v3.8.1/batch/mod.ts";
 import { Decoration } from "https://deno.land/x/denops_std@v3.8.1/buffer/mod.ts";
 import { countVimBytes } from "./text.ts";
 
@@ -9,22 +18,31 @@ export function removeAnsiEscapeCode(
   return t;
 }
 
-export function buildDecorationsFromAnsiEscapeCode(
+export async function buildDecorationsFromAnsiEscapeCode(
+  denops: Denops,
   content: string[],
-): [string[], Decoration[]] {
+): Promise<[string[], Decoration[]]> {
+  const colors = await denops.call("gin#internal#util#ansi_escape_code#colors");
+  assertArray(colors, isString);
   const trimmed: string[] = [];
   const decorations: Decoration[] = [];
+  const highlights: Map<string, ansiEscapeCode.Sgr> = new Map();
   for (let i = 0; i < content.length; i++) {
     const [t, annons] = ansiEscapeCode.trimAndParse(content[i]);
-    let previous: [number, string] | undefined;
+    let previous: [number, string, ansiEscapeCode.Sgr] | undefined;
     for (const annon of annons) {
       if (!annon.csi.sgr) {
         continue;
       }
-      const highlight = highlightFromSgr(annon.csi.sgr);
+      const sgr = {
+        ...(previous?.[2] ?? {}),
+        ...annon.csi.sgr,
+      };
+      const highlight = highlightNameFromSgr(sgr);
       if (!highlight) {
         continue;
       }
+      highlights.set(highlight, sgr);
       const byteOffset = countVimBytes(t.substring(0, annon.offset));
       if (previous) {
         decorations.push({
@@ -34,31 +52,98 @@ export function buildDecorationsFromAnsiEscapeCode(
           highlight: previous[1],
         });
       }
-      previous = highlight === "NONE" ? undefined : [byteOffset, highlight];
+      previous = highlight === "NONE"
+        ? undefined
+        : [byteOffset, highlight, annon.csi.sgr];
     }
     if (previous) {
       decorations.push({
         line: i + 1,
-        column: previous[0],
+        column: 1 + previous[0],
         length: countVimBytes(t) - previous[0],
         highlight: previous[1],
       });
     }
     trimmed.push(t);
   }
+  for (const chunk of itertools.chunked(highlights.entries(), 1000)) {
+    await batch.batch(denops, async (denops) => {
+      for (const [highlight, sgr] of chunk) {
+        const expr = highlightExprFromSgr(sgr, colors);
+        if (!expr) {
+          continue;
+        }
+        await denops.cmd(`highlight ${highlight} ${expr}`);
+      }
+    });
+  }
   return [trimmed, decorations];
 }
 
-function highlightFromSgr(sgr: ansiEscapeCode.Sgr): string | undefined {
-  if (sgr.foreground === "default" || sgr.reset) {
+function highlightNameFromSgr(sgr: ansiEscapeCode.Sgr): string {
+  if (sgr.reset) {
     return "NONE";
+  } else if (sgr.dim) {
+    return "Comment";
   }
-  if (sgr.foreground && typeof sgr.foreground === "number") {
-    const index = (sgr.bold && sgr.foreground < 8)
-      ? sgr.foreground + 8
-      : sgr.foreground;
-    return `GinColor${index}`;
+  const parts = [
+    unnullish(sgr.foreground, (v) => `F${formatColor(v)}`),
+    unnullish(sgr.background, (v) => `B${formatColor(v)}`),
+    unnullish(sgr.bold, (v) => v ? "Bold" : undefined),
+    unnullish(sgr.inverse, (v) => v ? "Inverse" : undefined),
+    unnullish(sgr.italic, (v) => v ? "Italic" : undefined),
+    unnullish(sgr.strike, (v) => v ? "Strike" : undefined),
+    unnullish(sgr.underline, (v) => v ? "Underline" : undefined),
+  ].filter((v) => v) as string[];
+  return parts.length ? `GinColor${parts.join("")}` : "NONE";
+}
+
+function highlightExprFromSgr(
+  sgr: ansiEscapeCode.Sgr,
+  colors: string[],
+): string | undefined {
+  if (sgr.reset || sgr.dim) {
+    return undefined;
   }
-  // We don't support that SGR
-  return undefined;
+  const attrlist = [
+    unnullish(sgr.bold, (v) => v ? "bold" : undefined),
+    unnullish(sgr.inverse, (v) => v ? "inverse" : undefined),
+    unnullish(sgr.italic, (v) => v ? "italic" : undefined),
+    unnullish(sgr.strike, (v) => v ? "strikethrough" : undefined),
+    unnullish(sgr.underline, (v) => v ? "underline" : undefined),
+  ].filter((v) => v).join(",");
+  const parts = [
+    attrlist ? `cterm=${attrlist} gui=${attrlist}` : `cterm=NONE gui=NONE`,
+    unnullish(sgr.foreground, (v) => {
+      if (v === "default") {
+        return undefined;
+      } else if (isNumber(v)) {
+        return `ctermfg=${v} guifg=${colors[v]}`;
+      } else {
+        return `guifg=#${formatColor(v)}`;
+      }
+    }),
+    unnullish(sgr.background, (v) => {
+      if (v === "default") {
+        return undefined;
+      } else if (isNumber(v)) {
+        return `ctermbg=${v} guibg=${colors[v]}`;
+      } else {
+        return `guibg=#${formatColor(v)}`;
+      }
+    }),
+  ].filter((v) => v) as string[];
+  return parts.join(" ");
+}
+
+function formatColor(color: ansiEscapeCode.Color): string {
+  if (color === "default") {
+    return "";
+  } else if (isNumber(color)) {
+    return color.toString();
+  } else {
+    return color
+      .map((v) => v.toString(16).padStart(2, "0"))
+      .join("");
+  }
 }
