@@ -6,6 +6,8 @@ let g:loaded_gin_diff = 1
 augroup gin_plugin_diff_internal
   autocmd!
   autocmd BufReadCmd gindiff://*
+        \ call denops#request('gin', 'diff:edit', [bufnr(), expand('<amatch>')])
+  autocmd FileReadCmd gindiff://*
         \ call denops#request('gin', 'diff:read', [bufnr(), expand('<amatch>')])
 augroup END
 
