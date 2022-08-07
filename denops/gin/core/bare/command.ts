@@ -99,12 +99,6 @@ export async function exec(
   ]);
   proc.close();
   if (options.buffer) {
-    let decorations: buffer.Decoration[] = [];
-    const preprocessor = (content: string[]) => {
-      const [trimmed, decos] = buildDecorationsFromAnsiEscapeCode(content);
-      decorations = decos;
-      return trimmed;
-    };
     let bufnr: number;
     if (typeof options.buffer === "string") {
       bufnr = await fn.bufnr(denops, options.buffer);
@@ -119,14 +113,26 @@ export async function exec(
     await batch.batch(denops, async (denops) => {
       await fn.setbufvar(denops, bufnr, "&modifiable", 0);
     });
-    await buffer.assign(
+    const { content, fileformat, fileencoding } = await buffer.decode(
       denops,
       bufnr,
       new Uint8Array([...stdout, ...stderr]),
       {
         fileformat: options.fileformat,
         fileencoding: options.encoding,
-        preprocessor,
+      },
+    );
+    const [trimmed, decorations] = await buildDecorationsFromAnsiEscapeCode(
+      denops,
+      content,
+    );
+    await buffer.replace(
+      denops,
+      bufnr,
+      trimmed,
+      {
+        fileformat,
+        fileencoding,
       },
     );
     await buffer.decorate(denops, bufnr, decorations);
