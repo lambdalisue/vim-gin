@@ -76,7 +76,6 @@ export async function exec(
 
   const infoIndex = await execEdit(denops, abspath, {
     worktree,
-    cached: true,
     opener: options.opener,
     cmdarg: options.cmdarg,
     mods: options.mods,
@@ -96,8 +95,7 @@ export async function exec(
 
   let infoWorktree: buffer.OpenResult | undefined;
   if (!options.noWorktree) {
-    infoWorktree = await execEdit(denops, abspath, {
-      worktree,
+    infoWorktree = await buffer.open(denops, abspath, {
       opener: "botright vsplit",
       cmdarg: options.cmdarg,
       mods: options.mods,

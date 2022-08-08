@@ -2,11 +2,12 @@ import type { Denops } from "https://deno.land/x/denops_std@v3.8.1/mod.ts";
 import * as unknownutil from "https://deno.land/x/unknownutil@v2.0.0/mod.ts";
 import * as path from "https://deno.land/std@0.151.0/path/mod.ts";
 import * as batch from "https://deno.land/x/denops_std@v3.8.1/batch/mod.ts";
+import * as buffer from "https://deno.land/x/denops_std@v3.8.1/buffer/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v3.8.1/function/mod.ts";
 import {
   parse as parseBufname,
 } from "https://deno.land/x/denops_std@v3.8.1/bufname/mod.ts";
-import { command as editCommand } from "../edit/command.ts";
+import { exec as execEdit } from "../edit/command.ts";
 import { INDEX, parseCommitish, WORKTREE } from "./commitish.ts";
 
 const patternSpc = /^(?:@@|\-\-\-|\+\+\+) /;
@@ -123,22 +124,20 @@ export async function jumpOld(denops: Denops, mods: string): Promise<void> {
   const commitish = unknownutil.ensureString(params?.commitish ?? "");
   const [target, _] = parseCommitish(commitish, cached);
   if (target === INDEX) {
-    await editCommand(denops, mods, [
-      `++worktree=${expr}`,
-      "--cached",
-      filename,
-    ]);
+    await execEdit(denops, filename, {
+      worktree: expr,
+      mods,
+    });
   } else if (target === WORKTREE) {
-    await editCommand(denops, mods, [
-      `++worktree=${expr}`,
-      filename,
-    ]);
+    await buffer.open(denops, filename, {
+      mods,
+    });
   } else {
-    await editCommand(denops, mods, [
-      `++worktree=${expr}`,
-      commitish || "HEAD",
-      filename,
-    ]);
+    await execEdit(denops, filename, {
+      worktree: expr,
+      commitish: commitish || "HEAD",
+      mods,
+    });
   }
   await fn.cursor(denops, jump.lnum, 1);
 }
@@ -163,22 +162,20 @@ export async function jumpNew(denops: Denops, mods: string): Promise<void> {
   const commitish = unknownutil.ensureString(params?.commitish ?? "");
   const [_, target] = parseCommitish(commitish, cached);
   if (target === INDEX) {
-    await editCommand(denops, mods, [
-      `++worktree=${expr}`,
-      "--cached",
-      filename,
-    ]);
+    await execEdit(denops, filename, {
+      worktree: expr,
+      mods,
+    });
   } else if (target === WORKTREE) {
-    await editCommand(denops, mods, [
-      `++worktree=${expr}`,
-      filename,
-    ]);
+    await buffer.open(denops, filename, {
+      mods,
+    });
   } else {
-    await editCommand(denops, mods, [
-      `++worktree=${expr}`,
-      commitish || "HEAD",
-      filename,
-    ]);
+    await execEdit(denops, filename, {
+      worktree: expr,
+      commitish: commitish || "HEAD",
+      mods,
+    });
   }
   await fn.cursor(denops, jump.lnum, 1);
 }

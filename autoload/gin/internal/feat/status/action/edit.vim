@@ -1,6 +1,8 @@
+let s:sep = !has('win32') || exists('+shellslash') && &shellslash ? '/': '\'
+
 function! gin#internal#feat#status#action#edit#register() abort
   noremap <buffer> <Plug>(gin-action-edit:local=)
-        \ <Cmd>call gin#action#fn({ xs -> <SID>edit({ -> <SID>opener() }, '', xs) })<CR>
+        \ <Cmd>call gin#action#fn({ xs -> <SID>edit_local({ -> <SID>opener() }, xs) })<CR>
   map <buffer> <Plug>(gin-action-edit:local:edit) <Plug>(gin-action-edit:local=)edit<CR>
   map <buffer> <Plug>(gin-action-edit:local:split) <Plug>(gin-action-edit:local=)split<CR>
   map <buffer> <Plug>(gin-action-edit:local:vsplit) <Plug>(gin-action-edit:local=)vsplit<CR>
@@ -8,7 +10,7 @@ function! gin#internal#feat#status#action#edit#register() abort
   map <buffer> <Plug>(gin-action-edit:local) <Plug>(gin-action-edit:local:edit)
 
   noremap <buffer> <Plug>(gin-action-edit:cached=)
-        \ <Cmd>call gin#action#fn({ xs -> <SID>edit({ -> <SID>opener() }, '--cached', xs) })<CR>
+        \ <Cmd>call gin#action#fn({ xs -> <SID>edit({ -> <SID>opener() }, '', xs) })<CR>
   map <buffer> <Plug>(gin-action-edit:cached:edit) <Plug>(gin-action-edit:cached=)edit<CR>
   map <buffer> <Plug>(gin-action-edit:cached:split) <Plug>(gin-action-edit:cached=)split<CR>
   map <buffer> <Plug>(gin-action-edit:cached:vsplit) <Plug>(gin-action-edit:cached=)vsplit<CR>
@@ -31,13 +33,20 @@ function! gin#internal#feat#status#action#edit#register() abort
   map <buffer> <Plug>(gin-action-edit) <Plug>(gin-action-edit:local)
 endfunction
 
-function! s:norm_xs(xs) abort
-  call map(a:xs, { _, v -> v.value })
-  call map(a:xs, { _, v -> escape(v, ' \\') })
-endfunction
-
 function! s:opener() abort
   return gin#internal#util#action#select_opener()
+endfunction
+
+function! s:edit_local(opener, xs) abort
+  let opener = a:opener()
+  if opener is# v:null
+    return
+  endif
+  let worktree = gin#util#worktree()
+  for x in a:xs
+    let path = join([worktree, x.path], s:sep)
+    call execute(printf('%s %s', opener, fnameescape(path)))
+  endfor
 endfunction
 
 function! s:edit(opener, suffix, xs) abort
@@ -45,6 +54,9 @@ function! s:edit(opener, suffix, xs) abort
   if opener is# v:null
     return
   endif
-  call s:norm_xs(a:xs)
-  call map(a:xs, { _, v -> execute(printf('%s | GinEdit %s %s', opener, a:suffix, v), '') })
+  let worktree = gin#util#worktree()
+  for x in a:xs
+    let path = join([worktree, x.path], s:sep)
+    call execute(printf('%s | GinEdit %s %s', opener, a:suffix, fnameescape(path)))
+  endfor
 endfunction

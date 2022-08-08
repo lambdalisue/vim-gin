@@ -83,8 +83,7 @@ export async function exec(
 
   const inProgressAliasHead = await getInProgressAliasHead(worktree);
 
-  const infoWorktree = await execEdit(denops, abspath, {
-    worktree,
+  const infoWorktree = await buffer.open(denops, abspath, {
     opener: options.opener,
     cmdarg: options.cmdarg,
     mods: options.mods,

@@ -200,17 +200,16 @@ COMMANDS					*gin-commands*
 
 							*:GinEdit*
 :GinEdit [++{option}...] {path}
-:GinEdit [++{option}...] --cached {path}
 :GinEdit [++{option}...] {commitish} {path}
-	Open a local {path} or "gin-edit" buffer of a file.
+	Open a "gin-edit" buffer of a file.
 	See |gin-command-options| for available {option}s.
 
-	If --cached flag is specified, it opens a buffer that shows content
-	in INDEX rather than the local working tree. The buffer is modifiable
-	and write the buffer to apply changes on INDEX.
+	If no {commitish} is specified, it opens a buffer that shows content
+	in INDEX. The buffer is modifiable and write the buffer to apply 
+	changes on INDEX.
 
 	If {commitish} is specified, it opens a buffer that shows content
-	in the {commitish} rather than the local working tree.
+	in the {commitish}. The buffer is not modifiable.
 
 							*:GinPatch*
 :GinPatch [++{option}...] {path}
