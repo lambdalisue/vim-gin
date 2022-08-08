@@ -117,7 +117,7 @@ COMMANDS					*gin-commands*
 	Use |:Gin| to just echo the result.
 
 							*:GinBranch*
-:GinBranch [++{option}...] [{flags}] [-- {pattern}...]
+:GinBranch[!] [++{option}...] [{flags}] [-- {pattern}...]
 	Open a "gin-branch" buffer to show a branch list.
 	See |gin-command-options| for available {option}s.
 
@@ -134,10 +134,13 @@ COMMANDS					*gin-commands*
 	Several default mappings are defined in the buffer. Use "help" action
 	to see mappings or disable by |g:gin_branch_disable_default_mappings|.
 
+	Users can specify default arguments by |g:gin_branch_default_args|.
+	Use a bang (!) to temporary disable default arguments.
+
 							*:GinChaperon*
-:GinChaperon [++{option}...] {path}
-:GinChaperon [++{option}...] ++no-theirs {path}
-:GinChaperon [++{option}...] ++no-ours {path}
+:GinChaperon[!] [++{option}...] {path}
+:GinChaperon[!] [++{option}...] ++no-theirs {path}
+:GinChaperon[!] [++{option}...] ++no-ours {path}
 	Open three main buffers (THEIRS, WORKTREE, and OURS) and three
 	supplemental buffers to solve conflicts on {path}.
 	See |gin-command-options| for available {option}s.
@@ -163,8 +166,11 @@ COMMANDS					*gin-commands*
 	OURS~
 	|<Plug>(gin-diffget)|		Assigned to "do" in default.
 
+	Users can specify default arguments by |g:gin_chaperon_default_args|.
+	Use a bang (!) to temporary disable default arguments.
+
 							*:GinDiff*
-:GinDiff [++{option}...] [++processor={processor}] [{flags}] [{commitish}] [-- {path}...]
+:GinDiff[!] [++{option}...] [++processor={processor}] [{flags}] [{commitish}] [-- {path}...]
 	Open a "gin-diff" buffer of a file.
 	See |gin-command-options| for available {option}s.
 
@@ -196,9 +202,12 @@ COMMANDS					*gin-commands*
 		
 	See ":man git-diff(1)" for detail about {flags}.
 
+	Users can specify default arguments by |g:gin_diff_default_args|.
+	Use a bang (!) to temporary disable default arguments.
+
 							*:GinEdit*
-:GinEdit [++{option}...] {path}
-:GinEdit [++{option}...] {commitish} {path}
+:GinEdit[!] [++{option}...] {path}
+:GinEdit[!] [++{option}...] {commitish} {path}
 	Open a "gin-edit" buffer of a file.
 	See |gin-command-options| for available {option}s.
 
@@ -209,10 +218,13 @@ COMMANDS					*gin-commands*
 	If {commitish} is specified, it opens a buffer that shows content
 	in the {commitish}. The buffer is not modifiable.
 
+	Users can specify default arguments by |g:gin_edit_default_args|.
+	Use a bang (!) to temporary disable default arguments.
+
 							*:GinPatch*
-:GinPatch [++{option}...] {path}
-:GinPatch [++{option}...] ++no-head {path}
-:GinPatch [++{option}...] ++no-worktree {path}
+:GinPatch[!] [++{option}...] {path}
+:GinPatch[!] [++{option}...] ++no-head {path}
+:GinPatch[!] [++{option}...] ++no-worktree {path}
 	Open three buffers (HEAD, INDEX, and WORKTREE) to patch changes of
 	{path}.
 	See |gin-command-options| for available {option}s.
@@ -235,8 +247,11 @@ COMMANDS					*gin-commands*
 	|<Plug>(gin-diffput)|		Assigned to "dp" in default.
 	|<Plug>(gin-diffget)|		Assigned to "do" in default.
 
+	Users can specify default arguments by |g:gin_patch_default_args|.
+	Use a bang (!) to temporary disable default arguments.
+
 							*:GinStatus*
-:GinStatus [++{option}...] [{flags}] [-- {pathspec}...]
+:GinStatus[!] [++{option}...] [{flags}] [-- {pathspec}...]
 	Open a "gin-status" buffer to show a status.
 	See |gin-command-options| for available {option}s.
 
@@ -252,6 +267,9 @@ COMMANDS					*gin-commands*
 
 	Several default mappings are defined in the buffer. Use "help" action
 	to see mappings or disable by |g:gin_status_disable_default_mappings|.
+
+	Users can specify default arguments by |g:gin_status_default_args|.
+	Use a bang (!) to temporary disable default arguments.
 
 							*gin-commands-options*
 Gin supports several options starts with double plus signs (++) as:
@@ -302,6 +320,11 @@ example for details.
 -----------------------------------------------------------------------------
 VARIABLES					*gin-variables*
 
+*g:gin_chaperon_default_args*
+	Specify default arguments of |:GinChaperon|.
+
+	Default: []
+
 *g:gin_chaperon_disable_default_mappings*
 	Disable default mappings on buffers shown by |:GinChaperon|.
 
@@ -318,10 +341,25 @@ VARIABLES					*gin-variables*
 
 	Default: 10
 
+*g:gin_diff_default_args*
+	Specify default arguments of |:GinDiff|.
+
+	Default: []
+
 *g:gin_diff_disable_default_mappings*
 	Disable default mappings on buffers shown by |:GinDiff|.
 
 	Default: 0
+
+*g:gin_edit_default_args*
+	Specify default arguments of |:GinEdit|.
+
+	Default: []
+
+*g:gin_patch_default_args*
+	Specify default arguments of |:GinPatch|.
+
+	Default: []
 
 *g:gin_patch_disable_default_mappings*
 	Disable default mappings on buffers shown by |:GinPatch|.
@@ -337,6 +375,11 @@ VARIABLES					*gin-variables*
 	Disable overriding "GIT_EDITOR" to proxy editors.
 
 	Default: 0
+
+*g:gin_status_default_args*
+	Specify default arguments of |:GinStatus|.
+
+	Default: []
 
 *g:gin_status_disable_default_mappings*
 	Disable default mappings on |:GinStatus| buffer.

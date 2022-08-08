@@ -7,12 +7,15 @@ import { command } from "./command.ts";
 export function main(denops: Denops): void {
   denops.dispatcher = {
     ...denops.dispatcher,
-    "patch:command": (mods, ...args) => {
+    "patch:command": (bang, mods, args) => {
       unknownutil.assertString(mods);
       unknownutil.assertArray(args, unknownutil.isString);
       const silent = parseSilent(mods);
       return helper.ensureSilent(denops, silent, () => {
-        return helper.friendlyCall(denops, () => command(denops, mods, args));
+        return helper.friendlyCall(denops, () =>
+          command(denops, mods, args, {
+            disableDefaultArgs: bang === "!",
+          }));
       });
     },
   };

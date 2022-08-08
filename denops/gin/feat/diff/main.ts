@@ -10,12 +10,15 @@ import { jumpNew, jumpOld } from "./jump.ts";
 export function main(denops: Denops): void {
   denops.dispatcher = {
     ...denops.dispatcher,
-    "diff:command": (mods, ...args) => {
+    "diff:command": (bang, mods, args) => {
       unknownutil.assertString(mods);
       unknownutil.assertArray(args, unknownutil.isString);
       const silent = parseSilent(mods);
       return helper.ensureSilent(denops, silent, () => {
-        return helper.friendlyCall(denops, () => command(denops, mods, args));
+        return helper.friendlyCall(denops, () =>
+          command(denops, mods, args, {
+            disableDefaultArgs: bang === "!",
+          }));
       });
     },
     "diff:edit": (bufnr, bufname) => {

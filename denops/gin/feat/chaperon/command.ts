@@ -18,11 +18,25 @@ import { findWorktreeFromDenops } from "../../util/worktree.ts";
 import { exec as execEdit } from "../edit/command.ts";
 import { AliasHead, getInProgressAliasHead, stripConflicts } from "./util.ts";
 
+export type CommandOptions = {
+  disableDefaultArgs?: boolean;
+};
+
 export async function command(
   denops: Denops,
   mods: string,
   args: string[],
+  options: CommandOptions = {},
 ): Promise<void> {
+  if (!options.disableDefaultArgs) {
+    const defaultArgs = await vars.g.get(
+      denops,
+      "gin_chaperon_default_args",
+      [],
+    );
+    unknownutil.assertArray(defaultArgs, unknownutil.isString);
+    args = [...defaultArgs, ...args];
+  }
   const [opts, _, residue] = parse(await normCmdArgs(denops, args));
   validateOpts(opts, [
     "worktree",

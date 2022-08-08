@@ -8,12 +8,15 @@ import { edit } from "./edit.ts";
 export function main(denops: Denops): void {
   denops.dispatcher = {
     ...denops.dispatcher,
-    "status:command": (mods, ...args) => {
+    "status:command": (bang, mods, args) => {
       unknownutil.assertString(mods);
       unknownutil.assertArray(args, unknownutil.isString);
       const silent = parseSilent(mods);
       return helper.ensureSilent(denops, silent, () => {
-        return helper.friendlyCall(denops, () => command(denops, mods, args));
+        return helper.friendlyCall(denops, () =>
+          command(denops, mods, args, {
+            disableDefaultArgs: bang === "!",
+          }));
       });
     },
     "status:edit": (bufnr, bufname) => {

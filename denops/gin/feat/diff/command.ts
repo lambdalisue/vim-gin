@@ -1,8 +1,10 @@
 import type { Denops } from "https://deno.land/x/denops_std@v3.8.1/mod.ts";
 import * as path from "https://deno.land/std@0.151.0/path/mod.ts";
+import * as unknownutil from "https://deno.land/x/unknownutil@v2.0.0/mod.ts";
 import { unnullish } from "https://deno.land/x/unnullish@v0.2.0/mod.ts";
 import * as buffer from "https://deno.land/x/denops_std@v3.8.1/buffer/mod.ts";
 import * as option from "https://deno.land/x/denops_std@v3.8.1/option/mod.ts";
+import * as vars from "https://deno.land/x/denops_std@v3.8.1/variable/mod.ts";
 import {
   format as formatBufname,
 } from "https://deno.land/x/denops_std@v3.8.1/bufname/mod.ts";
@@ -34,11 +36,25 @@ const allowedFlags = [
   "ignore-submodules",
 ];
 
+export type CommandOptions = {
+  disableDefaultArgs?: boolean;
+};
+
 export async function command(
   denops: Denops,
   mods: string,
   args: string[],
+  options: CommandOptions = {},
 ): Promise<void> {
+  if (!options.disableDefaultArgs) {
+    const defaultArgs = await vars.g.get(
+      denops,
+      "gin_diff_default_args",
+      [],
+    );
+    unknownutil.assertArray(defaultArgs, unknownutil.isString);
+    args = [...defaultArgs, ...args];
+  }
   const [opts, flags, residue] = parse(await normCmdArgs(denops, args));
   validateOpts(opts, [
     "processor",

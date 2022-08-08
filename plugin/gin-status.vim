@@ -9,11 +9,11 @@ augroup gin_plugin_status_internal
         \ call denops#request('gin', 'status:edit', [bufnr(), expand('<amatch>')])
 augroup END
 
-function! s:command(...) abort
+function! s:command(bang, mods, args) abort
   if denops#plugin#wait('gin')
     return
   endif
-  call denops#request('gin', 'status:command', a:000)
+  call denops#request('gin', 'status:command', [a:bang, a:mods, a:args])
 endfunction
 
-command! -bar -nargs=* GinStatus call s:command(<q-mods>, <f-args>)
+command! -bang -bar -nargs=* GinStatus call s:command(<q-bang>, <q-mods>, [<f-args>])
