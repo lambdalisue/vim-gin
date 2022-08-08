@@ -5,12 +5,13 @@ import * as fn from "https://deno.land/x/denops_std@v3.8.1/function/mod.ts";
 import * as path from "https://deno.land/std@0.151.0/path/mod.ts";
 import * as unknownutil from "https://deno.land/x/unknownutil@v2.0.0/mod.ts";
 import { GIN_BUFFER_PROTOCOLS } from "../global.ts";
+import { expand } from "../util/cmd.ts";
 import { find } from "../git/finder.ts";
 
 /**
  * Find a git worktree from a suspected directory
  */
-export async function findWorktreeFromSuspect(
+async function findWorktreeFromSuspect(
   suspect: string,
   verbose?: boolean,
 ): Promise<string> {
@@ -44,7 +45,7 @@ export async function findWorktreeFromSuspect(
 /**
  * Find a git worktree from suspected directories
  */
-export async function findWorktreeFromSuspects(
+async function findWorktreeFromSuspects(
   suspects: string[],
   verbose?: boolean,
 ): Promise<string> {
@@ -65,7 +66,7 @@ export async function findWorktreeFromSuspects(
 /**
  * Return candidates of worktree anchor directories from the host environment
  */
-export async function listWorktreeSuspectsFromDenops(
+async function listWorktreeSuspectsFromDenops(
   denops: Denops,
   verbose?: boolean,
 ): Promise<string[]> {
@@ -118,3 +119,23 @@ async function normSuspect(suspect: string): Promise<string[]> {
     throw err;
   }
 }
+
+/**
+ * Find a git worktree from the host environment
+ */
+export async function findWorktreeFromDenops(
+  denops: Denops,
+  options: FindWorktreeFromDenopsOptions = {},
+): Promise<string> {
+  return await findWorktreeFromSuspects(
+    options.worktree
+      ? [await expand(denops, options.worktree)]
+      : await listWorktreeSuspectsFromDenops(denops, !!options.verbose),
+    !!options.verbose,
+  );
+}
+
+export type FindWorktreeFromDenopsOptions = {
+  worktree?: string;
+  verbose?: boolean;
+};

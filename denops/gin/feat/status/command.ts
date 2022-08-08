@@ -9,7 +9,6 @@ import {
 import * as fn from "https://deno.land/x/denops_std@v3.8.1/function/mod.ts";
 import * as option from "https://deno.land/x/denops_std@v3.8.1/option/mod.ts";
 import * as vars from "https://deno.land/x/denops_std@v3.8.1/variable/mod.ts";
-import * as unknownutil from "https://deno.land/x/unknownutil@v2.0.0/mod.ts";
 import * as path from "https://deno.land/std@0.151.0/path/mod.ts";
 import {
   formatFlags,
@@ -18,11 +17,8 @@ import {
   validateOpts,
 } from "https://deno.land/x/denops_std@v3.8.1/argument/mod.ts";
 import * as buffer from "https://deno.land/x/denops_std@v3.8.1/buffer/mod.ts";
-import { expand, normCmdArgs } from "../../util/cmd.ts";
-import {
-  findWorktreeFromSuspects,
-  listWorktreeSuspectsFromDenops,
-} from "../../util/worktree.ts";
+import { normCmdArgs } from "../../util/cmd.ts";
+import { findWorktreeFromDenops } from "../../util/worktree.ts";
 import { Entry, GitStatusResult, parse as parseStatus } from "./parser.ts";
 import { render } from "./render.ts";
 import { execute } from "../../git/process.ts";
@@ -72,20 +68,13 @@ export async function exec(
   params: BufnameParams,
   options: Options = {},
 ): Promise<buffer.OpenResult> {
-  const [verbose] = await batch.gather(
-    denops,
-    async (denops) => {
-      await option.verbose.get(denops);
-    },
-  );
-  unknownutil.assertNumber(verbose);
+  const verbose = await option.verbose.get(denops);
 
-  const worktree = await findWorktreeFromSuspects(
-    options.worktree
-      ? [await expand(denops, options.worktree)]
-      : await listWorktreeSuspectsFromDenops(denops, !!verbose),
-    !!verbose,
-  );
+  const worktree = await findWorktreeFromDenops(denops, {
+    worktree: options.worktree,
+    verbose: !!verbose,
+  });
+
   const bufname = formatBufname({
     scheme: "ginstatus",
     expr: worktree,

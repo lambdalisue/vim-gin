@@ -12,11 +12,8 @@ import {
   validateOpts,
 } from "https://deno.land/x/denops_std@v3.8.1/argument/mod.ts";
 import * as buffer from "https://deno.land/x/denops_std@v3.8.1/buffer/mod.ts";
-import { expand, normCmdArgs } from "../../util/cmd.ts";
-import {
-  findWorktreeFromSuspects,
-  listWorktreeSuspectsFromDenops,
-} from "../../util/worktree.ts";
+import { normCmdArgs } from "../../util/cmd.ts";
+import { findWorktreeFromDenops } from "../../util/worktree.ts";
 import { exec as editExec } from "../edit/command.ts";
 
 export type Options = {
@@ -69,12 +66,10 @@ export async function exec(
   ) as [number, unknown];
   unknownutil.assertBoolean(disableDefaultMappings);
 
-  const worktree = await findWorktreeFromSuspects(
-    options.worktree
-      ? [await expand(denops, options.worktree)]
-      : await listWorktreeSuspectsFromDenops(denops, !!verbose),
-    !!verbose,
-  );
+  const worktree = await findWorktreeFromDenops(denops, {
+    worktree: options.worktree,
+    verbose: !!verbose,
+  });
 
   const infoIndex = await editExec(denops, filename, undefined, {}, {
     worktree,

@@ -13,11 +13,8 @@ import {
   validateOpts,
 } from "https://deno.land/x/denops_std@v3.8.1/argument/mod.ts";
 import * as buffer from "https://deno.land/x/denops_std@v3.8.1/buffer/mod.ts";
-import { expand, normCmdArgs } from "../../util/cmd.ts";
-import {
-  findWorktreeFromSuspects,
-  listWorktreeSuspectsFromDenops,
-} from "../../util/worktree.ts";
+import { normCmdArgs } from "../../util/cmd.ts";
+import { findWorktreeFromDenops } from "../../util/worktree.ts";
 import { exec as editExec } from "../edit/command.ts";
 import { AliasHead, getInProgressAliasHead, stripConflicts } from "./util.ts";
 
@@ -77,12 +74,10 @@ export async function exec(
   unknownutil.assertNumber(supplementHeight);
   unknownutil.assertBoolean(disableDefaultMappings);
 
-  const worktree = await findWorktreeFromSuspects(
-    options.worktree
-      ? [await expand(denops, options.worktree)]
-      : await listWorktreeSuspectsFromDenops(denops, !!verbose),
-    !!verbose,
-  );
+  const worktree = await findWorktreeFromDenops(denops, {
+    worktree: options.worktree,
+    verbose: !!verbose,
+  });
   const relpath = path.relative(worktree, filename);
 
   const inProgressAliasHead = await getInProgressAliasHead(worktree);

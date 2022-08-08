@@ -12,11 +12,7 @@ import {
   validateOpts,
 } from "https://deno.land/x/denops_std@v3.8.1/argument/mod.ts";
 import { normCmdArgs } from "../../util/cmd.ts";
-import { expand } from "../../util/cmd.ts";
-import {
-  findWorktreeFromSuspects,
-  listWorktreeSuspectsFromDenops,
-} from "../../util/worktree.ts";
+import { findWorktreeFromDenops } from "../../util/worktree.ts";
 
 export async function command(
   denops: Denops,
@@ -50,12 +46,10 @@ export async function exec(
   options: ExecOptions,
 ): Promise<buffer.OpenResult> {
   const verbose = await option.verbose.get(denops);
-  const worktree = await findWorktreeFromSuspects(
-    options.worktree
-      ? [await expand(denops, options.worktree)]
-      : await listWorktreeSuspectsFromDenops(denops, !!verbose),
-    !!verbose,
-  );
+  const worktree = await findWorktreeFromDenops(denops, {
+    worktree: options.worktree,
+    verbose: !!verbose,
+  });
   const bufname = formatBufname({
     scheme: "gin",
     expr: worktree,

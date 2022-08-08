@@ -3,12 +3,8 @@ import * as batch from "https://deno.land/x/denops_std@v3.8.1/batch/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v3.8.1/function/mod.ts";
 import * as option from "https://deno.land/x/denops_std@v3.8.1/option/mod.ts";
 import { decodeUtf8 } from "../util/text.ts";
-import { expand } from "../util/cmd.ts";
 import { removeAnsiEscapeCode } from "../util/ansi_escape_code.ts";
-import {
-  findWorktreeFromSuspects,
-  listWorktreeSuspectsFromDenops,
-} from "../util/worktree.ts";
+import { findWorktreeFromDenops } from "../util/worktree.ts";
 import { run } from "../git/process.ts";
 
 export class ExecuteError extends Error {
@@ -52,12 +48,10 @@ export async function execute(
     },
   ) as [Record<string, string>, number];
 
-  const worktree = await findWorktreeFromSuspects(
-    options.worktree
-      ? [await expand(denops, options.worktree)]
-      : await listWorktreeSuspectsFromDenops(denops, !!verbose),
-    !!verbose,
-  );
+  const worktree = await findWorktreeFromDenops(denops, {
+    worktree: options.worktree,
+    verbose: !!verbose,
+  });
 
   const proc = run(args, {
     printCommand: !!verbose,
