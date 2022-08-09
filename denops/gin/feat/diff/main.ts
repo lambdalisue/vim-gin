@@ -5,7 +5,7 @@ import { parseSilent } from "../../util/cmd.ts";
 import { command } from "./command.ts";
 import { edit } from "./edit.ts";
 import { read } from "./read.ts";
-import { jumpNew, jumpOld } from "./jump.ts";
+import { jumpNew, jumpOld, jumpSmart } from "./jump.ts";
 
 export function main(denops: Denops): void {
   denops.dispatcher = {
@@ -32,14 +32,28 @@ export function main(denops: Denops): void {
       return helper.friendlyCall(denops, () => read(denops, bufnr, bufname));
     },
     "diff:jump:new": (mods) => {
-      mods = mods ?? "";
-      unknownutil.assertString(mods);
-      return jumpNew(denops, mods);
+      if (mods) {
+        unknownutil.assertString(mods);
+      } else {
+        unknownutil.assertUndefined(mods);
+      }
+      return helper.friendlyCall(denops, () => jumpNew(denops, mods ?? ""));
     },
     "diff:jump:old": (mods) => {
-      mods = mods ?? "";
-      unknownutil.assertString(mods);
-      return jumpOld(denops, mods);
+      if (mods) {
+        unknownutil.assertString(mods);
+      } else {
+        unknownutil.assertUndefined(mods);
+      }
+      return helper.friendlyCall(denops, () => jumpOld(denops, mods ?? ""));
+    },
+    "diff:jump:smart": (mods) => {
+      if (mods) {
+        unknownutil.assertString(mods);
+      } else {
+        unknownutil.assertUndefined(mods);
+      }
+      return helper.friendlyCall(denops, () => jumpSmart(denops, mods ?? ""));
     },
   };
 }

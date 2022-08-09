@@ -8,12 +8,16 @@ import {
   parse as parseBufname,
 } from "https://deno.land/x/denops_std@v3.8.1/bufname/mod.ts";
 import { exec as execEdit } from "../edit/command.ts";
-import { INDEX, parseCommitish, WORKTREE } from "./commitish.ts";
+import { Commitish, INDEX, parseCommitish, WORKTREE } from "./commitish.ts";
 
 const patternSpc = /^(?:@@|\-\-\-|\+\+\+) /;
 const patternRng = /^@@ \-(\d+)(?:,\d+)? \+(\d+)(?:,\d+)? @@.*$/;
 const patternOld = /^\-\-\- (.*?)(?:\t.*)?$/;
 const patternNew = /^\+\+\+ (.*?)(?:\t.*)?$/;
+
+type Finder = (index: number, content: string[]) => Jump | undefined;
+
+type Parser = (commitish: string, cached: boolean) => Commitish;
 
 export type Jump = {
   path: string;
@@ -104,25 +108,31 @@ export function findJumpNew(
   };
 }
 
-export async function jumpOld(denops: Denops, mods: string): Promise<void> {
-  const [lnum, content, bufname] = await batch.gather(
+async function jump(
+  denops: Denops,
+  mods: string,
+  finder: Finder,
+  parser: Parser,
+): Promise<void> {
+  const [lnum, column, content, bufname] = await batch.gather(
     denops,
     async (denops) => {
       await fn.line(denops, ".");
+      await fn.col(denops, ".");
       await fn.getline(denops, 1, "$");
       await fn.bufname(denops, "%");
     },
-  ) as [number, string[], string];
+  ) as [number, number, string[], string];
   const { expr, params } = parseBufname(bufname);
-  const jump = findJumpOld(lnum - 1, content);
+  const jump = finder(lnum - 1, content);
   if (!jump) {
     // Do nothing
     return;
   }
-  const filename = path.join(expr, jump.path.replace(/^a\//, ""));
+  const filename = path.join(expr, jump.path.replace(/^[ab]\//, ""));
   const cached = "cached" in (params ?? {});
   const commitish = unknownutil.ensureString(params?.commitish ?? "");
-  const [target, _] = parseCommitish(commitish, cached);
+  const target = parser(commitish, cached);
   if (target === INDEX) {
     await execEdit(denops, filename, {
       worktree: expr,
@@ -139,43 +149,38 @@ export async function jumpOld(denops: Denops, mods: string): Promise<void> {
       mods,
     });
   }
-  await fn.cursor(denops, jump.lnum, 1);
+  await fn.cursor(denops, jump.lnum, column - 1);
+}
+
+export async function jumpOld(denops: Denops, mods: string): Promise<void> {
+  await jump(
+    denops,
+    mods,
+    findJumpOld,
+    (commitish: string, cached: boolean) => {
+      const [target, _] = parseCommitish(commitish, cached);
+      return target;
+    },
+  );
 }
 
 export async function jumpNew(denops: Denops, mods: string): Promise<void> {
-  const [lnum, content, bufname] = await batch.gather(
+  await jump(
     denops,
-    async (denops) => {
-      await fn.line(denops, ".");
-      await fn.getline(denops, 1, "$");
-      await fn.bufname(denops, "%");
+    mods,
+    findJumpNew,
+    (commitish: string, cached: boolean) => {
+      const [_, target] = parseCommitish(commitish, cached);
+      return target;
     },
-  ) as [number, string[], string];
-  const { expr, params } = parseBufname(bufname);
-  const jump = findJumpNew(lnum - 1, content);
-  if (!jump) {
-    // Do nothing
-    return;
-  }
-  const filename = path.join(expr, jump.path.replace(/^b\//, ""));
-  const cached = "cached" in (params ?? {});
-  const commitish = unknownutil.ensureString(params?.commitish ?? "");
-  const [_, target] = parseCommitish(commitish, cached);
-  if (target === INDEX) {
-    await execEdit(denops, filename, {
-      worktree: expr,
-      mods,
-    });
-  } else if (target === WORKTREE) {
-    await buffer.open(denops, filename, {
-      mods,
-    });
+  );
+}
+
+export async function jumpSmart(denops: Denops, mods: string): Promise<void> {
+  const line = await fn.getline(denops, ".");
+  if (line.startsWith("-")) {
+    await jumpOld(denops, mods);
   } else {
-    await execEdit(denops, filename, {
-      worktree: expr,
-      commitish: commitish || "HEAD",
-      mods,
-    });
+    await jumpNew(denops, mods);
   }
-  await fn.cursor(denops, jump.lnum, 1);
 }

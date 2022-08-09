@@ -177,8 +177,9 @@ COMMANDS					*gin-commands*
 	Users can use the following mappings in each buffers or disable
 	default mappings by |g:gin_diff_disable_default_mappings|.
 
+	|<Plug>(gin-diffjump-smart)|	Assigned to "<CR>" in default.
 	|<Plug>(gin-diffjump-old)|	Assigned to "g<CR>" in default.
-	|<Plug>(gin-diffjump-new)|	Assigned to "<CR>" in default.
+	|<Plug>(gin-diffjump-new)|	Assigned to "<C-g><CR>" in default.
 
 	If ++processor is specified, the output of the command is passed to
 	the processor command through stdin and the result of the processor is

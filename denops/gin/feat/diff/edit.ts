@@ -95,6 +95,15 @@ export async function exec(
           noremap: true,
         },
       );
+      await mapping.map(
+        denops,
+        "<Plug>(gin-diffjump-smart)",
+        `<Cmd>call denops#request('gin', 'diff:jump:smart', [])<CR>`,
+        {
+          buffer: true,
+          noremap: true,
+        },
+      );
     });
   });
 }
