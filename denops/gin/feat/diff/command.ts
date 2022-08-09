@@ -1,6 +1,6 @@
 import type { Denops } from "https://deno.land/x/denops_std@v3.8.1/mod.ts";
-import { unnullish } from "https://deno.land/x/unnullish@v0.2.0/mod.ts";
 import * as path from "https://deno.land/std@0.151.0/path/mod.ts";
+import { unnullish } from "https://deno.land/x/unnullish@v0.2.0/mod.ts";
 import * as buffer from "https://deno.land/x/denops_std@v3.8.1/buffer/mod.ts";
 import * as option from "https://deno.land/x/denops_std@v3.8.1/option/mod.ts";
 import {
@@ -46,11 +46,12 @@ export async function command(
     ...builtinOpts,
   ]);
   validateFlags(flags, allowedFlags);
-  const [commitish, abspath] = parseResidue(residue);
-  await exec(denops, abspath, {
+  const [commitish, paths] = parseResidue(residue);
+  await exec(denops, {
     processor: opts.processor?.split(" "),
     worktree: opts.worktree,
     commitish,
+    paths,
     flags,
     cmdarg: formatOpts(opts, builtinOpts).join(" "),
     mods,
@@ -61,6 +62,7 @@ export type ExecOptions = {
   processor?: string[];
   worktree?: string;
   commitish?: string;
+  paths?: string[];
   flags?: Flags;
   opener?: string;
   cmdarg?: string;
@@ -69,7 +71,6 @@ export type ExecOptions = {
 
 export async function exec(
   denops: Denops,
-  filename: string,
   options: ExecOptions,
 ): Promise<buffer.OpenResult> {
   const verbose = await option.verbose.get(denops);
@@ -79,7 +80,8 @@ export async function exec(
     verbose: !!verbose,
   });
 
-  const relpath = path.relative(worktree, filename);
+  const paths = options.paths?.map((p) => path.relative(worktree, p));
+
   const bufname = formatBufname({
     scheme: "gindiff",
     expr: worktree,
@@ -88,7 +90,7 @@ export async function exec(
       processor: unnullish(options.processor, (v) => v.join(" ")),
       commitish: options.commitish,
     },
-    fragment: relpath,
+    fragment: unnullish(paths, (v) => `${v.join(" ")}$`),
   });
   return await buffer.open(denops, bufname, {
     opener: options.opener,
@@ -97,13 +99,19 @@ export async function exec(
   });
 }
 
-function parseResidue(residue: string[]): [string | undefined, string] {
-  // GinDiff [{options}] [{commitish}] {path}
-  switch (residue.length) {
+function parseResidue(residue: string[]): [string | undefined, string[]] {
+  const index = residue.indexOf("--");
+  const head = index === -1 ? residue : residue.slice(0, index);
+  const tail = index === -1 ? [] : residue.slice(index + 1);
+  // GinDiff [{options}]
+  // GinDiff [{options}] {commitish}
+  // GinDiff [{options}] -- {path}...
+  // GinDiff [{options}] {commitish} -- {path}...
+  switch (head.length) {
+    case 0:
+      return [undefined, tail];
     case 1:
-      return [undefined, residue[0].toString()];
-    case 2:
-      return [residue[0].toString(), residue[1].toString()];
+      return [head[0], tail];
     default:
       throw new Error("Invalid number of arguments");
   }

@@ -164,9 +164,7 @@ COMMANDS					*gin-commands*
 	|<Plug>(gin-diffget)|		Assigned to "do" in default.
 
 							*:GinDiff*
-:GinDiff [++{option}...] [++processor={processor}] [{flags}] {path}
-:GinDiff [++{option}...] [++processor={processor}] [{flags}] --cached {path}
-:GinDiff [++{option}...] [++processor={processor}] [{flags}] {commitish} {path}
+:GinDiff [++{option}...] [++processor={processor}] [{flags}] [{commitish}] [-- {path}...]
 	Open a "gin-diff" buffer of a file.
 	See |gin-command-options| for available {option}s.
 
@@ -180,7 +178,7 @@ COMMANDS					*gin-commands*
 	the processor command through stdin and the result of the processor is
 	used as the output.
 >
-	:GinDiff ++processor=delta\ --diff-highlight\ --keep-plus-minus-markers HEAD %
+	:GinDiff ++processor=delta\ --diff-highlight\ --keep-plus-minus-markers
 <
 	The following {flags} are available:
 

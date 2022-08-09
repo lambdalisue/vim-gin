@@ -26,14 +26,12 @@ export async function edit(
   const cmdarg = await vars.v.get(denops, "cmdarg") as string;
   const [opts, _] = parseOpts(cmdarg.split(" "));
   validateOpts(opts, builtinOpts);
-  const { scheme, expr, params, fragment } = parseBufname(bufname);
-  if (!fragment) {
-    throw new Error(`A buffer '${scheme}://' requires a fragment part`);
-  }
-  await exec(denops, bufnr, fragment, {
+  const { expr, params, fragment } = parseBufname(bufname);
+  await exec(denops, bufnr, {
     processor: unnullish(params?.processor, (v) => ensureString(v).split(" ")),
     worktree: expr,
     commitish: unnullish(params?.commitish, ensureString),
+    paths: fragment?.replace(/\$$/, "").split(" ").filter((v) => v),
     flags: {
       ...params,
       processor: undefined,
@@ -48,6 +46,7 @@ export type ExecOptions = {
   processor?: string[];
   worktree?: string;
   commitish?: string;
+  paths?: string[];
   flags?: Flags;
   encoding?: string;
   fileformat?: string;
@@ -56,15 +55,14 @@ export type ExecOptions = {
 export async function exec(
   denops: Denops,
   bufnr: number,
-  relpath: string,
   options: ExecOptions,
 ): Promise<void> {
   const args = [
     "diff",
     ...formatFlags(options.flags ?? {}),
-    ...unnullish(options.commitish, (v) => [v]) ?? [],
+    ...(unnullish(options.commitish, (v) => [v]) ?? []),
     "--",
-    relpath,
+    ...(options.paths ?? []),
   ];
   await execBuffer(denops, bufnr, args, {
     processor: options.processor,
