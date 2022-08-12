@@ -358,6 +358,10 @@ gin#util#expand({expr})
 	Like |expand()| but it extract a target filename if the buffer is
 	gin's file-like buffer.
 
+						*gin#util#worktree()*
+gin#util#worktree([{path}])
+	Return a git worktree path of the {path} or the current buffer.
+
 						*gin#util#debounce()*
 gin#util#debounce({expr}, {delay})
 	Execute {expr} after {delay} milliseconds and debounce all calls

@@ -2,6 +2,7 @@ import type { Denops } from "https://deno.land/x/denops_std@v3.8.1/mod.ts";
 import * as unknownutil from "https://deno.land/x/unknownutil@v2.0.0/mod.ts";
 import * as buffer from "https://deno.land/x/denops_std@v3.8.1/buffer/mod.ts";
 import { expand } from "../../util/cmd.ts";
+import { findWorktreeFromDenops } from "../../util/worktree.ts";
 
 export function main(denops: Denops): void {
   denops.dispatcher = {
@@ -14,6 +15,15 @@ export function main(denops: Denops): void {
     "util:expand": (expr) => {
       unknownutil.assertString(expr);
       return expand(denops, expr);
+    },
+
+    "util:worktree": (worktree) => {
+      if (worktree) {
+        unknownutil.assertString(worktree);
+      } else {
+        unknownutil.assertUndefined(worktree);
+      }
+      return findWorktreeFromDenops(denops, { worktree });
     },
   };
 }
