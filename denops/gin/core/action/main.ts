@@ -8,27 +8,19 @@ const rangeRef: [number, number] = [0, 0];
 export function main(denops: Denops): void {
   denops.dispatcher = {
     ...denops.dispatcher,
-    "action:list_actions": (bufnr) => {
+    "action:list": (bufnr) => {
       unknownutil.assertNumber(bufnr);
       return action.list(denops, bufnr);
+    },
+    "action:call": (name, range) => {
+      unknownutil.assertString(name);
+      unknownutil.assertLike(rangeRef, range);
+      return action.call(denops, name, range);
     },
     "action:gather_candidates": (bufnr, range) => {
       unknownutil.assertNumber(bufnr);
       unknownutil.assertLike(rangeRef, range);
       return registry.gatherCandidates(denops, bufnr, range);
-    },
-    "action:action:choice": (range) => {
-      unknownutil.assertLike(rangeRef, range);
-      return action.actionChoice(denops, range);
-    },
-    "action:action:repeat": (range) => {
-      unknownutil.assertLike(rangeRef, range);
-      return action.actionRepeat(denops, range);
-    },
-    "action:action:help": (range, reduced) => {
-      unknownutil.assertLike(rangeRef, range);
-      unknownutil.assertBoolean(reduced);
-      return action.actionHelp(denops, range, reduced);
     },
   };
 }

@@ -57,12 +57,7 @@ Gin defines the following mappings for actions:
 	"a"	Open a prompt to input action to execute
 	"."	Repeat previous action which has executed from a prompt
 
-Users have to define alternative mappings to disable default mappings like:
->
-	" Use g? to show help instead of ?
-	nmap <buffer> g? <Plug>(gin-action-help)
-
-See |gin-actions| for all actions available.
+See |gin-actions| for details.
 
 -----------------------------------------------------------------------------
 PROXY						*gin-proxy*
@@ -450,36 +445,6 @@ gin#util#worktree([{path}])
 gin#util#debounce({expr}, {delay})
 	Execute {expr} after {delay} milliseconds and debounce all calls
 	within that {delay}.
-
-						*gin#action#fn()*
-gin#action#fn({callback})
-	A wrapper function to make an action mapping.
-	The wrapped function is called with {xs} which is a candidate |List|
-	when the action is invoked.
-	Note that users MUST use <Cmd> pseudokey to define mappings like:
->
-	function! s:my_custom(xs) abort
-	  echo string(a:xs)
-	endfunction
-
-	noremap <buffer> <Plug>(gin-action-my-custom)
-	      \ <Cmd>call gin#action#fn({ xs -> <SID>my_custom(xs) })<CR>
-<
-						*gin#action#call()*
-gin#action#call({name}, {range})
-	Invoke an action {name} with {range}. The {name} is |String| name and
-	the {range} is "[firstline, lastline]" |List|.
-	Note that this function uses |feedkeys()| internally.
->
-	call gin#action#call('my-custom', [1, 1])
-<
-	       				*gin#action#list_action()*
-gin#action#list_actions({bufnr})
-	List all available actions of the buffer {bufnr}.
-
-	       				*gin#action#gather_candidates()*
-gin#action#gather_candidates({bufnr}, {range})
-	Gather and return candidates of the buffer {bufnr} in {range}.
 
 -----------------------------------------------------------------------------
 COMPONENTS					*gin-components*

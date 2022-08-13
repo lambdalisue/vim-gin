@@ -53,9 +53,11 @@ export async function exec(
     removeAnsiEscapeCode(content.join("\n")),
   );
   if (!eventignore.includes("all")) {
-    await autocmd.emit(denops, "User", "GinCommandPost", {
-      nomodeline: true,
-    });
+    await denops.call(
+      "gin#util#debounce",
+      "doautocmd <nomodeline> User GinCommandPost",
+      100,
+    );
   }
 }
 

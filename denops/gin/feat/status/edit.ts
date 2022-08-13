@@ -12,9 +12,9 @@ import {
   parseOpts,
 } from "https://deno.land/x/denops_std@v3.8.1/argument/mod.ts";
 import { bind } from "../../core/bare/command.ts";
-import { register as registerGatherer } from "../../core/action/registry.ts";
 import { exec as execBuffer } from "../../core/buffer/edit.ts";
-import { getCandidates } from "./action.ts";
+import { init as initActionCore } from "../../core/action/action.ts";
+import { init as initActionStatus } from "./action.ts";
 
 export async function edit(
   denops: Denops,
@@ -60,7 +60,6 @@ export async function exec(
     encoding: options.encoding,
     fileformat: options.fileformat,
   });
-  await registerGatherer(denops, bufnr, getCandidates);
   await buffer.ensure(denops, bufnr, async () => {
     await buffer.modifiable(denops, bufnr, async () => {
       const saved = await fn.winsaveview(denops);
@@ -69,8 +68,9 @@ export async function exec(
     });
     await batch.batch(denops, async (denops) => {
       await bind(denops, bufnr);
+      await initActionCore(denops, bufnr);
+      await initActionStatus(denops, bufnr);
       await option.filetype.setLocal(denops, "gin-status");
-      await denops.call("gin#internal#feat#status#core#init");
       await autocmd.group(
         denops,
         `gin_feat_status_command_read_${bufnr}`,
