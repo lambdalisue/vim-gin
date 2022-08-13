@@ -38,12 +38,14 @@ export async function command(
   const [opts, residue] = parseOpts(await normCmdArgs(denops, args));
   validateOpts(opts, [
     "worktree",
+    "opener",
     ...builtinOpts,
   ]);
   const [commitish, filename] = parseResidue(residue);
   await exec(denops, filename, {
     worktree: opts.worktree,
     commitish,
+    opener: opts.opener,
     cmdarg: formatOpts(opts, builtinOpts).join(" "),
     mods,
   });

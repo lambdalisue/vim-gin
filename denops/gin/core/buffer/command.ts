@@ -24,12 +24,14 @@ export async function command(
     "processor",
     "worktree",
     "monochrome",
+    "opener",
     ...builtinOpts,
   ]);
   return exec(denops, residue, {
     processor: opts.processor?.split(" "),
     worktree: opts.worktree,
     monochrome: unnullish(opts.monochrome, () => true),
+    opener: opts.opener,
     cmdarg: formatOpts(opts, builtinOpts).join(" "),
     mods,
   });
@@ -39,6 +41,7 @@ export type ExecOptions = {
   processor?: string[];
   worktree?: string;
   monochrome?: boolean;
+  opener?: string;
   cmdarg?: string;
   mods?: string;
 };
@@ -63,6 +66,7 @@ export async function exec(
     fragment: `${args.join(" ")}$`,
   });
   return await buffer.open(denops, bufname, {
+    opener: options.opener,
     cmdarg: options.cmdarg,
     mods: options.mods,
   });

@@ -49,6 +49,7 @@ export async function command(
   const [opts, flags, residue] = parse(await normCmdArgs(denops, args));
   validateOpts(opts, [
     "worktree",
+    "opener",
     ...builtinOpts,
   ]);
   validateFlags(flags, allowedFlags);
@@ -56,6 +57,7 @@ export async function command(
     worktree: opts.worktree,
     patterns: residue,
     flags,
+    opener: opts.opener,
     cmdarg: formatOpts(opts, builtinOpts).join(" "),
     mods,
   });

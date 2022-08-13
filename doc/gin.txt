@@ -326,6 +326,12 @@ Gin supports several options starts with double plus signs (++) as:
 >
 	:GinStatus ++worktree=/home/john/project\ A
 <
+++opener={opener}
+	Specify a command to open the buffer. This option is only available on
+	Gin commands that open buffer(s).
+>
+	:GinEdit ++opener=botright\ vsplit README.md
+<
 ++enc={encoding}/++encoding={encoding}
 	Specify 'fileencoding' option of the buffer. This option is only
 	available on Gin commands that open buffer(s).

@@ -40,6 +40,7 @@ export async function command(
   const [opts, _, residue] = parse(await normCmdArgs(denops, args));
   validateOpts(opts, [
     "worktree",
+    "opener",
     "no-ours",
     "no-theirs",
     ...builtinOpts,
@@ -47,6 +48,7 @@ export async function command(
   const [abspath] = parseResidue(residue);
   await exec(denops, abspath, {
     worktree: opts.worktree,
+    opener: opts.opener,
     noOurs: "no-ours" in opts,
     noTheirs: "no-theirs" in opts,
     cmdarg: formatOpts(opts, builtinOpts).join(" "),

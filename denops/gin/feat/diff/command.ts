@@ -59,6 +59,7 @@ export async function command(
   validateOpts(opts, [
     "processor",
     "worktree",
+    "opener",
     ...builtinOpts,
   ]);
   validateFlags(flags, allowedFlags);
@@ -69,6 +70,7 @@ export async function command(
     commitish,
     paths,
     flags,
+    opener: opts.opener,
     cmdarg: formatOpts(opts, builtinOpts).join(" "),
     mods,
   });
