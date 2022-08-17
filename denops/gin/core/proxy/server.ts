@@ -137,9 +137,9 @@ async function edit(
     await autocmd.group(denops, auname, (helper) => {
       helper.remove("*", `<buffer=${bufnr}>`);
       helper.define(
-        ["WinClosed", "BufUnload", "VimLeave"],
+        ["BufWinLeave"],
         `<buffer=${bufnr}>`,
-        `call denops#notify('gin', '${waiterId}', [])`,
+        `call denops#request('gin', '${waiterId}', [])`,
         {
           once: true,
         },
