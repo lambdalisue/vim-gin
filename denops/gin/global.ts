@@ -1,4 +1,5 @@
 export const GIN_BUFFER_PROTOCOLS = [
+  "gin",
   "ginbranch",
   "gindiff",
   "ginedit",

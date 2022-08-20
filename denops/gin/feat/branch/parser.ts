@@ -1,5 +1,3 @@
-import { decodeUtf8 } from "../../util/text.ts";
-
 const branchAliasPattern = /^\s{2}(remotes\/([^\/]+)\/(\S+))\s+-> (\S+)$/;
 const remoteBranchPattern =
   /^\s{2}(remotes\/([^\/]+)\/(\S+))\s+([a-f0-9]+) (.*)$/;
@@ -49,10 +47,8 @@ export interface GitBranchResult {
   branches: Branch[];
 }
 
-export function parse(bytes: Uint8Array): GitBranchResult {
-  const text = decodeUtf8(bytes);
-  const records: string[] = text.replace(/\n$/, "").split("\n");
-  const branches: Branch[] = records.map((record) => {
+export function parse(content: string[]): GitBranchResult {
+  const branches: Branch[] = content.filter((v) => v).map((record) => {
     const m1 = record.match(branchAliasPattern);
     if (m1) {
       return {

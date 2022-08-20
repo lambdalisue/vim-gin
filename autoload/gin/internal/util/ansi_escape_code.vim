@@ -1,8 +1,3 @@
-if exists('g:loaded_gin_colors')
-  finish
-endif
-let g:loaded_gin_colors = 1
-
 " Ref: https://github.com/w0ng/vim-hybrid
 let s:terminal_ansi_colors = [
       \ '#282a2e',
@@ -23,6 +18,10 @@ let s:terminal_ansi_colors = [
       \ '#c5c8c6',
       \]
 
+function! gin#internal#util#ansi_escape_code#colors() abort
+  return s:list_colors()
+endfunction
+
 if has('nvim')
   function! s:list_colors() abort
     return map(
@@ -35,22 +34,3 @@ else
     return get(g:, 'terminal_ansi_colors', s:terminal_ansi_colors)
   endfunction
 endif
-
-function! s:define_highlight() abort
-  let colors = s:list_colors()
-  for i in range(16)
-    execute printf(
-          \ 'highlight default GinColor%d cterm=bold ctermfg=%d gui=bold guifg=%s',
-          \ i,
-          \ i,
-          \ colors[i],
-          \)
-  endfor
-endfunction
-
-augroup gin_plugin_colors_define_highlight_internal
-  autocmd! *
-  autocmd ColorScheme * call s:define_highlight()
-augroup END
-
-call s:define_highlight()

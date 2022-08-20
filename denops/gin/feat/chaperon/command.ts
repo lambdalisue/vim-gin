@@ -1,27 +1,62 @@
-import type { Denops } from "https://deno.land/x/denops_std@v3.6.0/mod.ts";
-import * as batch from "https://deno.land/x/denops_std@v3.6.0/batch/mod.ts";
-import * as fn from "https://deno.land/x/denops_std@v3.6.0/function/mod.ts";
-import * as mapping from "https://deno.land/x/denops_std@v3.6.0/mapping/mod.ts";
-import * as vars from "https://deno.land/x/denops_std@v3.6.0/variable/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v3.8.1/mod.ts";
+import * as batch from "https://deno.land/x/denops_std@v3.8.1/batch/mod.ts";
+import * as fn from "https://deno.land/x/denops_std@v3.8.1/function/mod.ts";
+import * as mapping from "https://deno.land/x/denops_std@v3.8.1/mapping/mod.ts";
+import * as vars from "https://deno.land/x/denops_std@v3.8.1/variable/mod.ts";
 import * as unknownutil from "https://deno.land/x/unknownutil@v2.0.0/mod.ts";
-import * as path from "https://deno.land/std@0.150.0/path/mod.ts";
-import * as option from "https://deno.land/x/denops_std@v3.6.0/option/mod.ts";
+import * as path from "https://deno.land/std@0.151.0/path/mod.ts";
+import * as option from "https://deno.land/x/denops_std@v3.8.1/option/mod.ts";
 import {
   builtinOpts,
   formatOpts,
   parse,
   validateOpts,
-} from "https://deno.land/x/denops_std@v3.6.0/argument/mod.ts";
-import * as buffer from "https://deno.land/x/denops_std@v3.6.0/buffer/mod.ts";
-import { expand, normCmdArgs } from "../../util/cmd.ts";
-import {
-  findWorktreeFromSuspects,
-  listWorktreeSuspectsFromDenops,
-} from "../../util/worktree.ts";
-import { exec as editExec } from "../edit/command.ts";
+} from "https://deno.land/x/denops_std@v3.8.1/argument/mod.ts";
+import * as buffer from "https://deno.land/x/denops_std@v3.8.1/buffer/mod.ts";
+import { normCmdArgs } from "../../util/cmd.ts";
+import { findWorktreeFromDenops } from "../../util/worktree.ts";
+import { exec as execEdit } from "../edit/command.ts";
 import { AliasHead, getInProgressAliasHead, stripConflicts } from "./util.ts";
 
-export type Options = {
+export type CommandOptions = {
+  disableDefaultArgs?: boolean;
+};
+
+export async function command(
+  denops: Denops,
+  mods: string,
+  args: string[],
+  options: CommandOptions = {},
+): Promise<void> {
+  if (!options.disableDefaultArgs) {
+    const defaultArgs = await vars.g.get(
+      denops,
+      "gin_chaperon_default_args",
+      [],
+    );
+    unknownutil.assertArray(defaultArgs, unknownutil.isString);
+    args = [...defaultArgs, ...args];
+  }
+  const [opts, _, residue] = parse(await normCmdArgs(denops, args));
+  validateOpts(opts, [
+    "worktree",
+    "opener",
+    "no-ours",
+    "no-theirs",
+    ...builtinOpts,
+  ]);
+  const [abspath] = parseResidue(residue);
+  await exec(denops, abspath, {
+    worktree: opts.worktree,
+    opener: opts.opener,
+    noOurs: "no-ours" in opts,
+    noTheirs: "no-theirs" in opts,
+    cmdarg: formatOpts(opts, builtinOpts).join(" "),
+    mods,
+  });
+}
+
+export type ExecOptions = {
   worktree?: string;
   noOurs?: boolean;
   noTheirs?: boolean;
@@ -30,33 +65,10 @@ export type Options = {
   mods?: string;
 };
 
-export async function command(
-  denops: Denops,
-  mods: string,
-  args: string[],
-): Promise<void> {
-  const [opts, _, residue] = parse(await normCmdArgs(denops, args));
-  validateOpts(opts, [
-    "worktree",
-    "no-ours",
-    "no-theirs",
-    ...builtinOpts,
-  ]);
-  const options = {
-    worktree: opts["worktree"],
-    noOurs: "no-ours" in opts,
-    noTheirs: "no-theirs" in opts,
-    cmdarg: formatOpts(opts, builtinOpts).join(" "),
-    mods,
-  };
-  const [abspath] = parseResidue(residue);
-  await exec(denops, abspath, options);
-}
-
 export async function exec(
   denops: Denops,
   filename: string,
-  options: Options,
+  options: ExecOptions,
 ): Promise<void> {
   const [verbose, noSupplements, supplementHeight, disableDefaultMappings] =
     await batch
@@ -77,18 +89,17 @@ export async function exec(
   unknownutil.assertNumber(supplementHeight);
   unknownutil.assertBoolean(disableDefaultMappings);
 
-  const worktree = await findWorktreeFromSuspects(
-    options.worktree
-      ? [await expand(denops, options.worktree)]
-      : await listWorktreeSuspectsFromDenops(denops, !!verbose),
-    !!verbose,
-  );
-  const relpath = path.relative(worktree, filename);
+  const worktree = await findWorktreeFromDenops(denops, {
+    worktree: options.worktree,
+    verbose: !!verbose,
+  });
+  const abspath = path.isAbsolute(filename)
+    ? filename
+    : path.join(worktree, filename);
 
   const inProgressAliasHead = await getInProgressAliasHead(worktree);
 
-  const infoWorktree = await editExec(denops, relpath, undefined, {}, {
-    worktree,
+  const infoWorktree = await buffer.open(denops, abspath, {
     opener: options.opener,
     cmdarg: options.cmdarg,
     mods: options.mods,
@@ -96,8 +107,9 @@ export async function exec(
 
   let infoTheirs: buffer.OpenResult | undefined;
   if (!options.noTheirs) {
-    infoTheirs = await editExec(denops, relpath, ":3", {}, {
+    infoTheirs = await execEdit(denops, abspath, {
       worktree,
+      commitish: ":3",
       opener: "topleft vsplit",
       cmdarg: options.cmdarg,
       mods: options.mods,
@@ -107,8 +119,9 @@ export async function exec(
 
   let infoOurs: buffer.OpenResult | undefined;
   if (!options.noOurs) {
-    infoOurs = await editExec(denops, relpath, ":2", {}, {
+    infoOurs = await execEdit(denops, abspath, {
       worktree,
+      commitish: ":2",
       opener: "botright vsplit",
       cmdarg: options.cmdarg,
       mods: options.mods,
@@ -155,6 +168,20 @@ export async function exec(
       inProgressAliasHead,
     );
   }
+
+  // edit | diffthis
+  const winids = [infoWorktree, infoTheirs, infoOurs]
+    .map((v) => v?.winid)
+    .filter((v) => v) as number[];
+  await batch.batch(denops, async (denops) => {
+    for (const winid of winids) {
+      await fn.win_execute(denops, winid, "edit", "silent!");
+    }
+    for (const winid of winids) {
+      await fn.win_execute(denops, winid, "diffthis", "silent!");
+    }
+  });
+
   // Focus Worktree
   await fn.win_gotoid(denops, infoWorktree.winid);
 }
@@ -198,7 +225,6 @@ async function initTheirs(
           },
         );
       }
-      await denops.cmd("diffthis");
     });
   });
 }
@@ -288,7 +314,6 @@ async function initWorktree(
           );
         }
       }
-      await denops.cmd("diffthis");
     });
   });
 }
@@ -320,7 +345,6 @@ async function initOurs(
           },
         );
       }
-      await denops.cmd("diffthis");
     });
   });
 }
@@ -338,7 +362,7 @@ async function openSupplements(
       await fn.win_gotoid(denops, winidTheirs);
       await denops.cmd(`rightbelow ${supplementHeight}split`);
       await denops.cmd(
-        `silent! Gin! ++buffer log -1 ${inProgressAliasHead} -p`,
+        `silent! GinBuffer log -1 ${inProgressAliasHead} -p`,
       );
       await option.winfixheight.setLocal(denops, true);
       await option.filetype.setLocal(denops, "git");
@@ -349,7 +373,7 @@ async function openSupplements(
     await fn.win_gotoid(denops, winidWorktree);
     await denops.cmd(`rightbelow ${supplementHeight}split`);
     await denops.cmd(
-      `silent! Gin! ++buffer log --oneline --left-right ${inProgressAliasHead}...HEAD`,
+      `silent! GinBuffer log --oneline --left-right ${inProgressAliasHead}...HEAD`,
     );
     await option.winfixheight.setLocal(denops, true);
     await option.filetype.setLocal(denops, "diff");
@@ -359,7 +383,7 @@ async function openSupplements(
     await batch.batch(denops, async (denops) => {
       await fn.win_gotoid(denops, winidOurs);
       await denops.cmd(`rightbelow ${supplementHeight}split`);
-      await denops.cmd("silent! Gin! ++buffer log -1 HEAD -p");
+      await denops.cmd("silent! GinBuffer log -1 HEAD -p");
       await option.winfixheight.setLocal(denops, true);
       await option.filetype.setLocal(denops, "git");
     });

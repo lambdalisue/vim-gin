@@ -1,10 +1,7 @@
-import type { Denops } from "https://deno.land/x/denops_std@v3.6.0/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v3.8.1/mod.ts";
 import { Cache } from "https://deno.land/x/local_cache@1.0/mod.ts";
 import { decodeUtf8 } from "../util/text.ts";
-import {
-  findWorktreeFromSuspects,
-  listWorktreeSuspectsFromDenops,
-} from "../util/worktree.ts";
+import { findWorktreeFromDenops } from "../util/worktree.ts";
 import { execute } from "../git/process.ts";
 
 type Data = [string, string];
@@ -17,9 +14,7 @@ async function getData(
   if (cache.has("data")) {
     return cache.get("data");
   }
-  const worktree = await findWorktreeFromSuspects(
-    await listWorktreeSuspectsFromDenops(denops),
-  );
+  const worktree = await findWorktreeFromDenops(denops);
   const result = await getBranches(worktree);
   cache.set("data", result);
   return result;

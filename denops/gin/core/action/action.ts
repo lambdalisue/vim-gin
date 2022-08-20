@@ -1,9 +1,12 @@
-import type { Denops } from "https://deno.land/x/denops_std@v3.6.0/mod.ts";
-import * as buffer from "https://deno.land/x/denops_std@v3.6.0/buffer/mod.ts";
-import * as fn from "https://deno.land/x/denops_std@v3.6.0/function/mod.ts";
-import * as helper from "https://deno.land/x/denops_std@v3.6.0/helper/mod.ts";
-import * as mapping from "https://deno.land/x/denops_std@v3.6.0/mapping/mod.ts";
-import * as vars from "https://deno.land/x/denops_std@v3.6.0/variable/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v3.8.1/mod.ts";
+import * as batch from "https://deno.land/x/denops_std@v3.8.1/batch/mod.ts";
+import * as buffer from "https://deno.land/x/denops_std@v3.8.1/buffer/mod.ts";
+import * as fn from "https://deno.land/x/denops_std@v3.8.1/function/mod.ts";
+import * as helper from "https://deno.land/x/denops_std@v3.8.1/helper/mod.ts";
+import * as mapping from "https://deno.land/x/denops_std@v3.8.1/mapping/mod.ts";
+import * as unknownutil from "https://deno.land/x/unknownutil@v2.0.0/mod.ts";
+
+let rangeInternal: Range | undefined;
 
 export type Action = {
   name: string;
@@ -12,6 +15,31 @@ export type Action = {
 };
 
 export type Range = [number, number];
+
+export type Callback = (
+  denops: Denops,
+  bufnr: number,
+  range: Range,
+) => Promise<void>;
+
+export async function init(denops: Denops, bufnr: number): Promise<void> {
+  await batch.batch(denops, async (denops) => {
+    await define(denops, bufnr, "choice", doChoice);
+    await define(denops, bufnr, "repeat", doRepeat);
+    await define(
+      denops,
+      bufnr,
+      "help",
+      (denops, bufnr, range) => doHelp(denops, bufnr, range, true),
+    );
+    await define(
+      denops,
+      bufnr,
+      "help:all",
+      (denops, bufnr, range) => doHelp(denops, bufnr, range, false),
+    );
+  });
+}
 
 export async function list(
   denops: Denops,
@@ -35,11 +63,69 @@ export async function list(
   return cs;
 }
 
-export async function actionChoice(
+export async function call(
   denops: Denops,
+  name: string,
   range: Range,
 ): Promise<void> {
-  const cs = await list(denops, await fn.bufnr(denops));
+  const rangeSaved = rangeInternal;
+  rangeInternal = [...range];
+  try {
+    await fn.execute(
+      denops,
+      `call feedkeys("\\<Plug>(gin-action-${name})\\<Ignore>", 'x')`,
+    );
+  } finally {
+    rangeInternal = rangeSaved;
+  }
+}
+
+export async function define(
+  denops: Denops,
+  bufnr: number,
+  name: string,
+  callback: Callback,
+): Promise<void> {
+  denops.dispatcher = {
+    ...denops.dispatcher,
+    [`action:action:${name}`]: async () => {
+      await helper.friendlyCall(denops, async () => {
+        await buffer.ensure(denops, bufnr, async () => {
+          const range = await getRange(denops);
+          await callback(denops, bufnr, range);
+        });
+      });
+    },
+  };
+  await mapping.map(
+    denops,
+    `<Plug>(gin-action-${name})`,
+    `<Cmd>call denops#request('gin', 'action:action:${name}', [])<CR>`,
+    { buffer: true },
+  );
+}
+
+async function getRange(denops: Denops): Promise<Range> {
+  if (rangeInternal) {
+    return rangeInternal;
+  }
+  const [mode, line1, line2] = await batch.gather(denops, async (denops) => {
+    await fn.mode(denops);
+    await fn.line(denops, ".");
+    await fn.line(denops, "v");
+  }) as [string, number, number];
+  if (mode === "n") {
+    return [line1, line1];
+  }
+  return line1 < line2 ? [line1, line2] : [line2, line1];
+}
+
+async function doChoice(
+  denops: Denops,
+  bufnr: number,
+  range: Range,
+): Promise<void> {
+  const cs = await list(denops, bufnr);
   const name = await helper.input(denops, {
     prompt: "action: ",
     completion: (
@@ -55,26 +141,32 @@ export async function actionChoice(
   if (name == null) {
     return;
   }
-  await vars.b.set(denops, "denops_action_previous", name);
-  await denops.call("gin#action#call", name, range);
+  await fn.setbufvar(denops, bufnr, "denops_action_previous", name);
+  await call(denops, name, range);
 }
 
-export async function actionRepeat(
+async function doRepeat(
   denops: Denops,
+  bufnr: number,
   range: Range,
 ): Promise<void> {
-  const name = await vars.b.get(denops, "denops_action_previous", null) as
-    | string
-    | null;
-  if (name == null) {
+  const name = await fn.getbufvar(
+    denops,
+    bufnr,
+    "denops_action_previous",
+    null,
+  );
+  if (!name) {
     await helper.echo(denops, "[gin] Nothing to repeat");
     return;
   }
-  await denops.call("gin#action#call", name, range);
+  unknownutil.assertString(name);
+  await call(denops, name, range);
 }
 
-export async function actionHelp(
+async function doHelp(
   denops: Denops,
+  _bufnr: number,
   _range: Range,
   reduced: boolean,
 ): Promise<void> {

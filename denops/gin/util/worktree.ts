@@ -1,22 +1,23 @@
-import type { Denops } from "https://deno.land/x/denops_std@v3.6.0/mod.ts";
-import * as batch from "https://deno.land/x/denops_std@v3.6.0/batch/mod.ts";
-import * as bufname from "https://deno.land/x/denops_std@v3.6.0/bufname/mod.ts";
-import * as fn from "https://deno.land/x/denops_std@v3.6.0/function/mod.ts";
-import * as path from "https://deno.land/std@0.150.0/path/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v3.8.1/mod.ts";
+import * as batch from "https://deno.land/x/denops_std@v3.8.1/batch/mod.ts";
+import { parse as parseBufname } from "https://deno.land/x/denops_std@v3.8.1/bufname/mod.ts";
+import * as fn from "https://deno.land/x/denops_std@v3.8.1/function/mod.ts";
+import * as path from "https://deno.land/std@0.151.0/path/mod.ts";
 import * as unknownutil from "https://deno.land/x/unknownutil@v2.0.0/mod.ts";
 import { GIN_BUFFER_PROTOCOLS } from "../global.ts";
+import { expand } from "../util/cmd.ts";
 import { find } from "../git/finder.ts";
 
 /**
  * Find a git worktree from a suspected directory
  */
-export async function findWorktreeFromSuspect(
+async function findWorktreeFromSuspect(
   suspect: string,
   verbose?: boolean,
 ): Promise<string> {
   // Check if 'anchor' is a gin buffer name
   try {
-    const { scheme, expr } = bufname.parse(suspect);
+    const { scheme, expr } = parseBufname(suspect);
     if (verbose) {
       console.debug(`The anchor scheme is '${scheme}' and expr is '${expr}'`);
     }
@@ -25,7 +26,7 @@ export async function findWorktreeFromSuspect(
       return expr;
     }
   } catch {
-    // Failed to execute 'bufname.parse(suspect)' means that the 'suspect' seems a real filepath.
+    // Failed to execute 'parseBufname(suspect)' means that the 'suspect' seems a real filepath.
     const candidates = new Set(await normSuspect(suspect));
     for (const c of candidates) {
       if (verbose) {
@@ -44,7 +45,7 @@ export async function findWorktreeFromSuspect(
 /**
  * Find a git worktree from suspected directories
  */
-export async function findWorktreeFromSuspects(
+async function findWorktreeFromSuspects(
   suspects: string[],
   verbose?: boolean,
 ): Promise<string> {
@@ -65,11 +66,11 @@ export async function findWorktreeFromSuspects(
 /**
  * Return candidates of worktree anchor directories from the host environment
  */
-export async function listWorktreeSuspectsFromDenops(
+async function listWorktreeSuspectsFromDenops(
   denops: Denops,
   verbose?: boolean,
 ): Promise<string[]> {
-  const [cwd, bname] = await batch.gather(
+  const [cwd, bufname] = await batch.gather(
     denops,
     async (denops) => {
       await fn.getcwd(denops);
@@ -77,13 +78,13 @@ export async function listWorktreeSuspectsFromDenops(
     },
   );
   unknownutil.assertString(cwd);
-  unknownutil.assertString(bname);
+  unknownutil.assertString(bufname);
   if (verbose) {
     console.debug("listWorktreeSuspectsFromDenops");
     console.debug(`  cwd: ${cwd}`);
-    console.debug(`  bname: ${bname}`);
+    console.debug(`  bufname: ${bufname}`);
   }
-  return [bname, cwd];
+  return [bufname, cwd];
 }
 
 async function normSuspect(suspect: string): Promise<string[]> {
@@ -118,3 +119,23 @@ async function normSuspect(suspect: string): Promise<string[]> {
     throw err;
   }
 }
+
+/**
+ * Find a git worktree from the host environment
+ */
+export async function findWorktreeFromDenops(
+  denops: Denops,
+  options: FindWorktreeFromDenopsOptions = {},
+): Promise<string> {
+  return await findWorktreeFromSuspects(
+    options.worktree
+      ? [await expand(denops, options.worktree)]
+      : await listWorktreeSuspectsFromDenops(denops, !!options.verbose),
+    !!options.verbose,
+  );
+}
+
+export type FindWorktreeFromDenopsOptions = {
+  worktree?: string;
+  verbose?: boolean;
+};

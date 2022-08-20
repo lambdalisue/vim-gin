@@ -1,25 +1,61 @@
-import type { Denops } from "https://deno.land/x/denops_std@v3.6.0/mod.ts";
-import * as batch from "https://deno.land/x/denops_std@v3.6.0/batch/mod.ts";
-import * as fn from "https://deno.land/x/denops_std@v3.6.0/function/mod.ts";
-import * as mapping from "https://deno.land/x/denops_std@v3.6.0/mapping/mod.ts";
-import * as vars from "https://deno.land/x/denops_std@v3.6.0/variable/mod.ts";
-import * as option from "https://deno.land/x/denops_std@v3.6.0/option/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v3.8.1/mod.ts";
+import * as path from "https://deno.land/std@0.151.0/path/mod.ts";
+import * as batch from "https://deno.land/x/denops_std@v3.8.1/batch/mod.ts";
+import * as fn from "https://deno.land/x/denops_std@v3.8.1/function/mod.ts";
+import * as mapping from "https://deno.land/x/denops_std@v3.8.1/mapping/mod.ts";
+import * as vars from "https://deno.land/x/denops_std@v3.8.1/variable/mod.ts";
+import * as option from "https://deno.land/x/denops_std@v3.8.1/option/mod.ts";
 import * as unknownutil from "https://deno.land/x/unknownutil@v2.0.0/mod.ts";
 import {
   builtinOpts,
   formatOpts,
   parse,
   validateOpts,
-} from "https://deno.land/x/denops_std@v3.6.0/argument/mod.ts";
-import * as buffer from "https://deno.land/x/denops_std@v3.6.0/buffer/mod.ts";
-import { expand, normCmdArgs } from "../../util/cmd.ts";
-import {
-  findWorktreeFromSuspects,
-  listWorktreeSuspectsFromDenops,
-} from "../../util/worktree.ts";
-import { exec as editExec } from "../edit/command.ts";
+} from "https://deno.land/x/denops_std@v3.8.1/argument/mod.ts";
+import * as buffer from "https://deno.land/x/denops_std@v3.8.1/buffer/mod.ts";
+import { normCmdArgs } from "../../util/cmd.ts";
+import { findWorktreeFromDenops } from "../../util/worktree.ts";
+import { exec as execEdit } from "../edit/command.ts";
 
-export type Options = {
+export type CommandOptions = {
+  disableDefaultArgs?: boolean;
+};
+
+export async function command(
+  denops: Denops,
+  mods: string,
+  args: string[],
+  options: CommandOptions = {},
+): Promise<void> {
+  if (!options.disableDefaultArgs) {
+    const defaultArgs = await vars.g.get(
+      denops,
+      "gin_patch_default_args",
+      [],
+    );
+    unknownutil.assertArray(defaultArgs, unknownutil.isString);
+    args = [...defaultArgs, ...args];
+  }
+  const [opts, _, residue] = parse(await normCmdArgs(denops, args));
+  validateOpts(opts, [
+    "worktree",
+    "opener",
+    "no-head",
+    "no-worktree",
+    ...builtinOpts,
+  ]);
+  const [abspath] = parseResidue(residue);
+  await exec(denops, abspath, {
+    worktree: opts.worktree,
+    noHead: "no-head" in opts,
+    noWorktree: "no-worktree" in opts,
+    opener: opts.opener,
+    cmdarg: formatOpts(opts, builtinOpts).join(" "),
+    mods,
+  });
+}
+
+export type ExecOptions = {
   worktree?: string;
   noHead?: boolean;
   noWorktree?: boolean;
@@ -28,33 +64,10 @@ export type Options = {
   mods?: string;
 };
 
-export async function command(
-  denops: Denops,
-  mods: string,
-  args: string[],
-): Promise<void> {
-  const [opts, _, residue] = parse(await normCmdArgs(denops, args));
-  validateOpts(opts, [
-    "worktree",
-    "no-head",
-    "no-worktree",
-    ...builtinOpts,
-  ]);
-  const options = {
-    worktree: opts["worktree"],
-    noHead: "no-head" in opts,
-    noWorktree: "no-worktree" in opts,
-    cmdarg: formatOpts(opts, builtinOpts).join(" "),
-    mods,
-  };
-  const [abspath] = parseResidue(residue);
-  await exec(denops, abspath, options);
-}
-
 export async function exec(
   denops: Denops,
   filename: string,
-  options: Options = {},
+  options: ExecOptions,
 ): Promise<void> {
   const [verbose, disableDefaultMappings] = await batch.gather(
     denops,
@@ -69,16 +82,16 @@ export async function exec(
   ) as [number, unknown];
   unknownutil.assertBoolean(disableDefaultMappings);
 
-  const worktree = await findWorktreeFromSuspects(
-    options.worktree
-      ? [await expand(denops, options.worktree)]
-      : await listWorktreeSuspectsFromDenops(denops, !!verbose),
-    !!verbose,
-  );
+  const worktree = await findWorktreeFromDenops(denops, {
+    worktree: options.worktree,
+    verbose: !!verbose,
+  });
+  const abspath = path.isAbsolute(filename)
+    ? filename
+    : path.join(worktree, filename);
 
-  const infoIndex = await editExec(denops, filename, undefined, {}, {
+  const infoIndex = await execEdit(denops, abspath, {
     worktree,
-    cached: true,
     opener: options.opener,
     cmdarg: options.cmdarg,
     mods: options.mods,
@@ -86,8 +99,9 @@ export async function exec(
 
   let infoHead: buffer.OpenResult | undefined;
   if (!options.noHead) {
-    infoHead = await editExec(denops, filename, "HEAD", {}, {
+    infoHead = await execEdit(denops, abspath, {
       worktree,
+      commitish: "HEAD",
       opener: "topleft vsplit",
       cmdarg: options.cmdarg,
       mods: options.mods,
@@ -97,8 +111,7 @@ export async function exec(
 
   let infoWorktree: buffer.OpenResult | undefined;
   if (!options.noWorktree) {
-    infoWorktree = await editExec(denops, filename, undefined, {}, {
-      worktree,
+    infoWorktree = await buffer.open(denops, abspath, {
       opener: "botright vsplit",
       cmdarg: options.cmdarg,
       mods: options.mods,
@@ -133,6 +146,19 @@ export async function exec(
       disableDefaultMappings,
     );
   }
+
+  // edit | diffthis
+  const winids = [infoIndex, infoHead, infoWorktree]
+    .map((v) => v?.winid)
+    .filter((v) => v) as number[];
+  await batch.batch(denops, async (denops) => {
+    for (const winid of winids) {
+      await fn.win_execute(denops, winid, "edit", "silent!");
+    }
+    for (const winid of winids) {
+      await fn.win_execute(denops, winid, "diffthis", "silent!");
+    }
+  });
 
   // Focus INDEX
   await fn.win_gotoid(denops, infoIndex.winid);
@@ -177,7 +203,6 @@ async function initHead(
           },
         );
       }
-      await denops.cmd("diffthis");
     });
   });
 }
@@ -226,7 +251,6 @@ async function initWorktree(
           },
         );
       }
-      await denops.cmd("diffthis");
     });
   });
 }
@@ -258,7 +282,7 @@ async function initIndex(
             buffer: true,
           },
         );
-        if (disableDefaultMappings) {
+        if (!disableDefaultMappings) {
           await mapping.map(
             denops,
             "dol",
@@ -331,7 +355,6 @@ async function initIndex(
           );
         }
       }
-      await denops.cmd("diffthis");
     });
   });
 }

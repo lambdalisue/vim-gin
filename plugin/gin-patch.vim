@@ -3,11 +3,11 @@ if exists('g:loaded_gin_patch')
 endif
 let g:loaded_gin_patch = 1
 
-function! s:command(...) abort
+function! s:command(bang, mods, args) abort
   if denops#plugin#wait('gin')
     return
   endif
-  call denops#request('gin', 'patch:command', a:000)
+  call denops#request('gin', 'patch:command', [a:bang, a:mods, a:args])
 endfunction
 
-command! -bar -nargs=* GinPatch call s:command(<q-mods>, <f-args>)
+command! -bang -bar -nargs=* GinPatch call s:command(<q-bang>, <q-mods>, [<f-args>])

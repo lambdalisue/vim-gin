@@ -1,63 +1,36 @@
 import type { Denops } from "https://deno.land/x/denops_std@v3.8.1/mod.ts";
 import { unnullish } from "https://deno.land/x/unnullish@v0.2.0/mod.ts";
-import * as unknownutil from "https://deno.land/x/unknownutil@v2.0.0/mod.ts";
 import * as buffer from "https://deno.land/x/denops_std@v3.8.1/buffer/mod.ts";
 import * as option from "https://deno.land/x/denops_std@v3.8.1/option/mod.ts";
-import * as vars from "https://deno.land/x/denops_std@v3.8.1/variable/mod.ts";
 import {
   format as formatBufname,
 } from "https://deno.land/x/denops_std@v3.8.1/bufname/mod.ts";
 import {
   builtinOpts,
-  Flags,
   formatOpts,
-  parse,
-  validateFlags,
+  parseOpts,
   validateOpts,
 } from "https://deno.land/x/denops_std@v3.8.1/argument/mod.ts";
 import { normCmdArgs } from "../../util/cmd.ts";
 import { findWorktreeFromDenops } from "../../util/worktree.ts";
 
-const allowedFlags = [
-  "u",
-  "untracked-files",
-  "ignore-submodules",
-  "ignored",
-  "renames",
-  "no-renames",
-  "find-renames",
-];
-
-export type CommandOptions = {
-  disableDefaultArgs?: boolean;
-};
-
 export async function command(
   denops: Denops,
   mods: string,
   args: string[],
-  options: CommandOptions = {},
-): Promise<void> {
-  if (!options.disableDefaultArgs) {
-    const defaultArgs = await vars.g.get(
-      denops,
-      "gin_status_default_args",
-      [],
-    );
-    unknownutil.assertArray(defaultArgs, unknownutil.isString);
-    args = [...defaultArgs, ...args];
-  }
-  const [opts, flags, residue] = parse(await normCmdArgs(denops, args));
+): Promise<buffer.OpenResult> {
+  const [opts, residue] = parseOpts(await normCmdArgs(denops, args));
   validateOpts(opts, [
+    "processor",
     "worktree",
+    "monochrome",
     "opener",
     ...builtinOpts,
   ]);
-  validateFlags(flags, allowedFlags);
-  await exec(denops, {
+  return exec(denops, residue, {
+    processor: opts.processor?.split(" "),
     worktree: opts.worktree,
-    pathspecs: residue,
-    flags,
+    monochrome: unnullish(opts.monochrome, () => true),
     opener: opts.opener,
     cmdarg: formatOpts(opts, builtinOpts).join(" "),
     mods,
@@ -65,9 +38,9 @@ export async function command(
 }
 
 export type ExecOptions = {
+  processor?: string[];
   worktree?: string;
-  pathspecs?: string[];
-  flags?: Flags;
+  monochrome?: boolean;
   opener?: string;
   cmdarg?: string;
   mods?: string;
@@ -75,23 +48,22 @@ export type ExecOptions = {
 
 export async function exec(
   denops: Denops,
-  options: ExecOptions = {},
+  args: string[],
+  options: ExecOptions,
 ): Promise<buffer.OpenResult> {
   const verbose = await option.verbose.get(denops);
-
   const worktree = await findWorktreeFromDenops(denops, {
     worktree: options.worktree,
     verbose: !!verbose,
   });
-
   const bufname = formatBufname({
-    scheme: "ginstatus",
+    scheme: "gin",
     expr: worktree,
     params: {
-      "untracked-files": "",
-      ...options.flags ?? {},
+      processor: unnullish(options.processor, (v) => v.join(" ")),
+      monochrome: unnullish(options.monochrome, () => ""),
     },
-    fragment: unnullish(options.pathspecs, (v) => `${v.join(" ")}$`),
+    fragment: `${args.join(" ")}$`,
   });
   return await buffer.open(denops, bufname, {
     opener: options.opener,

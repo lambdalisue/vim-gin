@@ -16,11 +16,12 @@ without announcements.**
 
 - Proxy the prompts/editor used by git commands to Vim
 - Components to show information on `statusline` and/or `tabline`
-- `Gin` to call a raw git command and echo the result or open a result buffer
+- `Gin` to call a raw git command and echo the result
+- `GinBuffer` to call a raw git command and open a result buffer
 - `GinBranch` to see `git branch` of a repository
 - `GinChaperon` to solve git conflicts (like `git mergetool`)
 - `GinDiff` to see `git diff` of a file
-- `GinEdit` to see `git show` or local content of a file
+- `GinEdit` to see `git show` of a file
 - `GinPatch` to stage changes partially (like `git add -p`)
 - `GinStatus` to see `git status` of a repository
 
