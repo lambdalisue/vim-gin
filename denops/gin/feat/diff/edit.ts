@@ -58,6 +58,9 @@ export async function exec(
   options: ExecOptions,
 ): Promise<void> {
   const args = [
+    // It seems 'color.ui=always' is not enough for Windows
+    "-c",
+    "color.diff=always",
     "diff",
     ...formatFlags(options.flags ?? {}),
     ...(unnullish(options.commitish, (v) => [v]) ?? []),
