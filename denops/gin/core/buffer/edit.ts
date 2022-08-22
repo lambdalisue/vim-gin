@@ -61,7 +61,17 @@ export async function exec(
   options: ExecOptions,
 ): Promise<void> {
   args = [
-    ...(options.monochrome ? [] : ["-c", "color.ui=always"]),
+    ...(options.monochrome ? [] : [
+      // It seems 'color.ui' is not enough on Windows
+      "-c",
+      "color.branch=always",
+      "-c",
+      "color.diff=always",
+      "-c",
+      "color.status=always",
+      "-c",
+      "color.ui=always",
+    ]),
     ...args,
   ];
   const { stdout } = await execute(denops, args, {

@@ -47,9 +47,6 @@ export async function exec(
   options: ExecOptions,
 ): Promise<void> {
   const args = [
-    // It seems 'color.ui=always' is not enough for Windows
-    "-c",
-    "color.status=always",
     "status",
     "--short",
     "--branch",
