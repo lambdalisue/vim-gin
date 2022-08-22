@@ -47,7 +47,8 @@ export async function exec(
   relpath: string,
   options: ExecOptions,
 ): Promise<void> {
-  const args = ["show", ...formatTreeish(options.commitish, relpath)];
+  const filename = relpath.replaceAll("\\", "/");
+  const args = ["show", ...formatTreeish(options.commitish, filename)];
   const { stdout } = await execute(denops, args, {
     worktree: options.worktree,
     throwOnError: true,

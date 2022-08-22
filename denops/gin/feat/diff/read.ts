@@ -52,12 +52,13 @@ export async function exec(
   bufnr: number,
   options: ExecOptions,
 ): Promise<void> {
+  const filenames = options.paths?.map((v) => v.replaceAll("\\", "/"));
   const args = [
     "diff",
     ...formatFlags(options.flags ?? {}),
     ...unnullish(options.commitish, (v) => [v]) ?? [],
     "--",
-    ...(options.paths ?? []),
+    ...(filenames ?? []),
   ];
   await execBuffer(denops, bufnr, args, {
     processor: options.processor,
