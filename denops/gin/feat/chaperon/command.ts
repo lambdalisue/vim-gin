@@ -175,9 +175,6 @@ export async function exec(
     .filter((v) => v) as number[];
   await batch.batch(denops, async (denops) => {
     for (const winid of winids) {
-      await fn.win_execute(denops, winid, "edit", "silent!");
-    }
-    for (const winid of winids) {
       await fn.win_execute(denops, winid, "diffthis", "silent!");
     }
   });
@@ -225,6 +222,7 @@ async function initTheirs(
           },
         );
       }
+      await denops.cmd("silent! edit");
     });
   });
 }
@@ -345,6 +343,7 @@ async function initOurs(
           },
         );
       }
+      await denops.cmd("silent! edit");
     });
   });
 }
