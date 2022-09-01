@@ -27,7 +27,7 @@ export async function read(
     processor: unnullish(opts.processor, (v) => v.split(" ")),
     worktree: expr,
     commitish: unnullish(params?.commitish, ensureString),
-    paths: fragment?.replace(/\$$/, "").split(" ").filter((v) => v),
+    paths: unnullish(fragment, (v) => JSON.parse(v.replace(/\$$/, ""))),
     flags: {
       ...params,
       commitish: undefined,

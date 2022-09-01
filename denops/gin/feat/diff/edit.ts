@@ -31,7 +31,7 @@ export async function edit(
     processor: unnullish(params?.processor, (v) => ensureString(v).split(" ")),
     worktree: expr,
     commitish: unnullish(params?.commitish, ensureString),
-    paths: fragment?.replace(/\$$/, "").split(" ").filter((v) => v),
+    paths: unnullish(fragment, (v) => JSON.parse(v.replace(/\$$/, ""))),
     flags: {
       ...params,
       processor: undefined,

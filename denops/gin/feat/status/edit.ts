@@ -1,4 +1,5 @@
 import type { Denops } from "https://deno.land/x/denops_std@v3.8.1/mod.ts";
+import { unnullish } from "https://deno.land/x/unnullish@v0.2.0/mod.ts";
 import * as autocmd from "https://deno.land/x/denops_std@v3.8.1/autocmd/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v3.8.1/function/mod.ts";
 import * as batch from "https://deno.land/x/denops_std@v3.8.1/batch/mod.ts";
@@ -27,7 +28,7 @@ export async function edit(
   await exec(denops, bufnr, {
     worktree: expr,
     flags: params,
-    pathspecs: fragment?.replace(/\$$/, "").split(" ").filter((v) => v),
+    pathspecs: unnullish(fragment, (v) => JSON.parse(v.replace(/\$$/, ""))),
     encoding: opts.enc ?? opts.encoding,
     fileformat: opts.ff ?? opts.fileformat,
   });

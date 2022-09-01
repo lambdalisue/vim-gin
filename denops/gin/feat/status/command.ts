@@ -91,7 +91,7 @@ export async function exec(
       "untracked-files": "",
       ...options.flags ?? {},
     },
-    fragment: unnullish(options.pathspecs, (v) => `${v.join(" ")}$`),
+    fragment: unnullish(options.pathspecs, (v) => `${JSON.stringify(v)}$`),
   });
   return await buffer.open(denops, bufname, {
     opener: options.opener,
