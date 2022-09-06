@@ -19,13 +19,24 @@ endfunction
 
 function! gin#internal#component#update(component) abort
   let previous = get(s:cache, a:component, '')
-  try
-    let value = denops#request('gin', a:component, [])
-  catch
-    let value = ''
-  endtry
-  let s:cache[a:component] = value
-  if value !=# previous
+  call denops#request_async(
+        \ 'gin',
+        \ a:component,
+        \ [],
+        \ funcref('s:update_success', [a:component, previous]),
+        \ funcref('s:update_fail'),
+        \)
+endfunction
+
+function! s:update_success(component, previous, value) abort
+  let s:cache[a:component] = a:value
+  if a:value !=# a:previous
     call gin#util#debounce('doautocmd <nomodeline> User GinComponentPost', 100)
+  endif
+endfunction
+
+function! s:update_fail(err) abort
+  if &verbose
+    echoerr a:err
   endif
 endfunction
