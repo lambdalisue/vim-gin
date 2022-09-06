@@ -462,6 +462,14 @@ Use component functions like:
 Note that components are updated asynchronously in background and it emits
 |GinComponentPost| |User| autocmd when the status is updated. Use this autocmd
 to update |statusline| or |tabline|.
+>
+	augroup my_gin_component
+	  autocmd!
+	  autocmd User GinComponentPost redrawstatus
+	  " Or if you use tabline instead
+	  "autocmd User GinComponentPost redrawtabline
+	augroup END
+<
 
 					*gin#component#branch#ascii()*
 					*gin#component#branch#unicode()*
