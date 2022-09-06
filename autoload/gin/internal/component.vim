@@ -10,6 +10,7 @@ function! gin#internal#component#init(component) abort
     autocmd!
     execute printf('autocmd BufEnter * call gin#internal#component#update("%s")', a:component)
     execute printf('autocmd User GinCommandPost call gin#internal#component#update("%s")', a:component)
+    execute printf('autocmd User DenopsPluginPost:gin call gin#internal#component#update("%s")', a:component)
   augroup END
 endfunction
 
