@@ -23,8 +23,8 @@ function! gin#internal#component#update(component) abort
         \ 'gin',
         \ a:component,
         \ [],
-        \ funcref('s:update_success', [a:component, previous]),
-        \ funcref('s:update_fail'),
+        \ { v -> s:update_success(a:component, previous, v) },
+        \ { e -> s:update_fail(e) },
         \)
 endfunction
 
