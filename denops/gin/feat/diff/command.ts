@@ -25,6 +25,7 @@ const allowedFlags = [
   "w",
   "I",
   "cached",
+  "staged",
   "renames",
   "diff-filter",
   "ignore-cr-at-eol",
