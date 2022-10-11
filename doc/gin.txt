@@ -104,7 +104,7 @@ COMMANDS					*gin-commands*
 >
 		:Gin ++wait add . | Gin commit
 <
-	See |gin-command-options| for common {++option}.
+	See |gin-commands-options| for common {++option}.
 
 							*:GinBuffer*
 :GinBuffer[!] [{++option}...] {command} [{args}]
@@ -126,7 +126,7 @@ COMMANDS					*gin-commands*
 >
 		:GinBuffer ++processor=delta blame README.md
 <
-	See |gin-command-options| for common {++option}.
+	See |gin-commands-options| for common {++option}.
 
 							*:GinBranch*
 :GinBranch[!] [{++option}...] [{flags}] [-- {pattern}...]
@@ -135,7 +135,7 @@ COMMANDS					*gin-commands*
 	matching branches. If multiple patterns are given, a branch is shown
 	if it matches any of the patterns.
 
-	See |gin-command-options| for common {++option}.
+	See |gin-commands-options| for common {++option}.
 
 	The following flags are valid as {flags}:
 
@@ -166,7 +166,7 @@ COMMANDS					*gin-commands*
 	++no-ours
 		Do NOT open OURS buffer.
 
-	See |gin-command-options| for common {++option}.
+	See |gin-commands-options| for common {++option}.
 
 	Users can use the following mappings in each buffers or disable
 	default mappings by |g:gin_chaperon_disable_default_mappings|.
@@ -205,7 +205,7 @@ COMMANDS					*gin-commands*
 >
 		:GinDiff ++processor=diff-highlight HEAD %
 <
-	See |gin-command-options| for common {++option}.
+	See |gin-commands-options| for common {++option}.
 
 	The following flags are valid as {flags}:
 
@@ -243,7 +243,7 @@ COMMANDS					*gin-commands*
 	If {commitish} is specified, it opens a buffer that shows content
 	in the {commitish}. The buffer is not modifiable.
 
-	See |gin-command-options| for common {++option}.
+	See |gin-commands-options| for common {++option}.
 
 	Users can specify default arguments by |g:gin_edit_default_args|.
 	Use a bang (!) to temporary disable default arguments.
@@ -261,7 +261,7 @@ COMMANDS					*gin-commands*
 	++no-worktree
 		Do NOT open WORKTREE buffer.
 
-	See |gin-command-options| for common {++option}.
+	See |gin-commands-options| for common {++option}.
 
 	Users can use the following mappings in each buffers or disable
 	default mappings by |g:gin_patch_disable_default_mappings|.
@@ -286,7 +286,7 @@ COMMANDS					*gin-commands*
 :GinStatus[!] [{++option}...] [{flags}] [-- {pathspec}...]
 	Open a "gin-status" buffer to show a status.
 
-	See |gin-command-options| for common {++option}.
+	See |gin-commands-options| for common {++option}.
 
 	The following flags are valid as {flags}:
 
