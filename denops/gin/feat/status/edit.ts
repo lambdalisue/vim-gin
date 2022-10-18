@@ -1,17 +1,17 @@
-import type { Denops } from "https://deno.land/x/denops_std@v3.8.1/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v3.9.0/mod.ts";
 import { unnullish } from "https://deno.land/x/unnullish@v0.2.0/mod.ts";
-import * as autocmd from "https://deno.land/x/denops_std@v3.8.1/autocmd/mod.ts";
-import * as fn from "https://deno.land/x/denops_std@v3.8.1/function/mod.ts";
-import * as batch from "https://deno.land/x/denops_std@v3.8.1/batch/mod.ts";
-import * as buffer from "https://deno.land/x/denops_std@v3.8.1/buffer/mod.ts";
-import * as option from "https://deno.land/x/denops_std@v3.8.1/option/mod.ts";
-import * as vars from "https://deno.land/x/denops_std@v3.8.1/variable/mod.ts";
-import { parse as parseBufname } from "https://deno.land/x/denops_std@v3.8.1/bufname/mod.ts";
+import * as autocmd from "https://deno.land/x/denops_std@v3.9.0/autocmd/mod.ts";
+import * as fn from "https://deno.land/x/denops_std@v3.9.0/function/mod.ts";
+import * as batch from "https://deno.land/x/denops_std@v3.9.0/batch/mod.ts";
+import * as buffer from "https://deno.land/x/denops_std@v3.9.0/buffer/mod.ts";
+import * as option from "https://deno.land/x/denops_std@v3.9.0/option/mod.ts";
+import * as vars from "https://deno.land/x/denops_std@v3.9.0/variable/mod.ts";
+import { parse as parseBufname } from "https://deno.land/x/denops_std@v3.9.0/bufname/mod.ts";
 import {
   Flags,
   formatFlags,
   parseOpts,
-} from "https://deno.land/x/denops_std@v3.8.1/argument/mod.ts";
+} from "https://deno.land/x/denops_std@v3.9.0/argument/mod.ts";
 import { bind } from "../../core/bare/command.ts";
 import { exec as execBuffer } from "../../core/buffer/edit.ts";
 import { init as initActionCore } from "../../core/action/action.ts";
