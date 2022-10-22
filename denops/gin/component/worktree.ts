@@ -1,6 +1,6 @@
-import type { Denops } from "https://deno.land/x/denops_std@v3.8.1/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v3.9.0/mod.ts";
 import { Cache } from "https://deno.land/x/local_cache@1.0/mod.ts";
-import * as path from "https://deno.land/std@0.151.0/path/mod.ts";
+import * as path from "https://deno.land/std@0.160.0/path/mod.ts";
 import { findWorktreeFromDenops } from "../util/worktree.ts";
 import { find } from "../git/finder.ts";
 

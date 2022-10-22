@@ -1,8 +1,8 @@
-import type { Denops } from "https://deno.land/x/denops_std@v3.8.1/mod.ts";
-import { writeAll } from "https://deno.land/std@0.151.0/streams/mod.ts";
-import * as batch from "https://deno.land/x/denops_std@v3.8.1/batch/mod.ts";
-import * as fn from "https://deno.land/x/denops_std@v3.8.1/function/mod.ts";
-import * as option from "https://deno.land/x/denops_std@v3.8.1/option/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v3.9.0/mod.ts";
+import { writeAll } from "https://deno.land/std@0.160.0/streams/mod.ts";
+import * as batch from "https://deno.land/x/denops_std@v3.9.0/batch/mod.ts";
+import * as fn from "https://deno.land/x/denops_std@v3.9.0/function/mod.ts";
+import * as option from "https://deno.land/x/denops_std@v3.9.0/option/mod.ts";
 import { decodeUtf8 } from "../util/text.ts";
 import { removeAnsiEscapeCode } from "../util/ansi_escape_code.ts";
 import { findWorktreeFromDenops } from "../util/worktree.ts";
