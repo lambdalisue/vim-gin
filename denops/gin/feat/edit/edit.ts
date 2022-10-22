@@ -13,15 +13,25 @@ import {
 import {
   parse as parseBufname,
 } from "https://deno.land/x/denops_std@v3.9.0/bufname/mod.ts";
-import { execute } from "../../core/executor.ts";
-import { formatTreeish } from "./util.ts";
+import { exec as execBare } from "../../core/bare/command.ts";
+import { execute, ExecuteError } from "../../core/executor.ts";
+import { formatTreeish, isExistsOnDistButNotInTheIndex } from "./util.ts";
+import { decodeUtf8 } from "../../util/text.ts";
+import { removeAnsiEscapeCode } from "../../util/ansi_escape_code.ts";
 
 export async function edit(
   denops: Denops,
   bufnr: number,
   bufname: string,
 ): Promise<void> {
-  const cmdarg = await vars.v.get(denops, "cmdarg") as string;
+  const [cmdarg, autoIntentToAdd] = await batch.gather(
+    denops,
+    async (denops) => {
+      await vars.v.get(denops, "cmdarg");
+      await vars.g.get(denops, "gin_edit_auto_intent_to_add");
+    },
+  ) as [string, unknown];
+
   const [opts, _] = parseOpts(cmdarg.split(" "));
   validateOpts(opts, ["enc", "encoding", "ff", "fileformat"]);
   const { scheme, expr, params, fragment } = parseBufname(bufname);
@@ -33,6 +43,7 @@ export async function edit(
     commitish: unnullish(params?.commitish, ensureString),
     encoding: opts.enc ?? opts.encoding,
     fileformat: opts.ff ?? opts.fileformat,
+    autoIntentToAdd: !!autoIntentToAdd,
   });
 }
 
@@ -41,6 +52,7 @@ export type ExecOptions = {
   commitish?: string;
   encoding?: string;
   fileformat?: string;
+  autoIntentToAdd?: boolean;
 };
 
 export async function exec(
@@ -51,10 +63,24 @@ export async function exec(
 ): Promise<void> {
   const filename = relpath.replaceAll("\\", "/");
   const args = ["show", ...formatTreeish(options.commitish, filename)];
-  const { stdout } = await execute(denops, args, {
+  const { success, stdout, stderr } = await execute(denops, args, {
     worktree: options.worktree,
-    throwOnError: true,
   });
+  if (!success) {
+    const errorMessage = decodeUtf8(stderr);
+    if (
+      options.autoIntentToAdd && isExistsOnDistButNotInTheIndex(errorMessage)
+    ) {
+      // Execute intent-to-add
+      await execBare(denops, ["add", "--intent-to-add", filename], options);
+      // Retry
+      return exec(denops, bufnr, relpath, {
+        ...options,
+        autoIntentToAdd: false,
+      });
+    }
+    throw new ExecuteError(removeAnsiEscapeCode(errorMessage));
+  }
   const { content, fileformat, fileencoding } = await buffer.decode(
     denops,
     bufnr,

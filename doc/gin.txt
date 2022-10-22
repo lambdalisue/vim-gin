@@ -252,6 +252,10 @@ COMMANDS					*gin-commands*
 	If {commitish} is specified, it opens a buffer that shows content
 	in the {commitish}. The buffer is not modifiable.
 
+	Note that |:GinEdit| does not work on files not in the index. 
+	Use |g:gin_edit_auto_intent_to_add| option to automatically call
+	"git add --intent-to-add".
+
 	See |gin-commands-options| for common {++option}.
 
 	Users can specify default arguments by |g:gin_edit_default_args|.
@@ -396,6 +400,13 @@ VARIABLES					*gin-variables*
 
 *g:gin_diff_disable_default_mappings*
 	Disable default mappings on buffers shown by |:GinDiff|.
+
+	Default: 0
+
+*g:gin_edit_auto_intent_to_add*
+	Set 1 to automatically call "git add --intent-to-add" if the file
+	specified to |:GinEdit| is not in the index so that |:GinEdit| 
+	successfully shows the content.
 
 	Default: 0
 

@@ -11,3 +11,8 @@ export function formatTreeish(
     return [`:${relpath}`];
   }
 }
+
+export function isExistsOnDistButNotInTheIndex(errorMessage: string): boolean {
+  const searchMessage = "exists on disk, but not in the index";
+  return errorMessage.includes(searchMessage);
+}
