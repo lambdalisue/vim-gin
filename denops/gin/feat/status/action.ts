@@ -34,8 +34,7 @@ export async function init(denops: Denops, bufnr: number): Promise<void> {
         denops,
         bufnr,
         `edit:cached:${opener}`,
-        (denops, bufnr, range) =>
-          doEdit(denops, bufnr, range, opener, ["--cached"]),
+        (denops, bufnr, range) => doEdit(denops, bufnr, range, opener, [""]),
       );
       await define(
         denops,
