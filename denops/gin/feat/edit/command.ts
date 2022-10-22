@@ -71,7 +71,9 @@ export async function exec(
     verbose: !!verbose,
   });
 
-  const relpath = path.relative(worktree, filename);
+  const relpath = path.isAbsolute(filename)
+    ? path.relative(worktree, filename)
+    : filename;
 
   const bufname = formatBufname({
     scheme: "ginedit",

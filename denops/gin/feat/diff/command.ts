@@ -99,7 +99,9 @@ export async function exec(
     verbose: !!verbose,
   });
 
-  const paths = options.paths?.map((p) => path.relative(worktree, p));
+  const paths = options.paths?.map((p) =>
+    path.isAbsolute(p) ? path.relative(worktree, p) : p
+  );
 
   const bufname = formatBufname({
     scheme: "gindiff",
