@@ -153,6 +153,15 @@ COMMANDS					*gin-commands*
 	Users can specify default arguments by |g:gin_branch_default_args|.
 	Use a bang (!) to temporary disable default arguments.
 
+							*:GinCd*
+							*:GinLcd*
+							*:GinTcd*
+:GinCd
+:GinLcd
+:GinTcd
+	Change the current working directory to the git's repository root
+	directory. Commands call |cd|, |lcd|, and |tcd| respectively.
+	
 							*:GinChaperon*
 :GinChaperon[!] [++{option}...] {path}
 	Open three main buffers (THEIRS, WORKTREE, and OURS) and three
