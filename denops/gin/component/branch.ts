@@ -23,16 +23,27 @@ async function getData(
 async function getBranches(
   cwd: string,
 ): Promise<Data> {
-  const stdout = await execute([
-    "rev-parse",
-    "--abbrev-ref",
-    "--symbolic-full-name",
-    "HEAD",
-    "@{u}",
-  ], {
-    noOptionalLocks: true,
-    cwd,
-  });
+  let stdout: Uint8Array;
+  try {
+    stdout = await execute([
+      "rev-parse",
+      "--abbrev-ref",
+      "--symbolic-full-name",
+      "HEAD",
+      "@{u}",
+    ], {
+      noOptionalLocks: true,
+      cwd,
+    });
+  } catch {
+    stdout = await execute([
+      "branch",
+      "--show-current",
+    ], {
+      noOptionalLocks: true,
+      cwd,
+    });
+  }
   const [branch, upstream] = decodeUtf8(stdout).split("\n");
   return [branch, upstream];
 }
