@@ -1,14 +1,14 @@
-import type { Denops } from "https://deno.land/x/denops_std@v3.9.0/mod.ts";
-import * as anonymous from "https://deno.land/x/denops_std@v3.9.0/anonymous/mod.ts";
-import * as autocmd from "https://deno.land/x/denops_std@v3.9.0/autocmd/mod.ts";
-import * as batch from "https://deno.land/x/denops_std@v3.9.0/batch/mod.ts";
-import * as buffer from "https://deno.land/x/denops_std@v3.9.0/buffer/mod.ts";
-import * as fn from "https://deno.land/x/denops_std@v3.9.0/function/mod.ts";
-import * as vars from "https://deno.land/x/denops_std@v3.9.0/variable/mod.ts";
-import * as unknownutil from "https://deno.land/x/unknownutil@v2.0.0/mod.ts";
-import * as path from "https://deno.land/std@0.160.0/path/mod.ts";
-import * as streams from "https://deno.land/std@0.160.0/streams/mod.ts";
-import { deferred } from "https://deno.land/std@0.160.0/async/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v3.9.2/mod.ts";
+import * as anonymous from "https://deno.land/x/denops_std@v3.9.2/anonymous/mod.ts";
+import * as autocmd from "https://deno.land/x/denops_std@v3.9.2/autocmd/mod.ts";
+import * as batch from "https://deno.land/x/denops_std@v3.9.2/batch/mod.ts";
+import * as buffer from "https://deno.land/x/denops_std@v3.9.2/buffer/mod.ts";
+import * as fn from "https://deno.land/x/denops_std@v3.9.2/function/mod.ts";
+import * as vars from "https://deno.land/x/denops_std@v3.9.2/variable/mod.ts";
+import * as unknownutil from "https://deno.land/x/unknownutil@v2.1.0/mod.ts";
+import * as path from "https://deno.land/std@0.165.0/path/mod.ts";
+import * as streams from "https://deno.land/std@0.165.0/streams/mod.ts";
+import { deferred } from "https://deno.land/std@0.165.0/async/mod.ts";
 import { decodeUtf8, encodeUtf8 } from "../../util/text.ts";
 
 const recordPattern = /^([^:]+?):(.*)$/;
