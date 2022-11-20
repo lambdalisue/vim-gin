@@ -1,5 +1,5 @@
 import { Cache } from "https://deno.land/x/local_cache@1.0/mod.ts";
-import * as path from "https://deno.land/std@0.165.0/path/mod.ts";
+import * as path from "https://deno.land/std@0.160.0/path/mod.ts";
 import { execute } from "./process.ts";
 import { decodeUtf8 } from "../util/text.ts";
 

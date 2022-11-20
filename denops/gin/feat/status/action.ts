@@ -1,10 +1,10 @@
-import type { Denops } from "https://deno.land/x/denops_std@v3.9.2/mod.ts";
-import { unnullish } from "https://deno.land/x/unnullish@v1.0.0/mod.ts";
-import * as path from "https://deno.land/std@0.165.0/path/mod.ts";
-import * as batch from "https://deno.land/x/denops_std@v3.9.2/batch/mod.ts";
-import * as buffer from "https://deno.land/x/denops_std@v3.9.2/buffer/mod.ts";
-import * as fn from "https://deno.land/x/denops_std@v3.9.2/function/mod.ts";
-import * as helper from "https://deno.land/x/denops_std@v3.9.2/helper/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v3.9.0/mod.ts";
+import { unnullish } from "https://deno.land/x/unnullish@v0.2.0/mod.ts";
+import * as path from "https://deno.land/std@0.160.0/path/mod.ts";
+import * as batch from "https://deno.land/x/denops_std@v3.9.0/batch/mod.ts";
+import * as buffer from "https://deno.land/x/denops_std@v3.9.0/buffer/mod.ts";
+import * as fn from "https://deno.land/x/denops_std@v3.9.0/function/mod.ts";
+import * as helper from "https://deno.land/x/denops_std@v3.9.0/helper/mod.ts";
 import { findWorktreeFromDenops } from "../../util/worktree.ts";
 import { define, Range } from "../../core/action/action.ts";
 import { command as commandEdit } from "../edit/command.ts";

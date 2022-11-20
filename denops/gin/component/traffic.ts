@@ -1,4 +1,4 @@
-import type { Denops } from "https://deno.land/x/denops_std@v3.9.2/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v3.9.0/mod.ts";
 import { Cache } from "https://deno.land/x/local_cache@1.0/mod.ts";
 import { decodeUtf8 } from "../util/text.ts";
 import { findWorktreeFromDenops } from "../util/worktree.ts";
