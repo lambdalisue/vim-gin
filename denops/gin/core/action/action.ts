@@ -1,10 +1,10 @@
-import type { Denops } from "https://deno.land/x/denops_std@v3.9.0/mod.ts";
-import * as batch from "https://deno.land/x/denops_std@v3.9.0/batch/mod.ts";
-import * as buffer from "https://deno.land/x/denops_std@v3.9.0/buffer/mod.ts";
-import * as fn from "https://deno.land/x/denops_std@v3.9.0/function/mod.ts";
-import * as helper from "https://deno.land/x/denops_std@v3.9.0/helper/mod.ts";
-import * as mapping from "https://deno.land/x/denops_std@v3.9.0/mapping/mod.ts";
-import * as unknownutil from "https://deno.land/x/unknownutil@v2.0.0/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v3.9.3/mod.ts";
+import * as batch from "https://deno.land/x/denops_std@v3.9.3/batch/mod.ts";
+import * as buffer from "https://deno.land/x/denops_std@v3.9.3/buffer/mod.ts";
+import * as fn from "https://deno.land/x/denops_std@v3.9.3/function/mod.ts";
+import * as helper from "https://deno.land/x/denops_std@v3.9.3/helper/mod.ts";
+import * as mapping from "https://deno.land/x/denops_std@v3.9.3/mapping/mod.ts";
+import * as unknownutil from "https://deno.land/x/unknownutil@v2.1.0/mod.ts";
 
 let rangeInternal: Range | undefined;
 

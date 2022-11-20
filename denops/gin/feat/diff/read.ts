@@ -1,17 +1,17 @@
-import type { Denops } from "https://deno.land/x/denops_std@v3.9.0/mod.ts";
-import { unnullish } from "https://deno.land/x/unnullish@v0.2.0/mod.ts";
-import { ensureString } from "https://deno.land/x/unknownutil@v2.0.0/mod.ts";
-import * as vars from "https://deno.land/x/denops_std@v3.9.0/variable/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v3.9.3/mod.ts";
+import { unnullish } from "https://deno.land/x/unnullish@v1.0.0/mod.ts";
+import { ensureString } from "https://deno.land/x/unknownutil@v2.1.0/mod.ts";
+import * as vars from "https://deno.land/x/denops_std@v3.9.3/variable/mod.ts";
 import {
   parse as parseBufname,
-} from "https://deno.land/x/denops_std@v3.9.0/bufname/mod.ts";
+} from "https://deno.land/x/denops_std@v3.9.3/bufname/mod.ts";
 import {
   builtinOpts,
   Flags,
   formatFlags,
   parseOpts,
   validateOpts,
-} from "https://deno.land/x/denops_std@v3.9.0/argument/mod.ts";
+} from "https://deno.land/x/denops_std@v3.9.3/argument/mod.ts";
 import { exec as execBuffer } from "../../core/buffer/read.ts";
 
 export async function read(
