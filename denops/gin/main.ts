@@ -1,4 +1,4 @@
-import type { Denops } from "https://deno.land/x/denops_std@v3.9.3/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v3.10.0/mod.ts";
 
 import { main as mainAction } from "./core/action/main.ts";
 import { main as mainBare } from "./core/bare/main.ts";

@@ -1,10 +1,10 @@
-import { assertEquals } from "https://deno.land/std@0.165.0/testing/asserts.ts";
-import { test } from "https://deno.land/x/denops_std@v3.9.3/test/mod.ts";
-import * as batch from "https://deno.land/x/denops_std@v3.9.3/batch/mod.ts";
-import * as fn from "https://deno.land/x/denops_std@v3.9.3/function/mod.ts";
+import { assertEquals } from "https://deno.land/std@0.167.0/testing/asserts.ts";
+import { test } from "https://deno.land/x/denops_std@v3.10.0/test/mod.ts";
+import * as batch from "https://deno.land/x/denops_std@v3.10.0/batch/mod.ts";
+import * as fn from "https://deno.land/x/denops_std@v3.10.0/function/mod.ts";
 import * as unknownutil from "https://deno.land/x/unknownutil@v2.1.0/mod.ts";
-import * as path from "https://deno.land/std@0.165.0/path/mod.ts";
-import { deadline } from "https://deno.land/std@0.165.0/async/mod.ts";
+import * as path from "https://deno.land/std@0.167.0/path/mod.ts";
+import { deadline } from "https://deno.land/std@0.167.0/async/mod.ts";
 import { normCmdArgs } from "./cmd.ts";
 
 const runtimepath = path.resolve(

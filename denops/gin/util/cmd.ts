@@ -1,7 +1,7 @@
-import type { Denops } from "https://deno.land/x/denops_std@v3.9.3/mod.ts";
-import * as fn from "https://deno.land/x/denops_std@v3.9.3/function/mod.ts";
-import { parse as parseBufname } from "https://deno.land/x/denops_std@v3.9.3/bufname/mod.ts";
-import { Silent } from "https://deno.land/x/denops_std@v3.9.3/helper/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v3.10.0/mod.ts";
+import * as fn from "https://deno.land/x/denops_std@v3.10.0/function/mod.ts";
+import { parse as parseBufname } from "https://deno.land/x/denops_std@v3.10.0/bufname/mod.ts";
+import { Silent } from "https://deno.land/x/denops_std@v3.10.0/helper/mod.ts";
 import { GIN_FILE_BUFFER_PROTOCOLS } from "../global.ts";
 
 export function parseSilent(mods: string): Silent {

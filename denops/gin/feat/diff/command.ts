@@ -1,13 +1,13 @@
-import type { Denops } from "https://deno.land/x/denops_std@v3.9.3/mod.ts";
-import * as path from "https://deno.land/std@0.165.0/path/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v3.10.0/mod.ts";
+import * as path from "https://deno.land/std@0.167.0/path/mod.ts";
 import * as unknownutil from "https://deno.land/x/unknownutil@v2.1.0/mod.ts";
 import { unnullish } from "https://deno.land/x/unnullish@v1.0.0/mod.ts";
-import * as buffer from "https://deno.land/x/denops_std@v3.9.3/buffer/mod.ts";
-import * as option from "https://deno.land/x/denops_std@v3.9.3/option/mod.ts";
-import * as vars from "https://deno.land/x/denops_std@v3.9.3/variable/mod.ts";
+import * as buffer from "https://deno.land/x/denops_std@v3.10.0/buffer/mod.ts";
+import * as option from "https://deno.land/x/denops_std@v3.10.0/option/mod.ts";
+import * as vars from "https://deno.land/x/denops_std@v3.10.0/variable/mod.ts";
 import {
   format as formatBufname,
-} from "https://deno.land/x/denops_std@v3.9.3/bufname/mod.ts";
+} from "https://deno.land/x/denops_std@v3.10.0/bufname/mod.ts";
 import {
   builtinOpts,
   Flags,
@@ -15,7 +15,7 @@ import {
   parse,
   validateFlags,
   validateOpts,
-} from "https://deno.land/x/denops_std@v3.9.3/argument/mod.ts";
+} from "https://deno.land/x/denops_std@v3.10.0/argument/mod.ts";
 import { normCmdArgs } from "../../util/cmd.ts";
 import { findWorktreeFromDenops } from "../../util/worktree.ts";
 
