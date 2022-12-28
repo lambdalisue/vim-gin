@@ -105,6 +105,7 @@ export async function exec(
       await option.buftype.setLocal(denops, "nofile");
       await option.swapfile.setLocal(denops, false);
       await option.modifiable.setLocal(denops, false);
+      await option.modeline.setLocal(denops, false);
     });
   });
 }
