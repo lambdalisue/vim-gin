@@ -1,12 +1,12 @@
-import type { Denops } from "https://deno.land/x/denops_std@v3.10.0/mod.ts";
-import * as autocmd from "https://deno.land/x/denops_std@v3.10.0/autocmd/mod.ts";
-import * as helper from "https://deno.land/x/denops_std@v3.10.0/helper/mod.ts";
-import * as option from "https://deno.land/x/denops_std@v3.10.0/option/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v3.12.1/mod.ts";
+import * as autocmd from "https://deno.land/x/denops_std@v3.12.1/autocmd/mod.ts";
+import * as helper from "https://deno.land/x/denops_std@v3.12.1/helper/mod.ts";
+import * as option from "https://deno.land/x/denops_std@v3.12.1/option/mod.ts";
 import { removeAnsiEscapeCode } from "../../util/ansi_escape_code.ts";
 import {
   parseOpts,
   validateOpts,
-} from "https://deno.land/x/denops_std@v3.10.0/argument/mod.ts";
+} from "https://deno.land/x/denops_std@v3.12.1/argument/mod.ts";
 import { normCmdArgs } from "../../util/cmd.ts";
 import { execute } from "../executor.ts";
 
