@@ -35,7 +35,6 @@ jobs:
         runner:
           - ubuntu-latest
         version:
-          - "1.17.0"
           - "1.x"
     runs-on: ${{ matrix.runner }}
     steps:
