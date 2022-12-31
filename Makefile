@@ -1,4 +1,4 @@
-TARGETS := $$(find . \( -name '*.ts' -or -name '*.md' \) -not -path './.deno/*')
+TARGETS := $$(find . -name '*.ts' -or -name '*.md')
 
 .DEFAULT_GOAL := help
 
@@ -8,13 +8,13 @@ help:
 	    perl -pe 's/(.*):.*##\s*/sprintf("%-20s",$$1)/eg;'
 
 fmt: FORCE	## Format code
-	@deno fmt --config deno.jsonc
+	@deno fmt
 
 fmt-check: FORCE	## Format check
-	@deno fmt --check --config deno.jsonc
+	@deno fmt --check
 
 lint: FORCE	## Lint code
-	@deno lint --config deno.jsonc
+	@deno lint
 
 type-check: FORCE	## Type check
 	@deno test --unstable --no-run ${TARGETS}
