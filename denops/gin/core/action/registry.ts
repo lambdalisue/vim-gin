@@ -1,6 +1,6 @@
-import type { Denops } from "https://deno.land/x/denops_std@v3.10.0/mod.ts";
-import * as anonymous from "https://deno.land/x/denops_std@v3.10.0/anonymous/mod.ts";
-import * as autocmd from "https://deno.land/x/denops_std@v3.10.0/autocmd/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v3.12.1/mod.ts";
+import * as anonymous from "https://deno.land/x/denops_std@v3.12.1/anonymous/mod.ts";
+import * as autocmd from "https://deno.land/x/denops_std@v3.12.1/autocmd/mod.ts";
 import type { Range } from "./action.ts";
 
 export type { Range };

@@ -6,6 +6,7 @@ let b:did_ftplugin = 1
 setlocal nobuflisted
 setlocal nolist nospell
 setlocal nowrap nofoldenable
+setlocal nomodeline
 
 " Alias
 map <buffer> <Plug>(gin-action-edit) <Plug>(gin-action-edit:local)

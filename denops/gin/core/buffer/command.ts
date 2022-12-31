@@ -1,16 +1,16 @@
-import type { Denops } from "https://deno.land/x/denops_std@v3.10.0/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v3.12.1/mod.ts";
 import { unnullish } from "https://deno.land/x/unnullish@v1.0.0/mod.ts";
-import * as buffer from "https://deno.land/x/denops_std@v3.10.0/buffer/mod.ts";
-import * as option from "https://deno.land/x/denops_std@v3.10.0/option/mod.ts";
+import * as buffer from "https://deno.land/x/denops_std@v3.12.1/buffer/mod.ts";
+import * as option from "https://deno.land/x/denops_std@v3.12.1/option/mod.ts";
 import {
   format as formatBufname,
-} from "https://deno.land/x/denops_std@v3.10.0/bufname/mod.ts";
+} from "https://deno.land/x/denops_std@v3.12.1/bufname/mod.ts";
 import {
   builtinOpts,
   formatOpts,
   parseOpts,
   validateOpts,
-} from "https://deno.land/x/denops_std@v3.10.0/argument/mod.ts";
+} from "https://deno.land/x/denops_std@v3.12.1/argument/mod.ts";
 import { normCmdArgs } from "../../util/cmd.ts";
 import { findWorktreeFromDenops } from "../../util/worktree.ts";
 
