@@ -90,16 +90,11 @@ jobs:
           ${DENOPS_TEST_VIM} --version
         env:
           DENOPS_TEST_VIM: ${{ steps.vim.outputs.executable_path }}
-      # - uses: thinca/action-setup-vim@v1
-      #   id: nvim
-      #   with:
-      #     vim_type: "Neovim"
-      #     vim_version: "${{ matrix.host_version.nvim }}"
-      - uses: rhysd/action-setup-vim@v1
+      - uses: thinca/action-setup-vim@v1
         id: nvim
         with:
-          neovim: true
-          version: "${{ matrix.host_version.nvim }}"
+          vim_type: "Neovim"
+          vim_version: "${{ matrix.host_version.nvim }}"
       - name: Check Neovim
         run: |
           echo ${DENOPS_TEST_NVIM}
