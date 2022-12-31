@@ -5,6 +5,7 @@ let b:did_ftplugin = 1
 
 setlocal nolist nospell
 setlocal nowrap nofoldenable
+setlocal nomodeline
 
 map <buffer> <Plug>(gin-action-merge) <Plug>(gin-action-merge:ff)
 
