@@ -1,6 +1,6 @@
 pre-commit:
   commands:
     lint:
-      run: make lint
+      run: deno lint
     fmt:
-      run: make fmt
+      run: deno fmt
