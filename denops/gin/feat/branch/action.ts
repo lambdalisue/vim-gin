@@ -1,7 +1,7 @@
-import type { Denops } from "https://deno.land/x/denops_std@v3.12.1/mod.ts";
-import * as fn from "https://deno.land/x/denops_std@v3.12.1/function/mod.ts";
-import * as batch from "https://deno.land/x/denops_std@v3.12.1/batch/mod.ts";
-import * as helper from "https://deno.land/x/denops_std@v3.12.1/helper/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v4.0.0/mod.ts";
+import * as fn from "https://deno.land/x/denops_std@v4.0.0/function/mod.ts";
+import * as batch from "https://deno.land/x/denops_std@v4.0.0/batch/mod.ts";
+import * as helper from "https://deno.land/x/denops_std@v4.0.0/helper/mod.ts";
 import { define, Range } from "../../core/action/action.ts";
 import { command as commandBare } from "../../core/bare/command.ts";
 import { Branch, parse as parseBranch } from "./parser.ts";

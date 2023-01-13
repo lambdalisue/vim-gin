@@ -1,12 +1,12 @@
-import type { Denops } from "https://deno.land/x/denops_std@v3.12.1/mod.ts";
-import * as path from "https://deno.land/std@0.170.0/path/mod.ts";
-import * as fs from "https://deno.land/std@0.170.0/fs/mod.ts";
-import * as batch from "https://deno.land/x/denops_std@v3.12.1/batch/mod.ts";
-import * as fn from "https://deno.land/x/denops_std@v3.12.1/function/mod.ts";
-import * as option from "https://deno.land/x/denops_std@v3.12.1/option/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v4.0.0/mod.ts";
+import * as path from "https://deno.land/std@0.171.0/path/mod.ts";
+import * as fs from "https://deno.land/std@0.171.0/fs/mod.ts";
+import * as batch from "https://deno.land/x/denops_std@v4.0.0/batch/mod.ts";
+import * as fn from "https://deno.land/x/denops_std@v4.0.0/function/mod.ts";
+import * as option from "https://deno.land/x/denops_std@v4.0.0/option/mod.ts";
 import {
   parse as parseBufname,
-} from "https://deno.land/x/denops_std@v3.12.1/bufname/mod.ts";
+} from "https://deno.land/x/denops_std@v4.0.0/bufname/mod.ts";
 import { findWorktreeFromDenops } from "../../util/worktree.ts";
 import { exec as execBare } from "../../core/bare/command.ts";
 
