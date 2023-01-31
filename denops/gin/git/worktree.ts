@@ -5,7 +5,7 @@ import * as fn from "https://deno.land/x/denops_std@v4.0.0/function/mod.ts";
 import * as path from "https://deno.land/std@0.171.0/path/mod.ts";
 import * as unknownutil from "https://deno.land/x/unknownutil@v2.1.0/mod.ts";
 import { GIN_BUFFER_PROTOCOLS } from "../global.ts";
-import { expand } from "../util/cmd.ts";
+import { expand } from "../util/expand.ts";
 import { find } from "./finder.ts";
 
 /**
