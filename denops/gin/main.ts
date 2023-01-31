@@ -4,7 +4,7 @@ import { main as mainAction } from "./core/action/main.ts";
 import { main as mainBare } from "./core/bare/main.ts";
 import { main as mainBuffer } from "./core/buffer/main.ts";
 import { main as mainProxy } from "./core/proxy/main.ts";
-import { main as mainUtil } from "./core/util/main.ts";
+import { main as mainUtil } from "./util/main.ts";
 
 import { main as mainBranch } from "./feat/branch/main.ts";
 import { main as mainChaperon } from "./feat/chaperon/main.ts";
