@@ -1,8 +1,6 @@
 import type { Denops } from "https://deno.land/x/denops_std@v4.0.0/mod.ts";
-import * as fn from "https://deno.land/x/denops_std@v4.0.0/function/mod.ts";
-import { parse as parseBufname } from "https://deno.land/x/denops_std@v4.0.0/bufname/mod.ts";
 import { Silent } from "https://deno.land/x/denops_std@v4.0.0/helper/mod.ts";
-import { GIN_FILE_BUFFER_PROTOCOLS } from "../global.ts";
+import { expand } from "./expand.ts";
 
 export function parseSilent(mods: string): Silent {
   if (mods.indexOf("silent!") !== -1) {
@@ -36,17 +34,4 @@ async function normCmdArg(
     return await p;
   }
   return arg.replaceAll(/^\\(%|#)/g, "$1");
-}
-
-export async function expand(denops: Denops, expr: string): Promise<string> {
-  const bufname = await fn.expand(denops, expr) as string;
-  try {
-    const { scheme, fragment } = parseBufname(bufname);
-    if (GIN_FILE_BUFFER_PROTOCOLS.includes(scheme)) {
-      return fragment ?? bufname;
-    }
-  } catch {
-    // Ignore errors
-  }
-  return bufname;
 }

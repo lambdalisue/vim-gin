@@ -1,7 +1,7 @@
 import type { Denops } from "https://deno.land/x/denops_std@v4.0.0/mod.ts";
 import { Cache } from "https://deno.land/x/local_cache@1.0/mod.ts";
 import * as path from "https://deno.land/std@0.171.0/path/mod.ts";
-import { findWorktreeFromDenops } from "../util/worktree.ts";
+import { findWorktreeFromDenops } from "../git/worktree.ts";
 import { find } from "../git/finder.ts";
 
 type Data = string;

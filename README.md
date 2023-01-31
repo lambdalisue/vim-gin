@@ -23,6 +23,7 @@ without announcements.**
 - `GinChaperon` to solve git conflicts (like `git mergetool`)
 - `GinDiff` to see `git diff` of a file
 - `GinEdit` to see `git show` of a file
+- `GinLog` to see `git log` of a repository/file
 - `GinPatch` to stage changes partially (like `git add -p`)
 - `GinStatus` to see `git status` of a repository
 
