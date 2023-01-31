@@ -27,7 +27,7 @@ export async function register(
   });
   await autocmd.group(
     denops,
-    "gin_feat_action_registry_internal",
+    "gin_command_action_registry_internal",
     (helper) => {
       helper.remove("*", pat);
       helper.define(

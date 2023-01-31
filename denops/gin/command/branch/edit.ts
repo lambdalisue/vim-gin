@@ -1,7 +1,4 @@
 import type { Denops } from "https://deno.land/x/denops_std@v4.0.0/mod.ts";
-import { unnullish } from "https://deno.land/x/unnullish@v1.0.0/mod.ts";
-import * as autocmd from "https://deno.land/x/denops_std@v4.0.0/autocmd/mod.ts";
-import * as fn from "https://deno.land/x/denops_std@v4.0.0/function/mod.ts";
 import * as batch from "https://deno.land/x/denops_std@v4.0.0/batch/mod.ts";
 import * as buffer from "https://deno.land/x/denops_std@v4.0.0/buffer/mod.ts";
 import * as option from "https://deno.land/x/denops_std@v4.0.0/option/mod.ts";
@@ -12,10 +9,10 @@ import {
   formatFlags,
   parseOpts,
 } from "https://deno.land/x/denops_std@v4.0.0/argument/mod.ts";
-import { bind } from "../../core/bare/command.ts";
-import { exec as execBuffer } from "../../core/buffer/edit.ts";
+import { bind } from "../../command/bare/command.ts";
+import { exec as execBuffer } from "../../command/buffer/edit.ts";
 import { init as initActionCore } from "../../core/action/action.ts";
-import { init as initActionStatus } from "./action.ts";
+import { init as initActionBranch } from "./action.ts";
 
 export async function edit(
   denops: Denops,
@@ -28,7 +25,7 @@ export async function edit(
   await exec(denops, bufnr, {
     worktree: expr,
     flags: params,
-    pathspecs: unnullish(fragment, (v) => JSON.parse(v.replace(/\$$/, ""))),
+    patterns: fragment?.replace(/\$$/, "").split(" ").filter((v) => v),
     encoding: opts.enc ?? opts.encoding,
     fileformat: opts.ff ?? opts.fileformat,
   });
@@ -37,7 +34,7 @@ export async function edit(
 export type ExecOptions = {
   worktree?: string;
   flags?: Flags;
-  pathspecs?: string[];
+  patterns?: string[];
   encoding?: string;
   fileformat?: string;
 };
@@ -48,13 +45,12 @@ export async function exec(
   options: ExecOptions,
 ): Promise<void> {
   const args = [
-    "status",
-    "--short",
-    "--branch",
-    "--ahead-behind",
+    "branch",
+    "--list",
+    "-vv",
     ...formatFlags(options.flags ?? {}),
     "--",
-    ...(options.pathspecs ?? []),
+    ...(options.patterns ?? []),
   ];
   await execBuffer(denops, bufnr, args, {
     worktree: options.worktree,
@@ -62,28 +58,11 @@ export async function exec(
     fileformat: options.fileformat,
   });
   await buffer.ensure(denops, bufnr, async () => {
-    await buffer.modifiable(denops, bufnr, async () => {
-      const saved = await fn.winsaveview(denops);
-      await denops.cmd("silent! 2,$sort /.. /)");
-      await fn.winrestview(denops, saved);
-    });
     await batch.batch(denops, async (denops) => {
       await bind(denops, bufnr);
       await initActionCore(denops, bufnr);
-      await initActionStatus(denops, bufnr);
-      await option.filetype.setLocal(denops, "gin-status");
-      await autocmd.group(
-        denops,
-        `gin_feat_status_command_read_${bufnr}`,
-        (helper) => {
-          helper.remove();
-          helper.define(
-            ["BufWritePost", "FileWritePost"],
-            "*",
-            `call gin#util#reload(${bufnr})`,
-          );
-        },
-      );
+      await initActionBranch(denops, bufnr);
+      await option.filetype.setLocal(denops, "gin-branch");
     });
   });
 }

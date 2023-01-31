@@ -12,7 +12,7 @@ import {
   parseOpts,
   validateOpts,
 } from "https://deno.land/x/denops_std@v4.0.0/argument/mod.ts";
-import { exec as execBuffer } from "../../core/buffer/read.ts";
+import { exec as execBuffer } from "../../command/buffer/read.ts";
 
 export async function read(
   denops: Denops,

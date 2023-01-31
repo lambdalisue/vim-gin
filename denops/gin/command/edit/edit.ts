@@ -78,17 +78,21 @@ export async function exec(
         await option.buftype.setLocal(denops, "nowrite");
       } else {
         await option.buftype.setLocal(denops, "acwrite");
-        await autocmd.group(denops, "gin_feat_edit_edit_internal", (helper) => {
-          helper.remove("*", "<buffer>");
-          helper.define(
-            "BufWriteCmd",
-            "<buffer>",
-            `call denops#request('gin', 'edit:write', [bufnr(), expand('<amatch>')])`,
-            {
-              nested: true,
-            },
-          );
-        });
+        await autocmd.group(
+          denops,
+          "gin_command_edit_edit_internal",
+          (helper) => {
+            helper.remove("*", "<buffer>");
+            helper.define(
+              "BufWriteCmd",
+              "<buffer>",
+              `call denops#request('gin', 'edit:write', [bufnr(), expand('<amatch>')])`,
+              {
+                nested: true,
+              },
+            );
+          },
+        );
       }
     });
   });

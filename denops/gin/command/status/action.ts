@@ -11,7 +11,7 @@ import { command as commandEdit } from "../edit/command.ts";
 import { command as commandDiff } from "../diff/command.ts";
 import { command as commandChaperon } from "../chaperon/command.ts";
 import { command as commandPatch } from "../patch/command.ts";
-import { command as commandBare } from "../../core/bare/command.ts";
+import { command as commandBare } from "../../command/bare/command.ts";
 import { Entry, parse as parseStatus } from "./parser.ts";
 
 export async function init(denops: Denops, bufnr: number): Promise<void> {

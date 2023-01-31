@@ -5,7 +5,7 @@ import * as fn from "https://deno.land/x/denops_std@v4.0.0/function/mod.ts";
 import * as vars from "https://deno.land/x/denops_std@v4.0.0/variable/mod.ts";
 import * as helper from "https://deno.land/x/denops_std@v4.0.0/helper/mod.ts";
 import { define, Range } from "../../core/action/action.ts";
-import { command as commandBuffer } from "../../core/buffer/command.ts";
+import { command as commandBuffer } from "../../command/buffer/command.ts";
 import { Entry, parse as parseLog } from "./parser.ts";
 
 export async function init(denops: Denops, bufnr: number): Promise<void> {

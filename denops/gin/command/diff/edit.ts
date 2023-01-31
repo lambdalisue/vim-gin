@@ -16,7 +16,7 @@ import {
   validateOpts,
 } from "https://deno.land/x/denops_std@v4.0.0/argument/mod.ts";
 import * as buffer from "https://deno.land/x/denops_std@v4.0.0/buffer/mod.ts";
-import { exec as execBuffer } from "../../core/buffer/edit.ts";
+import { exec as execBuffer } from "../../command/buffer/edit.ts";
 
 export async function edit(
   denops: Denops,
