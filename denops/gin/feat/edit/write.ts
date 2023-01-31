@@ -7,7 +7,7 @@ import * as option from "https://deno.land/x/denops_std@v4.0.0/option/mod.ts";
 import {
   parse as parseBufname,
 } from "https://deno.land/x/denops_std@v4.0.0/bufname/mod.ts";
-import { findWorktreeFromDenops } from "../../util/worktree.ts";
+import { findWorktreeFromDenops } from "../../git/worktree.ts";
 import { exec as execBare } from "../../core/bare/command.ts";
 
 export async function write(

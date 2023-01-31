@@ -1,7 +1,7 @@
 import type { Denops } from "https://deno.land/x/denops_std@v4.0.0/mod.ts";
 import { Cache } from "https://deno.land/x/local_cache@1.0/mod.ts";
 import { decodeUtf8 } from "../util/text.ts";
-import { findWorktreeFromDenops } from "../util/worktree.ts";
+import { findWorktreeFromDenops } from "../git/worktree.ts";
 import { execute } from "../git/process.ts";
 
 type Data = [number, number];

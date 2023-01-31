@@ -14,7 +14,7 @@ import {
   format as formatBufname,
 } from "https://deno.land/x/denops_std@v4.0.0/bufname/mod.ts";
 import { normCmdArgs } from "../../util/cmd.ts";
-import { findWorktreeFromDenops } from "../../util/worktree.ts";
+import { findWorktreeFromDenops } from "../../git/worktree.ts";
 
 export type CommandOptions = {
   disableDefaultArgs?: boolean;
