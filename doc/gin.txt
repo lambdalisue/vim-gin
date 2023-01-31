@@ -257,6 +257,20 @@ COMMANDS					*gin-commands*
 	Users can specify default arguments by |g:gin_edit_default_args|.
 	Use a bang (!) to temporary disable default arguments.
 
+							*:GinLog*
+:GinLog[!] [{++option}...] [{commitish}] [-- {pathspec}...]
+	Open a "gin-log" buffer to show a git log.
+
+	See |gin-commands-options| for common {++option}.
+		
+	See ":man git-log(1)" for {flags}.
+
+	Several default mappings are defined in the buffer. Use "help" action
+	to see mappings or disable by |g:gin_log_disable_default_mappings|.
+
+	Users can specify default arguments by |g:gin_log_default_args|.
+	Use a bang (!) to temporary disable default arguments.
+
 							*:GinPatch*
 :GinPatch[!] [{++option}...] {path}
 	Open three buffers (HEAD, INDEX, and WORKTREE) to patch changes of

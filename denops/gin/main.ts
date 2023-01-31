@@ -10,6 +10,7 @@ import { main as mainBranch } from "./feat/branch/main.ts";
 import { main as mainChaperon } from "./feat/chaperon/main.ts";
 import { main as mainDiff } from "./feat/diff/main.ts";
 import { main as mainEdit } from "./feat/edit/main.ts";
+import { main as mainLog } from "./feat/log/main.ts";
 import { main as mainPatch } from "./feat/patch/main.ts";
 import { main as mainStatus } from "./feat/status/main.ts";
 
@@ -28,6 +29,7 @@ export function main(denops: Denops): void {
   mainChaperon(denops);
   mainDiff(denops);
   mainEdit(denops);
+  mainLog(denops);
   mainPatch(denops);
   mainStatus(denops);
 
