@@ -9,7 +9,7 @@ import * as unknownutil from "https://deno.land/x/unknownutil@v2.1.0/mod.ts";
 import * as path from "https://deno.land/std@0.171.0/path/mod.ts";
 import * as streams from "https://deno.land/std@0.171.0/streams/mod.ts";
 import { deferred } from "https://deno.land/std@0.171.0/async/mod.ts";
-import { decodeUtf8, encodeUtf8 } from "../../util/text.ts";
+import { decodeUtf8, encodeUtf8 } from "../util/text.ts";
 
 const recordPattern = /^([^:]+?):(.*)$/;
 
