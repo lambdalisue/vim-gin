@@ -6,7 +6,7 @@ import * as buffer from "https://deno.land/x/denops_std@v4.0.0/buffer/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v4.0.0/function/mod.ts";
 import * as helper from "https://deno.land/x/denops_std@v4.0.0/helper/mod.ts";
 import { findWorktreeFromDenops } from "../../git/worktree.ts";
-import { define, Range } from "../../core/action/action.ts";
+import { define, Range } from "../../action/core/action.ts";
 import { command as commandEdit } from "../edit/command.ts";
 import { command as commandDiff } from "../diff/command.ts";
 import { command as commandChaperon } from "../chaperon/command.ts";

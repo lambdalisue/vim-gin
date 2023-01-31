@@ -14,7 +14,7 @@ import {
 } from "https://deno.land/x/denops_std@v4.0.0/argument/mod.ts";
 import { bind } from "../../command/bare/command.ts";
 import { exec as execBuffer } from "../../command/buffer/edit.ts";
-import { init as initActionCore } from "../../core/action/action.ts";
+import { init as initActionCore } from "../../action/core/action.ts";
 import { init as initActionStatus } from "./action.ts";
 
 export async function edit(
