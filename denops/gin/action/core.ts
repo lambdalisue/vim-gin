@@ -8,6 +8,12 @@ import * as unknownutil from "https://deno.land/x/unknownutil@v2.1.0/mod.ts";
 
 let rangeInternal: Range | undefined;
 
+export type GatherCandidates<T> = (
+  denops: Denops,
+  bufnr: number,
+  range: Range,
+) => Promise<T[]>;
+
 export type Action = {
   name: string;
   lhs: string;
@@ -101,6 +107,20 @@ export async function define(
     denops,
     `<Plug>(gin-action-${name})`,
     `<Cmd>call denops#request('gin', 'action:action:${name}', [])<CR>`,
+    { buffer: true },
+  );
+}
+
+export async function alias(
+  denops: Denops,
+  _bufnr: number,
+  name: string,
+  to: string,
+): Promise<void> {
+  await mapping.map(
+    denops,
+    `<Plug>(gin-action-${name})`,
+    `<Plug>(gin-action-${to})`,
     { buffer: true },
   );
 }

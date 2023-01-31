@@ -8,11 +8,10 @@ setlocal nolist nospell
 setlocal nowrap nofoldenable
 setlocal cursorline
 
-" Alias
-map <buffer> <Plug>(gin-action-show) <Plug>(gin-action-show:edit)
-
 if !get(g:, 'gin_log_disable_default_mappings')
   map <buffer><nowait> a <Plug>(gin-action-choice)
   map <buffer><nowait> . <Plug>(gin-action-repeat)
   nmap <buffer><nowait> ? <Plug>(gin-action-help)
+
+  map <buffer><nowait> <Return> <Plug>(gin-action-show)zv
 endif

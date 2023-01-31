@@ -1,5 +1,6 @@
 import type { Denops } from "https://deno.land/x/denops_std@v4.0.0/mod.ts";
 import { unnullish } from "https://deno.land/x/unnullish@v1.0.0/mod.ts";
+import * as fn from "https://deno.land/x/denops_std@v4.0.0/function/mod.ts";
 import * as batch from "https://deno.land/x/denops_std@v4.0.0/batch/mod.ts";
 import * as buffer from "https://deno.land/x/denops_std@v4.0.0/buffer/mod.ts";
 import * as option from "https://deno.land/x/denops_std@v4.0.0/option/mod.ts";
@@ -12,8 +13,17 @@ import {
 } from "https://deno.land/x/denops_std@v4.0.0/argument/mod.ts";
 import { bind } from "../../command/bare/command.ts";
 import { exec as execBuffer } from "../../command/buffer/edit.ts";
-import { init as initActionCore } from "../../action/core/action.ts";
-import { init as initActionLog } from "./action.ts";
+import { init as initActionCore, Range } from "../../action/core.ts";
+import { init as initActionCherryPick } from "../../action/cherry_pick.ts";
+import { init as initActionEcho } from "../../action/echo.ts";
+import { init as initActionMerge } from "../../action/merge.ts";
+import { init as initActionRebase } from "../../action/rebase.ts";
+import { init as initActionReset } from "../../action/reset.ts";
+import { init as initActionRevert } from "../../action/revert.ts";
+import { init as initActionShow } from "../../action/show.ts";
+import { init as initActionSwitch } from "../../action/switch.ts";
+import { init as initActionTag } from "../../action/tag.ts";
+import { Entry, parse as parseLog } from "./parser.ts";
 
 export async function edit(
   denops: Denops,
@@ -60,8 +70,41 @@ export async function exec(
     await batch.batch(denops, async (denops) => {
       await bind(denops, bufnr);
       await initActionCore(denops, bufnr);
-      await initActionLog(denops, bufnr);
+      await initActionCherryPick(denops, bufnr, gatherCandidates);
+      await initActionEcho(denops, bufnr, gatherCandidates);
+      await initActionMerge(denops, bufnr, async (denops, bufnr, range) => {
+        const xs = await gatherCandidates(denops, bufnr, range);
+        return xs.map((x) => ({ kind: "", ...x }));
+      });
+      await initActionRebase(denops, bufnr, async (denops, bufnr, range) => {
+        const xs = await gatherCandidates(denops, bufnr, range);
+        return xs.map((x) => ({ kind: "", ...x }));
+      });
+      await initActionReset(denops, bufnr, gatherCandidates);
+      await initActionRevert(denops, bufnr, gatherCandidates);
+      await initActionShow(denops, bufnr, gatherCandidates);
+      await initActionSwitch(denops, bufnr, gatherCandidates);
+      await initActionTag(denops, bufnr, gatherCandidates);
       await option.filetype.setLocal(denops, "gin-log");
     });
   });
+}
+
+async function gatherCandidates(
+  denops: Denops,
+  bufnr: number,
+  [start, end]: Range,
+): Promise<Entry[]> {
+  const [content, patternStr] = await batch.gather(denops, async (denops) => {
+    await fn.getbufline(
+      denops,
+      bufnr,
+      Math.max(start, 1),
+      Math.max(end, 1),
+    );
+    await vars.g.get(denops, "gin_log_parse_pattern");
+  }) as [string[], string | undefined];
+  const pattern = unnullish(patternStr, (v) => new RegExp(v));
+  const result = parseLog(content, pattern);
+  return result.entries;
 }

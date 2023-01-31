@@ -1,5 +1,6 @@
 import type { Denops } from "https://deno.land/x/denops_std@v4.0.0/mod.ts";
 import { unnullish } from "https://deno.land/x/unnullish@v1.0.0/mod.ts";
+import * as path from "https://deno.land/std@0.171.0/path/mod.ts";
 import * as autocmd from "https://deno.land/x/denops_std@v4.0.0/autocmd/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v4.0.0/function/mod.ts";
 import * as batch from "https://deno.land/x/denops_std@v4.0.0/batch/mod.ts";
@@ -14,8 +15,20 @@ import {
 } from "https://deno.land/x/denops_std@v4.0.0/argument/mod.ts";
 import { bind } from "../../command/bare/command.ts";
 import { exec as execBuffer } from "../../command/buffer/edit.ts";
-import { init as initActionCore } from "../../action/core/action.ts";
-import { init as initActionStatus } from "./action.ts";
+import { findWorktreeFromDenops } from "../../git/worktree.ts";
+import { init as initActionCore, Range } from "../../action/core.ts";
+import { init as initActionAdd } from "../../action/add.ts";
+import { init as initActionChaperon } from "../../action/chaperon.ts";
+import { init as initActionDiff } from "../../action/diff.ts";
+import { init as initActionDiffSmart } from "../../action/diff_smart.ts";
+import { init as initActionEdit } from "../../action/edit.ts";
+import { init as initActionPatch } from "../../action/patch.ts";
+import { init as initActionResetFile } from "../../action/reset_file.ts";
+import { init as initActionRestore } from "../../action/restore.ts";
+import { init as initActionRm } from "../../action/rm.ts";
+import { init as initActionStage } from "../../action/stage.ts";
+import { init as initActionStash } from "../../action/stash.ts";
+import { Entry, parse as parseStatus } from "./parser.ts";
 
 export async function edit(
   denops: Denops,
@@ -70,7 +83,17 @@ export async function exec(
     await batch.batch(denops, async (denops) => {
       await bind(denops, bufnr);
       await initActionCore(denops, bufnr);
-      await initActionStatus(denops, bufnr);
+      await initActionAdd(denops, bufnr, gatherCandidates);
+      await initActionChaperon(denops, bufnr, gatherCandidates);
+      await initActionDiff(denops, bufnr, gatherCandidates);
+      await initActionDiffSmart(denops, bufnr, gatherCandidates);
+      await initActionEdit(denops, bufnr, gatherCandidates);
+      await initActionPatch(denops, bufnr, gatherCandidates);
+      await initActionResetFile(denops, bufnr, gatherCandidates);
+      await initActionRestore(denops, bufnr, gatherCandidates);
+      await initActionRm(denops, bufnr, gatherCandidates);
+      await initActionStage(denops, bufnr, gatherCandidates);
+      await initActionStash(denops, bufnr, gatherCandidates);
       await option.filetype.setLocal(denops, "gin-status");
       await autocmd.group(
         denops,
@@ -86,4 +109,24 @@ export async function exec(
       );
     });
   });
+}
+
+async function gatherCandidates(
+  denops: Denops,
+  bufnr: number,
+  [start, end]: Range,
+): Promise<Entry[]> {
+  const worktree = await findWorktreeFromDenops(denops);
+  const content = await fn.getbufline(
+    denops,
+    bufnr,
+    Math.max(start, 1),
+    Math.max(end, 1),
+  );
+  const result = parseStatus(content);
+  return result.entries.map((ent) => ({
+    ...ent,
+    path: path.join(worktree, ent.path),
+    origPath: unnullish(ent.origPath, (v) => path.join(worktree, v)),
+  }));
 }

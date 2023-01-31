@@ -7,8 +7,6 @@ setlocal nolist nospell
 setlocal nowrap nofoldenable
 setlocal nomodeline
 
-map <buffer> <Plug>(gin-action-merge) <Plug>(gin-action-merge:ff)
-
 if !get(g:, 'gin_branch_disable_default_mappings')
   map <buffer><nowait> a <Plug>(gin-action-choice)
   map <buffer><nowait> . <Plug>(gin-action-repeat)
