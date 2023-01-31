@@ -11,7 +11,7 @@ import {
 import {
   parse as parseBufname,
 } from "https://deno.land/x/denops_std@v4.0.0/bufname/mod.ts";
-import { execute } from "../executor.ts";
+import { execute } from "../../git/executor.ts";
 
 export async function read(
   denops: Denops,

@@ -16,7 +16,7 @@ import {
 import {
   buildDecorationsFromAnsiEscapeCode,
 } from "../../util/ansi_escape_code.ts";
-import { execute } from "../executor.ts";
+import { execute } from "../../git/executor.ts";
 
 export async function edit(
   denops: Denops,

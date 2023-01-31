@@ -8,7 +8,7 @@ import {
   validateOpts,
 } from "https://deno.land/x/denops_std@v4.0.0/argument/mod.ts";
 import { normCmdArgs } from "../../util/cmd.ts";
-import { execute } from "../executor.ts";
+import { execute } from "../../git/executor.ts";
 
 export async function command(denops: Denops, args: string[]): Promise<void> {
   const [opts, residue] = parseOpts(await normCmdArgs(denops, args));

@@ -5,8 +5,8 @@ import * as fn from "https://deno.land/x/denops_std@v4.0.0/function/mod.ts";
 import * as option from "https://deno.land/x/denops_std@v4.0.0/option/mod.ts";
 import { decodeUtf8 } from "../util/text.ts";
 import { removeAnsiEscapeCode } from "../util/ansi_escape_code.ts";
-import { findWorktreeFromDenops } from "../git/worktree.ts";
-import { run } from "../git/process.ts";
+import { findWorktreeFromDenops } from "./worktree.ts";
+import { run } from "./process.ts";
 
 export class ExecuteError extends Error {
   constructor(message?: string) {
