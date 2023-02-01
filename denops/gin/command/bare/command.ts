@@ -54,7 +54,7 @@ export async function exec(
   );
   if (!eventignore.includes("all")) {
     await denops.call(
-      "gin#util#debounce",
+      "gin#internal#util#debounce",
       "doautocmd <nomodeline> User GinCommandPost",
       100,
     );

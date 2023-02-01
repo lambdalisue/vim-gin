@@ -32,7 +32,7 @@ endfunction
 function! s:update_success(component, previous, value) abort
   let s:cache[a:component] = a:value
   if a:value !=# a:previous
-    call gin#util#debounce('doautocmd <nomodeline> User GinComponentPost', 100)
+    call gin#internal#util#debounce('doautocmd <nomodeline> User GinComponentPost', 100)
   endif
 endfunction
 

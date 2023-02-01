@@ -464,11 +464,6 @@ gin#util#expand({expr})
 gin#util#worktree([{path}])
 	Return a git worktree path of the {path} or the current buffer.
 
-						*gin#util#debounce()*
-gin#util#debounce({expr}, {delay})
-	Execute {expr} after {delay} milliseconds and debounce all calls
-	within that {delay}.
-
 -----------------------------------------------------------------------------
 COMPONENTS					*gin-components*
 
