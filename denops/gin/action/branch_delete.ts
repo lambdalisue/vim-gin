@@ -4,9 +4,8 @@ import { define, GatherCandidates, Range } from "./core.ts";
 import { command as commandBare } from "../command/bare/command.ts";
 
 export type Candidate =
-  | { kind: "local"; branch: string }
   | { kind: "remote"; branch: string; remote: string }
-  | { kind: "alias"; branch: string };
+  | { kind?: "alias" | "local"; branch: string };
 
 export async function init(
   denops: Denops,
@@ -43,18 +42,18 @@ async function doDelete(
     switch (x.kind) {
       case "alias":
         continue;
-      case "local":
-        await commandBare(denops, [
-          "branch",
-          force ? "-D" : "-d",
-          x.branch,
-        ]);
-        break;
       case "remote":
         await commandBare(denops, [
           "push",
           "--delete",
           x.remote,
+          x.branch,
+        ]);
+        break;
+      default:
+        await commandBare(denops, [
+          "branch",
+          force ? "-D" : "-d",
           x.branch,
         ]);
         break;

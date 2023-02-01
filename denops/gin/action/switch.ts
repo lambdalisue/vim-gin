@@ -3,7 +3,7 @@ import * as batch from "https://deno.land/x/denops_std@v4.0.0/batch/mod.ts";
 import { define, GatherCandidates, Range } from "./core.ts";
 import { command as commandBare } from "../command/bare/command.ts";
 
-export type Candidate = { commit: string };
+export type Candidate = { target: string };
 
 export async function init(
   denops: Denops,
@@ -40,5 +40,5 @@ async function doSwitch(
   if (!x) {
     return;
   }
-  await commandBare(denops, ["switch", ...extraArgs, x.commit]);
+  await commandBare(denops, ["switch", ...extraArgs, x.target]);
 }

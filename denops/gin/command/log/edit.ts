@@ -72,18 +72,15 @@ export async function exec(
       await initActionCore(denops, bufnr);
       await initActionCherryPick(denops, bufnr, gatherCandidates);
       await initActionEcho(denops, bufnr, gatherCandidates);
-      await initActionMerge(denops, bufnr, async (denops, bufnr, range) => {
-        const xs = await gatherCandidates(denops, bufnr, range);
-        return xs.map((x) => ({ kind: "", ...x }));
-      });
-      await initActionRebase(denops, bufnr, async (denops, bufnr, range) => {
-        const xs = await gatherCandidates(denops, bufnr, range);
-        return xs.map((x) => ({ kind: "", ...x }));
-      });
+      await initActionMerge(denops, bufnr, gatherCandidates);
+      await initActionRebase(denops, bufnr, gatherCandidates);
       await initActionReset(denops, bufnr, gatherCandidates);
       await initActionRevert(denops, bufnr, gatherCandidates);
       await initActionShow(denops, bufnr, gatherCandidates);
-      await initActionSwitch(denops, bufnr, gatherCandidates);
+      await initActionSwitch(denops, bufnr, async (denops, bufnr, range) => {
+        const xs = await gatherCandidates(denops, bufnr, range);
+        return xs.map((x) => ({ target: x.commit, ...x }));
+      });
       await initActionTag(denops, bufnr, gatherCandidates);
       await option.filetype.setLocal(denops, "gin-log");
     });

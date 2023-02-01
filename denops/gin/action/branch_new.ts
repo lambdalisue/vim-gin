@@ -4,7 +4,7 @@ import * as helper from "https://deno.land/x/denops_std@v4.0.0/helper/mod.ts";
 import { define, GatherCandidates, Range } from "./core.ts";
 import { command as commandBare } from "../command/bare/command.ts";
 
-export type Candidate = { branch: string };
+export type Candidate = { branch?: string };
 
 export async function init(
   denops: Denops,

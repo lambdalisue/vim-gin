@@ -43,11 +43,13 @@ async function doCherryPick(
   gatherCandidates: GatherCandidates<Candidate>,
 ): Promise<void> {
   const xs = await gatherCandidates(denops, bufnr, range);
-  for (const x of xs) {
-    await commandBare(denops, [
-      "cherry-pick",
-      ...(mainline ? [] : ["--mainline", mainline]),
-      x.commit,
-    ]);
+  const x = xs.at(0);
+  if (!x) {
+    return;
   }
+  await commandBare(denops, [
+    "cherry-pick",
+    ...(mainline ? [] : ["--mainline", mainline]),
+    x.commit,
+  ]);
 }
