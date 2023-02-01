@@ -78,7 +78,7 @@ async function doTag(
       prompt: `Name: `,
     });
     if (!name) {
-      console.log("Cancelled");
+      await helper.echo(denops, "Cancelled");
       return;
     }
     await commandBare(denops, [

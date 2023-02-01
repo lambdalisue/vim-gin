@@ -43,11 +43,13 @@ async function doRevert(
   gatherCandidates: GatherCandidates<Candidate>,
 ): Promise<void> {
   const xs = await gatherCandidates(denops, bufnr, range);
-  for (const x of xs) {
-    await commandBare(denops, [
-      "revert",
-      ...(mainline ? [] : ["--mainline", mainline]),
-      x.commit,
-    ]);
+  const x = xs.at(0);
+  if (!x) {
+    return;
   }
+  await commandBare(denops, [
+    "revert",
+    ...(mainline ? [] : ["--mainline", mainline]),
+    x.commit,
+  ]);
 }

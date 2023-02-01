@@ -57,10 +57,14 @@ export async function doReset(
   gatherCandidates: GatherCandidates<Candidate>,
 ): Promise<void> {
   const xs = await gatherCandidates(denops, bufnr, range);
+  const x = xs.at(0);
+  if (!x) {
+    return;
+  }
   await commandBare(denops, [
     "reset",
     "--quiet",
     ...(mode ? [`--${mode}`] : []),
-    ...xs.map((x) => x.commit),
+    x.commit,
   ]);
 }

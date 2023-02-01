@@ -81,10 +81,7 @@ export async function exec(
         const xs = await gatherCandidates(denops, bufnr, range);
         return xs.map((b) => ({ commit: b.target, ...b }));
       });
-      await initActionSwitch(denops, bufnr, async (denops, bufnr, range) => {
-        const xs = await gatherCandidates(denops, bufnr, range);
-        return xs.map((b) => ({ commit: b.branch, ...b }));
-      });
+      await initActionSwitch(denops, bufnr, gatherCandidates);
       await option.filetype.setLocal(denops, "gin-branch");
     });
   });
