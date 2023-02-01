@@ -10,8 +10,7 @@ function! gin#internal#component#init(component) abort
     autocmd!
     execute printf('autocmd BufEnter * call gin#internal#component#update("%s")', a:component)
     execute printf('autocmd User GinCommandPost call gin#internal#component#update("%s")', a:component)
-    " Delay call a bit because `denps#plugin#is_loaded()` returns zero at point of `DenopsPluginPost`.
-    execute printf('autocmd User DenopsPluginPost:gin call timer_start(0, { -> gin#internal#component#update("%s")})', a:component)
+    execute printf('autocmd User DenopsPluginPost:gin call gin#internal#component#update("%s")', a:component)
   augroup END
 endfunction
 
@@ -20,9 +19,6 @@ function! gin#internal#component#get(component) abort
 endfunction
 
 function! gin#internal#component#update(component) abort
-  if !denops#plugin#is_loaded('gin')
-    return
-  endif
   let previous = get(s:cache, a:component, '')
   call denops#request_async(
         \ 'gin',
