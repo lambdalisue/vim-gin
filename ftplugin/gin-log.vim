@@ -14,4 +14,7 @@ if !get(g:, 'gin_log_disable_default_mappings')
   nmap <buffer><nowait> ? <Plug>(gin-action-help)
 
   map <buffer><nowait> <Return> <Plug>(gin-action-show)zv
+
+  nmap <buffer><nowait> yy <Plug>(gin-action-yank:commit)
+  vmap <buffer><nowait> y <Plug>(gin-action-yank:commit)<Esc>
 endif

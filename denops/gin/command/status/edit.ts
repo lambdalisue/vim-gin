@@ -28,6 +28,7 @@ import { init as initActionRestore } from "../../action/restore.ts";
 import { init as initActionRm } from "../../action/rm.ts";
 import { init as initActionStage } from "../../action/stage.ts";
 import { init as initActionStash } from "../../action/stash.ts";
+import { init as initActionYank } from "../../action/yank.ts";
 import { Entry, parse as parseStatus } from "./parser.ts";
 
 export async function edit(
@@ -94,6 +95,18 @@ export async function exec(
       await initActionRm(denops, bufnr, gatherCandidates);
       await initActionStage(denops, bufnr, gatherCandidates);
       await initActionStash(denops, bufnr, gatherCandidates);
+      await initActionYank(denops, bufnr, async (denops, bufnr, range) => {
+        const xs = await gatherCandidates(denops, bufnr, range);
+        return xs.map((x) => ({ value: x.path }));
+      }, {
+        suffix: ":path",
+      });
+      await initActionYank(denops, bufnr, async (denops, bufnr, range) => {
+        const xs = await gatherCandidates(denops, bufnr, range);
+        return xs.map((x) => ({ value: x.origPath ?? "" }));
+      }, {
+        suffix: ":path:orig",
+      });
       await option.filetype.setLocal(denops, "gin-status");
       await autocmd.group(
         denops,

@@ -23,6 +23,7 @@ import { init as initActionRevert } from "../../action/revert.ts";
 import { init as initActionShow } from "../../action/show.ts";
 import { init as initActionSwitch } from "../../action/switch.ts";
 import { init as initActionTag } from "../../action/tag.ts";
+import { init as initActionYank } from "../../action/yank.ts";
 import { Entry, parse as parseLog } from "./parser.ts";
 
 export async function edit(
@@ -82,6 +83,12 @@ export async function exec(
         return xs.map((x) => ({ target: x.commit, ...x }));
       });
       await initActionTag(denops, bufnr, gatherCandidates);
+      await initActionYank(denops, bufnr, async (denops, bufnr, range) => {
+        const xs = await gatherCandidates(denops, bufnr, range);
+        return xs.map((x) => ({ value: x.commit }));
+      }, {
+        suffix: ":commit",
+      });
       await option.filetype.setLocal(denops, "gin-log");
     });
   });
