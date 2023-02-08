@@ -13,4 +13,7 @@ if !get(g:, 'gin_branch_disable_default_mappings')
   nmap <buffer><nowait> ? <Plug>(gin-action-help)
 
   nmap <buffer><nowait> <Return> <Plug>(gin-action-switch)
+
+  nmap <buffer><nowait> yy <Plug>(gin-action-yank:branch)
+  vmap <buffer><nowait> y <Plug>(gin-action-yank:branch)<Esc>
 endif

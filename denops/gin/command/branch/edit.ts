@@ -20,6 +20,7 @@ import { init as initActionEcho } from "../../action/echo.ts";
 import { init as initActionMerge } from "../../action/merge.ts";
 import { init as initActionRebase } from "../../action/rebase.ts";
 import { init as initActionSwitch } from "../../action/switch.ts";
+import { init as initActionYank } from "../../action/yank.ts";
 import { Branch, parse as parseBranch } from "./parser.ts";
 
 export async function edit(
@@ -82,6 +83,24 @@ export async function exec(
         return xs.map((b) => ({ commit: b.target, ...b }));
       });
       await initActionSwitch(denops, bufnr, gatherCandidates);
+      await initActionYank(denops, bufnr, async (denops, bufnr, range) => {
+        const xs = await gatherCandidates(denops, bufnr, range);
+        return xs.map((b) => ({ value: b.branch }));
+      }, {
+        suffix: ":branch",
+      });
+      await initActionYank(denops, bufnr, async (denops, bufnr, range) => {
+        const xs = await gatherCandidates(denops, bufnr, range);
+        return xs.map((b) => ({ value: b.target }));
+      }, {
+        suffix: ":target",
+      });
+      await initActionYank(denops, bufnr, async (denops, bufnr, range) => {
+        const xs = await gatherCandidates(denops, bufnr, range);
+        return xs.map((b) => ({ value: "commit" in b ? b.commit : "" }));
+      }, {
+        suffix: ":commit",
+      });
       await option.filetype.setLocal(denops, "gin-branch");
     });
   });
