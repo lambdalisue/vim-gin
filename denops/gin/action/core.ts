@@ -91,6 +91,7 @@ export async function define(
   bufnr: number,
   name: string,
   callback: Callback,
+  options: Omit<mapping.MapOptions, "buffer" | "silent" | "noremap"> = {},
 ): Promise<void> {
   denops.dispatcher = {
     ...denops.dispatcher,
@@ -107,7 +108,7 @@ export async function define(
     denops,
     `<Plug>(gin-action-${name})`,
     `<Cmd>call denops#request('gin', 'action:action:${name}', [])<CR>`,
-    { buffer: true },
+    { ...options, buffer: true, silent: true, noremap: true },
   );
 }
 
