@@ -19,6 +19,9 @@ function! gin#internal#component#get(component) abort
 endfunction
 
 function! gin#internal#component#update(component) abort
+  if !denops#plugin#is_loaded('gin')
+    return
+  endif
   let previous = get(s:cache, a:component, '')
   call denops#request_async(
         \ 'gin',
