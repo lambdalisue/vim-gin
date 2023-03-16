@@ -107,7 +107,7 @@ COMMANDS					*gin-commands*
 	See |gin-commands-options| for common {++option}.
 
 							*:GinBuffer*
-:GinBuffer[!] [{++option}...] {command} [{args}]
+:GinBuffer [{++option}...] {command} [{args}]
 	Call a git raw {command} with {args} arguments asynchronously and open
 	a "gin" buffer to show the results. Note that it shows error results
 	in the buffer as well.
@@ -129,7 +129,7 @@ COMMANDS					*gin-commands*
 	See |gin-commands-options| for common {++option}.
 
 							*:GinBranch*
-:GinBranch[!] [{++option}...] [{flags}] [-- {pattern}...]
+:GinBranch[&] [{++option}...] [{flags}] [-- {pattern}...]
 	Open a "gin-branch" buffer to show a branch list. If {pattern} is
 	given, it is used as a shell wildcard to restrict the output to
 	matching branches. If multiple patterns are given, a branch is shown
@@ -151,7 +151,7 @@ COMMANDS					*gin-commands*
 	to see mappings or disable by |g:gin_branch_disable_default_mappings|.
 
 	Users can specify default arguments by |g:gin_branch_default_args|.
-	Use a bang (!) to temporary disable default arguments.
+	Use an ampersand (&) to temporary disable default arguments.
 
 							*:GinCd*
 							*:GinLcd*
@@ -163,7 +163,7 @@ COMMANDS					*gin-commands*
 	directory. Commands call |cd|, |lcd|, and |tcd| respectively.
 	
 							*:GinChaperon*
-:GinChaperon[!] [++{option}...] {path}
+:GinChaperon[&] [++{option}...] {path}
 	Open three main buffers (THEIRS, WORKTREE, and OURS) and three
 	supplemental buffers to solve conflicts on {path}.
 
@@ -192,7 +192,7 @@ COMMANDS					*gin-commands*
 	|<Plug>(gin-diffget)|		Assigned to "do" in default.
 
 	Users can specify default arguments by |g:gin_chaperon_default_args|.
-	Use a bang (!) to temporary disable default arguments.
+	Use an ampersand (&) to temporary disable default arguments.
 
 	Use |g:gin_chaperon_supplement_disable| to disable supplemental
 	buffers.
@@ -200,7 +200,7 @@ COMMANDS					*gin-commands*
 	supplemental buffers.
 
 							*:GinDiff*
-:GinDiff[!] [{++option}...] [{flags}] [{commitish}] [-- {path}...]
+:GinDiff[&] [{++option}...] [{flags}] [{commitish}] [-- {path}...]
 	Open a "gin-diff" buffer to show changes between the working tree and
 	the index or a tree, changes between the index and a tree, changes
 	between two trees.
@@ -240,10 +240,10 @@ COMMANDS					*gin-commands*
 	|<Plug>(gin-diffjump-new)|	Assigned to "<C-g><CR>" in default.
 
 	Users can specify default arguments by |g:gin_diff_default_args|.
-	Use a bang (!) to temporary disable default arguments.
+	Use an ampersand (&) to temporary disable default arguments.
 
 							*:GinEdit*
-:GinEdit[!] [{++option}...] [{commitish}] {path}
+:GinEdit[&] [{++option}...] [{commitish}] {path}
 	Open a "gin-edit" buffer to show a corresponding content of {path} in
 	the index or the commitish.
 	If no {commitish} is specified, it opens a buffer that shows content
@@ -255,10 +255,10 @@ COMMANDS					*gin-commands*
 	See |gin-commands-options| for common {++option}.
 
 	Users can specify default arguments by |g:gin_edit_default_args|.
-	Use a bang (!) to temporary disable default arguments.
+	Use an ampersand (&) to temporary disable default arguments.
 
 							*:GinLog*
-:GinLog[!] [{++option}...] [{commitish}] [-- {pathspec}...]
+:GinLog[&] [{++option}...] [{commitish}] [-- {pathspec}...]
 	Open a "gin-log" buffer to show a git log.
 
 	See |gin-commands-options| for common {++option}.
@@ -269,10 +269,10 @@ COMMANDS					*gin-commands*
 	to see mappings or disable by |g:gin_log_disable_default_mappings|.
 
 	Users can specify default arguments by |g:gin_log_default_args|.
-	Use a bang (!) to temporary disable default arguments.
+	Use an ampersand (&) to temporary disable default arguments.
 
 							*:GinPatch*
-:GinPatch[!] [{++option}...] {path}
+:GinPatch[&] [{++option}...] {path}
 	Open three buffers (HEAD, INDEX, and WORKTREE) to patch changes of
 	{path}.
 
@@ -303,10 +303,10 @@ COMMANDS					*gin-commands*
 	|<Plug>(gin-diffget)|		Assigned to "do" in default.
 
 	Users can specify default arguments by |g:gin_patch_default_args|.
-	Use a bang (!) to temporary disable default arguments.
+	Use an ampersand (&) to temporary disable default arguments.
 
 							*:GinStatus*
-:GinStatus[!] [{++option}...] [{flags}] [-- {pathspec}...]
+:GinStatus[&] [{++option}...] [{flags}] [-- {pathspec}...]
 	Open a "gin-status" buffer to show a status.
 
 	See |gin-commands-options| for common {++option}.
@@ -325,7 +325,7 @@ COMMANDS					*gin-commands*
 	to see mappings or disable by |g:gin_status_disable_default_mappings|.
 
 	Users can specify default arguments by |g:gin_status_default_args|.
-	Use a bang (!) to temporary disable default arguments.
+	Use an ampersand (&) to temporary disable default arguments.
 
 							*gin-commands-options*
 Gin supports several options starts with double plus signs (++) as:
