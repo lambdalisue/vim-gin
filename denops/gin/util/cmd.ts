@@ -2,6 +2,13 @@ import type { Denops } from "https://deno.land/x/denops_std@v4.0.0/mod.ts";
 import { Silent } from "https://deno.land/x/denops_std@v4.0.0/helper/mod.ts";
 import { expand } from "./expand.ts";
 
+export function parseDisableDefaultArgs(args: string[]): [boolean, string[]] {
+  if (args.at(0) === "&") {
+    return [true, args.slice(1)];
+  }
+  return [false, args];
+}
+
 export function parseSilent(mods: string): Silent {
   if (mods.indexOf("silent!") !== -1) {
     return "silent!";
