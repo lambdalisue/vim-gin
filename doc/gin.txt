@@ -418,6 +418,16 @@ VARIABLES					*gin-variables*
 
 	Default: []
 
+*g:gin_log_default_args*
+	Specify default arguments of |:GinLog|.
+
+	Default: []
+
+*g:gin_log_disable_default_mappings*
+	Disable default mappings on buffers shown by |:GinLog|.
+
+	Default: 0
+
 *g:gin_patch_default_args*
 	Specify default arguments of |:GinPatch|.
 
