@@ -1,7 +1,7 @@
 import type { Denops } from "https://deno.land/x/denops_std@v4.1.0/mod.ts";
 import * as batch from "https://deno.land/x/denops_std@v4.1.0/batch/mod.ts";
 import { define, GatherCandidates, Range } from "./core.ts";
-import { command as commandBare } from "../command/bare/command.ts";
+import { exec as execBare } from "../command/bare/command.ts";
 import { doResetFile } from "./reset_file.ts";
 
 export type Candidate = { path: string; XY: string };
@@ -52,7 +52,7 @@ async function doStage(
   const xsRemoved = xs.filter((x) => x.XY.endsWith("D"));
   const xsOthers = xs.filter((x) => !x.XY.endsWith(".") && !x.XY.endsWith("D"));
   if (xsRemoved.length) {
-    await commandBare(denops, [
+    await execBare(denops, [
       "rm",
       "--quiet",
       "--ignore-unmatch",
@@ -62,7 +62,7 @@ async function doStage(
     ]);
   }
   if (xsOthers.length) {
-    await commandBare(denops, [
+    await execBare(denops, [
       "add",
       "--ignore-errors",
       "--force",
@@ -83,7 +83,7 @@ async function doStageIntentToAdd(
   const xsRemoved = xs.filter((x) => x.XY.endsWith("D"));
   const xsOthers = xs.filter((x) => x.XY !== "??" && !x.XY.endsWith("D"));
   if (xsUnknown.length) {
-    await commandBare(denops, [
+    await execBare(denops, [
       "add",
       "--ignore-errors",
       "--force",
@@ -93,7 +93,7 @@ async function doStageIntentToAdd(
     ]);
   }
   if (xsRemoved.length) {
-    await commandBare(denops, [
+    await execBare(denops, [
       "rm",
       "--quiet",
       "--ignore-unmatch",
@@ -103,7 +103,7 @@ async function doStageIntentToAdd(
     ]);
   }
   if (xsOthers.length) {
-    await commandBare(denops, [
+    await execBare(denops, [
       "add",
       "--ignore-errors",
       "--force",
@@ -123,13 +123,13 @@ async function doUnstageIntentToAdd(
   const xsAdded = xs.filter((x) => x.XY === "A.");
   const xsOthers = xs.filter((x) => x.XY !== "A.");
   if (xsAdded.length) {
-    await commandBare(denops, [
+    await execBare(denops, [
       "reset",
       "--quiet",
       "--",
       ...xsAdded.map((x) => x.path),
     ]);
-    await commandBare(denops, [
+    await execBare(denops, [
       "add",
       "--ignore-errors",
       "--force",
@@ -139,7 +139,7 @@ async function doUnstageIntentToAdd(
     ]);
   }
   if (xsOthers.length) {
-    await commandBare(denops, [
+    await execBare(denops, [
       "reset",
       "--quiet",
       "--",

@@ -74,7 +74,7 @@ export type ExecOptions = {
 
 export async function exec(
   denops: Denops,
-  options: ExecOptions,
+  options: ExecOptions = {},
 ): Promise<buffer.OpenResult> {
   const verbose = await option.verbose.get(denops);
 

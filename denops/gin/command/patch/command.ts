@@ -67,7 +67,7 @@ export type ExecOptions = {
 export async function exec(
   denops: Denops,
   filename: string,
-  options: ExecOptions,
+  options: ExecOptions = {},
 ): Promise<void> {
   const [verbose, disableDefaultMappings] = await batch.gather(
     denops,

@@ -1,7 +1,10 @@
 import type { Denops } from "https://deno.land/x/denops_std@v4.1.0/mod.ts";
 import * as batch from "https://deno.land/x/denops_std@v4.1.0/batch/mod.ts";
 import { alias, define, GatherCandidates, Range } from "./core.ts";
-import { command as commandChaperon } from "../command/chaperon/command.ts";
+import {
+  exec as execChaperon,
+  ExecOptions as ExecChaperonOptions,
+} from "../command/chaperon/command.ts";
 
 export type Candidate = { path: string };
 
@@ -16,21 +19,21 @@ export async function init(
       bufnr,
       "chaperon:both",
       (denops, bufnr, range) =>
-        doChaperon(denops, bufnr, range, [], gatherCandidates),
+        doChaperon(denops, bufnr, range, {}, gatherCandidates),
     );
     await define(
       denops,
       bufnr,
       "chaperon:theirs",
       (denops, bufnr, range) =>
-        doChaperon(denops, bufnr, range, ["++no-ours"], gatherCandidates),
+        doChaperon(denops, bufnr, range, { noOurs: true }, gatherCandidates),
     );
     await define(
       denops,
       bufnr,
       "chaperon:ours",
       (denops, bufnr, range) =>
-        doChaperon(denops, bufnr, range, ["++no-theirs"], gatherCandidates),
+        doChaperon(denops, bufnr, range, { noTheirs: true }, gatherCandidates),
     );
     await alias(
       denops,
@@ -45,15 +48,14 @@ async function doChaperon(
   denops: Denops,
   bufnr: number,
   range: Range,
-  extraArgs: string[],
+  options: ExecChaperonOptions,
   gatherCandidates: GatherCandidates<Candidate>,
 ): Promise<void> {
   const xs = await gatherCandidates(denops, bufnr, range);
   for (const x of xs) {
-    await commandChaperon(denops, "", [
-      "++opener=tabedit",
-      ...extraArgs,
-      x.path,
-    ]);
+    await execChaperon(denops, x.path, {
+      opener: "tabedit",
+      ...options,
+    });
   }
 }

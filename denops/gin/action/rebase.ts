@@ -2,7 +2,7 @@ import type { Denops } from "https://deno.land/x/denops_std@v4.1.0/mod.ts";
 import * as batch from "https://deno.land/x/denops_std@v4.1.0/batch/mod.ts";
 import * as helper from "https://deno.land/x/denops_std@v4.1.0/helper/mod.ts";
 import { define, GatherCandidates, Range } from "./core.ts";
-import { command as commandBare } from "../command/bare/command.ts";
+import { exec as execBare } from "../command/bare/command.ts";
 
 export type Candidate = { commit: string };
 
@@ -40,7 +40,7 @@ async function doRebase(
   if (!x) {
     return;
   }
-  await commandBare(denops, [
+  await execBare(denops, [
     "rebase",
     x.commit,
   ]);
@@ -60,7 +60,7 @@ async function doRebaseInteractive(
   // NOTE:
   // We must NOT await the command otherwise Vim would freeze
   // because command proxy could not work if we await here.
-  commandBare(denops, [
+  execBare(denops, [
     "rebase",
     "--interactive",
     x.commit,

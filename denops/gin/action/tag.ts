@@ -2,7 +2,7 @@ import type { Denops } from "https://deno.land/x/denops_std@v4.1.0/mod.ts";
 import * as batch from "https://deno.land/x/denops_std@v4.1.0/batch/mod.ts";
 import * as helper from "https://deno.land/x/denops_std@v4.1.0/helper/mod.ts";
 import { alias, define, GatherCandidates, Range } from "./core.ts";
-import { command as commandBare } from "../command/bare/command.ts";
+import { exec as execBare } from "../command/bare/command.ts";
 
 export type Candidate = { commit: string };
 
@@ -81,7 +81,7 @@ async function doTag(
       await helper.echo(denops, "Cancelled");
       return;
     }
-    await commandBare(denops, [
+    await execBare(denops, [
       "tag",
       ...(annotate ? ["--annotate"] : []),
       ...(sign ? ["--sign"] : []),

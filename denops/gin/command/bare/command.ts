@@ -35,7 +35,7 @@ export type ExecOptions = {
 export async function exec(
   denops: Denops,
   args: string[],
-  options: ExecOptions,
+  options: ExecOptions = {},
 ): Promise<void> {
   const eventignore = await option.eventignore.get(denops);
   const { stdout, stderr } = await execute(denops, args, {
