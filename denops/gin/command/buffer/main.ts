@@ -1,8 +1,17 @@
 import type { Denops } from "https://deno.land/x/denops_std@v4.1.0/mod.ts";
+import { unnullish } from "https://deno.land/x/unnullish@v1.0.0/unnullish.ts";
 import * as unknownutil from "https://deno.land/x/unknownutil@v2.1.0/mod.ts";
 import * as helper from "https://deno.land/x/denops_std@v4.1.0/helper/mod.ts";
-import { parseSilent } from "../../util/cmd.ts";
-import { command } from "./command.ts";
+import * as buffer from "https://deno.land/x/denops_std@v4.1.0/buffer/mod.ts";
+import {
+  builtinOpts,
+  formatOpts,
+  parseOpts,
+  validateOpts,
+} from "https://deno.land/x/denops_std@v4.1.0/argument/opts.ts";
+
+import { normCmdArgs, parseSilent } from "../../util/cmd.ts";
+import { exec } from "./command.ts";
 import { edit } from "./edit.ts";
 import { read } from "./read.ts";
 
@@ -34,4 +43,27 @@ export function main(denops: Denops): void {
       );
     },
   };
+}
+
+async function command(
+  denops: Denops,
+  mods: string,
+  args: string[],
+): Promise<buffer.OpenResult> {
+  const [opts, residue] = parseOpts(await normCmdArgs(denops, args));
+  validateOpts(opts, [
+    "processor",
+    "worktree",
+    "monochrome",
+    "opener",
+    ...builtinOpts,
+  ]);
+  return exec(denops, residue, {
+    processor: opts.processor?.split(" "),
+    worktree: opts.worktree,
+    monochrome: unnullish(opts.monochrome, () => true),
+    opener: opts.opener,
+    cmdarg: formatOpts(opts, builtinOpts).join(" "),
+    mods,
+  });
 }

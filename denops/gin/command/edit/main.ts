@@ -1,8 +1,19 @@
 import type { Denops } from "https://deno.land/x/denops_std@v4.1.0/mod.ts";
 import * as unknownutil from "https://deno.land/x/unknownutil@v2.1.0/mod.ts";
+import * as vars from "https://deno.land/x/denops_std@v4.1.0/variable/mod.ts";
 import * as helper from "https://deno.land/x/denops_std@v4.1.0/helper/mod.ts";
-import { parseDisableDefaultArgs, parseSilent } from "../../util/cmd.ts";
-import { command } from "./command.ts";
+import {
+  builtinOpts,
+  formatOpts,
+  parseOpts,
+  validateOpts,
+} from "https://deno.land/x/denops_std@v4.1.0/argument/mod.ts";
+import {
+  normCmdArgs,
+  parseDisableDefaultArgs,
+  parseSilent,
+} from "../../util/cmd.ts";
+import { exec } from "./command.ts";
 import { edit } from "./edit.ts";
 import { read } from "./read.ts";
 import { write } from "./write.ts";
@@ -42,4 +53,54 @@ export function main(denops: Denops): void {
       return helper.friendlyCall(denops, () => write(denops, bufnr, bufname));
     },
   };
+}
+
+type CommandOptions = {
+  disableDefaultArgs?: boolean;
+};
+
+async function command(
+  denops: Denops,
+  mods: string,
+  args: string[],
+  options: CommandOptions = {},
+): Promise<void> {
+  if (!options.disableDefaultArgs) {
+    const defaultArgs = await vars.g.get(
+      denops,
+      "gin_edit_default_args",
+      [],
+    );
+    unknownutil.assertArray(defaultArgs, unknownutil.isString);
+    args = [...defaultArgs, ...args];
+  }
+  const [opts, residue] = parseOpts(await normCmdArgs(denops, args));
+  validateOpts(opts, [
+    "worktree",
+    "opener",
+    ...builtinOpts,
+  ]);
+  const [commitish, filename] = parseResidue(residue);
+  await exec(denops, filename, {
+    worktree: opts.worktree,
+    commitish,
+    opener: opts.opener,
+    cmdarg: formatOpts(opts, builtinOpts).join(" "),
+    mods,
+  });
+}
+
+function parseResidue(
+  residue: string[],
+): [string | undefined, string] {
+  // GinEdit [{options}] {path}
+  // GinEdit [{options}] {commitish} {path}
+  switch (residue.length) {
+    case 1:
+      return [undefined, residue[0]];
+    case 2:
+      return [residue[0], residue[1]];
+    default:
+      throw new Error("Invalid number of arguments");
+  }
 }

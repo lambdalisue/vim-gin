@@ -3,28 +3,7 @@ import * as autocmd from "https://deno.land/x/denops_std@v4.1.0/autocmd/mod.ts";
 import * as helper from "https://deno.land/x/denops_std@v4.1.0/helper/mod.ts";
 import * as option from "https://deno.land/x/denops_std@v4.1.0/option/mod.ts";
 import { removeAnsiEscapeCode } from "../../util/ansi_escape_code.ts";
-import {
-  parseOpts,
-  validateOpts,
-} from "https://deno.land/x/denops_std@v4.1.0/argument/mod.ts";
-import { normCmdArgs } from "../../util/cmd.ts";
 import { execute } from "../../git/executor.ts";
-
-export async function command(denops: Denops, args: string[]): Promise<void> {
-  const [opts, residue] = parseOpts(await normCmdArgs(denops, args));
-  validateOpts(opts, [
-    "worktree",
-    "enc",
-    "encoding",
-    "ff",
-    "fileformat",
-  ]);
-  await exec(denops, residue, {
-    worktree: opts.worktree,
-    encoding: opts.enc ?? opts.encoding,
-    fileformat: opts.ff ?? opts.fileformat,
-  });
-}
 
 export type ExecOptions = {
   worktree?: string;
