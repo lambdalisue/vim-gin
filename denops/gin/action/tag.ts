@@ -1,6 +1,6 @@
-import type { Denops } from "https://deno.land/x/denops_std@v4.0.0/mod.ts";
-import * as batch from "https://deno.land/x/denops_std@v4.0.0/batch/mod.ts";
-import * as helper from "https://deno.land/x/denops_std@v4.0.0/helper/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v4.1.0/mod.ts";
+import * as batch from "https://deno.land/x/denops_std@v4.1.0/batch/mod.ts";
+import * as helper from "https://deno.land/x/denops_std@v4.1.0/helper/mod.ts";
 import { alias, define, GatherCandidates, Range } from "./core.ts";
 import { command as commandBare } from "../command/bare/command.ts";
 

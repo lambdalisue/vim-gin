@@ -1,18 +1,18 @@
-import type { Denops } from "https://deno.land/x/denops_std@v4.0.0/mod.ts";
-import * as path from "https://deno.land/std@0.171.0/path/mod.ts";
-import * as batch from "https://deno.land/x/denops_std@v4.0.0/batch/mod.ts";
-import * as fn from "https://deno.land/x/denops_std@v4.0.0/function/mod.ts";
-import * as mapping from "https://deno.land/x/denops_std@v4.0.0/mapping/mod.ts";
-import * as vars from "https://deno.land/x/denops_std@v4.0.0/variable/mod.ts";
-import * as option from "https://deno.land/x/denops_std@v4.0.0/option/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v4.1.0/mod.ts";
+import * as path from "https://deno.land/std@0.180.0/path/mod.ts";
+import * as batch from "https://deno.land/x/denops_std@v4.1.0/batch/mod.ts";
+import * as fn from "https://deno.land/x/denops_std@v4.1.0/function/mod.ts";
+import * as mapping from "https://deno.land/x/denops_std@v4.1.0/mapping/mod.ts";
+import * as vars from "https://deno.land/x/denops_std@v4.1.0/variable/mod.ts";
+import * as option from "https://deno.land/x/denops_std@v4.1.0/option/mod.ts";
 import * as unknownutil from "https://deno.land/x/unknownutil@v2.1.0/mod.ts";
 import {
   builtinOpts,
   formatOpts,
   parse,
   validateOpts,
-} from "https://deno.land/x/denops_std@v4.0.0/argument/mod.ts";
-import * as buffer from "https://deno.land/x/denops_std@v4.0.0/buffer/mod.ts";
+} from "https://deno.land/x/denops_std@v4.1.0/argument/mod.ts";
+import * as buffer from "https://deno.land/x/denops_std@v4.1.0/buffer/mod.ts";
 import { normCmdArgs } from "../../util/cmd.ts";
 import { findWorktreeFromDenops } from "../../git/worktree.ts";
 import { exec as execEdit } from "../edit/command.ts";
