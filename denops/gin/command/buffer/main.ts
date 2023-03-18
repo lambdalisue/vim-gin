@@ -18,12 +18,16 @@ import { read } from "./read.ts";
 export function main(denops: Denops): void {
   denops.dispatcher = {
     ...denops.dispatcher,
-    "buffer:command": (mods, ...args) => {
+    "buffer:command": (bang, mods, args) => {
+      unknownutil.assertString(bang);
       unknownutil.assertString(mods);
       unknownutil.assertArray(args, unknownutil.isString);
       const silent = parseSilent(mods);
       return helper.ensureSilent(denops, silent, () => {
-        return helper.friendlyCall(denops, () => command(denops, mods, args));
+        return helper.friendlyCall(
+          denops,
+          () => command(denops, bang, mods, args),
+        );
       });
     },
     "buffer:edit": (bufnr, bufname) => {
@@ -47,6 +51,7 @@ export function main(denops: Denops): void {
 
 async function command(
   denops: Denops,
+  bang: string,
   mods: string,
   args: string[],
 ): Promise<buffer.OpenResult> {
@@ -65,5 +70,6 @@ async function command(
     opener: opts.opener,
     cmdarg: formatOpts(opts, builtinOpts).join(" "),
     mods,
+    bang: bang === "!",
   });
 }

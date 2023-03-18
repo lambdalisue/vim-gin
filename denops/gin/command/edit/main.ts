@@ -31,7 +31,7 @@ export function main(denops: Denops): void {
         return helper.friendlyCall(
           denops,
           () =>
-            command(denops, mods, realArgs, {
+            command(denops, bang, mods, realArgs, {
               disableDefaultArgs,
             }),
         );
@@ -61,6 +61,7 @@ type CommandOptions = {
 
 async function command(
   denops: Denops,
+  bang: string,
   mods: string,
   args: string[],
   options: CommandOptions = {},
@@ -87,6 +88,7 @@ async function command(
     opener: opts.opener,
     cmdarg: formatOpts(opts, builtinOpts).join(" "),
     mods,
+    bang: bang === "!",
   });
 }
 

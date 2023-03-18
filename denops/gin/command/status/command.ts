@@ -15,6 +15,7 @@ export type ExecOptions = {
   opener?: string;
   cmdarg?: string;
   mods?: string;
+  bang?: boolean;
 };
 
 export async function exec(
@@ -41,5 +42,6 @@ export async function exec(
     opener: options.opener,
     cmdarg: options.cmdarg,
     mods: options.mods,
+    bang: options.bang,
   });
 }
