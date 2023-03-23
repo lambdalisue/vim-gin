@@ -60,7 +60,7 @@ async function doDiffSmart(
         opener,
         paths: [x.path],
         flags: {
-          "--cached": "",
+          "cached": "",
         },
       });
     }

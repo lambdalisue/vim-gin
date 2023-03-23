@@ -38,7 +38,7 @@ export async function init(
             bufnr,
             range,
             opener,
-            { flags: { "--cached": "" } },
+            { flags: { "cached": "" } },
             gatherCandidates,
           ),
       );
