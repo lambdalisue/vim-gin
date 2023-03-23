@@ -32,11 +32,11 @@ endfunction
 
 command! -bar -nargs=* Gin call s:command(<q-bang>, <q-mods>, [<f-args>])
 
-function! s:buffer_command(...) abort
+function! s:buffer_command(bang, mods, args) abort
   if denops#plugin#wait('gin')
     return
   endif
-  call denops#request('gin', 'buffer:command', a:000)
+  call denops#request('gin', 'buffer:command', [a:bang, a:mods, a:args])
 endfunction
 
-command! -bar -nargs=* GinBuffer call s:buffer_command(<q-mods>, <f-args>)
+command! -bar -nargs=* GinBuffer call s:buffer_command(<q-bang>, <q-mods>, [<f-args>])

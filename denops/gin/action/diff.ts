@@ -1,7 +1,10 @@
 import type { Denops } from "https://deno.land/x/denops_std@v4.1.0/mod.ts";
 import * as batch from "https://deno.land/x/denops_std@v4.1.0/batch/mod.ts";
 import { alias, define, GatherCandidates, Range } from "./core.ts";
-import { command as commandDiff } from "../command/diff/command.ts";
+import {
+  exec as execDiff,
+  ExecOptions as ExecDiffOptions,
+} from "../command/diff/command.ts";
 
 export type Candidate = { path: string };
 
@@ -23,21 +26,35 @@ export async function init(
         bufnr,
         `diff:local:${opener}`,
         (denops, bufnr, range) =>
-          doDiff(denops, bufnr, range, opener, [], gatherCandidates),
+          doDiff(denops, bufnr, range, opener, {}, gatherCandidates),
       );
       await define(
         denops,
         bufnr,
         `diff:cached:${opener}`,
         (denops, bufnr, range) =>
-          doDiff(denops, bufnr, range, opener, ["--cached"], gatherCandidates),
+          doDiff(
+            denops,
+            bufnr,
+            range,
+            opener,
+            { flags: { "--cached": "" } },
+            gatherCandidates,
+          ),
       );
       await define(
         denops,
         bufnr,
         `diff:HEAD:${opener}`,
         (denops, bufnr, range) =>
-          doDiff(denops, bufnr, range, opener, ["HEAD"], gatherCandidates),
+          doDiff(
+            denops,
+            bufnr,
+            range,
+            opener,
+            { commitish: "HEAD" },
+            gatherCandidates,
+          ),
       );
     }
     await alias(
@@ -72,16 +89,15 @@ async function doDiff(
   bufnr: number,
   range: Range,
   opener: string,
-  extraArgs: string[],
+  options: ExecDiffOptions,
   gatherCandidates: GatherCandidates<Candidate>,
 ): Promise<void> {
   const xs = await gatherCandidates(denops, bufnr, range);
   for (const x of xs) {
-    await commandDiff(denops, "", [
-      `++opener=${opener}`,
-      ...extraArgs,
-      "--",
-      x.path,
-    ]);
+    await execDiff(denops, {
+      opener,
+      paths: [x.path],
+      ...options,
+    });
   }
 }

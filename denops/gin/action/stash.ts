@@ -1,7 +1,7 @@
 import type { Denops } from "https://deno.land/x/denops_std@v4.1.0/mod.ts";
 import * as batch from "https://deno.land/x/denops_std@v4.1.0/batch/mod.ts";
 import { define, GatherCandidates, Range } from "./core.ts";
-import { command as commandBare } from "../command/bare/command.ts";
+import { exec as execBare } from "../command/bare/command.ts";
 
 export type Candidate = { path: string };
 
@@ -36,7 +36,7 @@ async function doStash(
   gatherCandidates: GatherCandidates<Candidate>,
 ): Promise<void> {
   const xs = await gatherCandidates(denops, bufnr, range);
-  await commandBare(denops, [
+  await execBare(denops, [
     "stash",
     "push",
     "--all",

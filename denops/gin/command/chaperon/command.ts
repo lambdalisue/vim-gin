@@ -6,55 +6,10 @@ import * as vars from "https://deno.land/x/denops_std@v4.1.0/variable/mod.ts";
 import * as unknownutil from "https://deno.land/x/unknownutil@v2.1.0/mod.ts";
 import * as path from "https://deno.land/std@0.180.0/path/mod.ts";
 import * as option from "https://deno.land/x/denops_std@v4.1.0/option/mod.ts";
-import {
-  builtinOpts,
-  formatOpts,
-  parse,
-  validateOpts,
-} from "https://deno.land/x/denops_std@v4.1.0/argument/mod.ts";
 import * as buffer from "https://deno.land/x/denops_std@v4.1.0/buffer/mod.ts";
-import { normCmdArgs } from "../../util/cmd.ts";
 import { findWorktreeFromDenops } from "../../git/worktree.ts";
 import { exec as execEdit } from "../edit/command.ts";
 import { AliasHead, getInProgressAliasHead, stripConflicts } from "./util.ts";
-
-export type CommandOptions = {
-  disableDefaultArgs?: boolean;
-};
-
-export async function command(
-  denops: Denops,
-  mods: string,
-  args: string[],
-  options: CommandOptions = {},
-): Promise<void> {
-  if (!options.disableDefaultArgs) {
-    const defaultArgs = await vars.g.get(
-      denops,
-      "gin_chaperon_default_args",
-      [],
-    );
-    unknownutil.assertArray(defaultArgs, unknownutil.isString);
-    args = [...defaultArgs, ...args];
-  }
-  const [opts, _, residue] = parse(await normCmdArgs(denops, args));
-  validateOpts(opts, [
-    "worktree",
-    "opener",
-    "no-ours",
-    "no-theirs",
-    ...builtinOpts,
-  ]);
-  const [abspath] = parseResidue(residue);
-  await exec(denops, abspath, {
-    worktree: opts.worktree,
-    opener: opts.opener,
-    noOurs: "no-ours" in opts,
-    noTheirs: "no-theirs" in opts,
-    cmdarg: formatOpts(opts, builtinOpts).join(" "),
-    mods,
-  });
-}
 
 export type ExecOptions = {
   worktree?: string;
@@ -63,12 +18,13 @@ export type ExecOptions = {
   opener?: string;
   cmdarg?: string;
   mods?: string;
+  bang?: boolean;
 };
 
 export async function exec(
   denops: Denops,
   filename: string,
-  options: ExecOptions,
+  options: ExecOptions = {},
 ): Promise<void> {
   const [verbose, noSupplements, supplementHeight, disableDefaultMappings] =
     await batch
@@ -103,6 +59,7 @@ export async function exec(
     opener: options.opener,
     cmdarg: options.cmdarg,
     mods: options.mods,
+    bang: options.bang,
   });
 
   let infoTheirs: buffer.OpenResult | undefined;
@@ -181,18 +138,6 @@ export async function exec(
 
   // Focus Worktree
   await fn.win_gotoid(denops, infoWorktree.winid);
-}
-
-function parseResidue(
-  residue: string[],
-): [string] {
-  // GinChaperon [{options}] {path}
-  switch (residue.length) {
-    case 1:
-      return [residue[0]];
-    default:
-      throw new Error("Invalid number of arguments");
-  }
 }
 
 async function initTheirs(
