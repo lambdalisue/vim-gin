@@ -1,5 +1,6 @@
 import type { Denops } from "https://deno.land/x/denops_std@v4.1.0/mod.ts";
 import { unnullish } from "https://deno.land/x/unnullish@v1.0.0/mod.ts";
+import { ensureString } from "https://deno.land/x/unknownutil@v2.1.0/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v4.1.0/function/mod.ts";
 import * as batch from "https://deno.land/x/denops_std@v4.1.0/batch/mod.ts";
 import * as buffer from "https://deno.land/x/denops_std@v4.1.0/buffer/mod.ts";
@@ -7,9 +8,11 @@ import * as option from "https://deno.land/x/denops_std@v4.1.0/option/mod.ts";
 import * as vars from "https://deno.land/x/denops_std@v4.1.0/variable/mod.ts";
 import { parse as parseBufname } from "https://deno.land/x/denops_std@v4.1.0/bufname/mod.ts";
 import {
+  builtinOpts,
   Flags,
   formatFlags,
   parseOpts,
+  validateOpts,
 } from "https://deno.land/x/denops_std@v4.1.0/argument/mod.ts";
 import { bind } from "../../command/bare/command.ts";
 import { exec as execBuffer } from "../../command/buffer/edit.ts";
@@ -33,11 +36,16 @@ export async function edit(
 ): Promise<void> {
   const cmdarg = await vars.v.get(denops, "cmdarg") as string;
   const [opts, _] = parseOpts(cmdarg.split(" "));
+  validateOpts(opts, builtinOpts);
   const { expr, params, fragment } = parseBufname(bufname);
   await exec(denops, bufnr, {
     worktree: expr,
-    flags: params,
-    args: unnullish(fragment, (v) => JSON.parse(v.replace(/\$$/, ""))),
+    commitish: unnullish(params?.commitish, ensureString),
+    paths: unnullish(fragment, JSON.parse),
+    flags: {
+      ...params,
+      commitish: undefined,
+    },
     encoding: opts.enc ?? opts.encoding,
     fileformat: opts.ff ?? opts.fileformat,
   });
@@ -45,8 +53,9 @@ export async function edit(
 
 export type ExecOptions = {
   worktree?: string;
+  commitish?: string;
+  paths?: string[];
   flags?: Flags;
-  args?: string[];
   encoding?: string;
   fileformat?: string;
 };
@@ -56,11 +65,14 @@ export async function exec(
   bufnr: number,
   options: ExecOptions,
 ): Promise<void> {
+  const filenames = options.paths?.map((v) => v.replaceAll("\\", "/"));
   const args = [
     "log",
     "--color=always",
     ...formatFlags(options.flags ?? {}),
-    ...(options.args ?? []),
+    ...(unnullish(options.commitish, (v) => [v]) ?? []),
+    "--",
+    ...(filenames ?? []),
   ];
   await execBuffer(denops, bufnr, args, {
     worktree: options.worktree,

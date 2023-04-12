@@ -6,4 +6,4 @@ export const GIN_BUFFER_PROTOCOLS = [
   "ginlog",
   "ginstatus",
 ];
-export const GIN_FILE_BUFFER_PROTOCOLS = ["gindiff", "ginedit"];
+export const GIN_FILE_BUFFER_PROTOCOLS = ["gindiff", "ginedit", "ginlog"];

@@ -24,7 +24,6 @@ export async function read(
   validateOpts(opts, builtinOpts);
   const { expr, params, fragment } = parseBufname(bufname);
   await exec(denops, bufnr, {
-    processor: unnullish(opts.processor, (v) => v.split(" ")),
     worktree: expr,
     commitish: unnullish(params?.commitish, ensureString),
     paths: unnullish(fragment, JSON.parse),
@@ -38,7 +37,6 @@ export async function read(
 }
 
 export type ExecOptions = {
-  processor?: string[];
   worktree?: string;
   commitish?: string;
   paths?: string[];
@@ -54,14 +52,13 @@ export async function exec(
 ): Promise<void> {
   const filenames = options.paths?.map((v) => v.replaceAll("\\", "/"));
   const args = [
-    "diff",
+    "log",
     ...formatFlags(options.flags ?? {}),
     ...unnullish(options.commitish, (v) => [v]) ?? [],
     "--",
     ...(filenames ?? []),
   ];
   await execBuffer(denops, bufnr, args, {
-    processor: options.processor,
     worktree: options.worktree,
     encoding: options.encoding,
     fileformat: options.fileformat,

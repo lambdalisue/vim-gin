@@ -7,6 +7,8 @@ augroup gin_plugin_log_internal
   autocmd!
   autocmd BufReadCmd ginlog://*
         \ call denops#request('gin', 'log:edit', [bufnr(), expand('<amatch>')])
+  autocmd FileReadCmd ginlog://*
+        \ call denops#request('gin', 'log:read', [bufnr(), expand('<amatch>')])
 augroup END
 
 function! s:command(bang, mods, args) abort

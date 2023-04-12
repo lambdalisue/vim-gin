@@ -44,7 +44,7 @@ export async function exec(
       processor: unnullish(options.processor, (v) => v.join(" ")),
       commitish: options.commitish,
     },
-    fragment: unnullish(paths, (v) => `${JSON.stringify(v)}$`),
+    fragment: unnullish(paths, JSON.stringify),
   });
   return await buffer.open(denops, bufname, {
     opener: options.opener,
