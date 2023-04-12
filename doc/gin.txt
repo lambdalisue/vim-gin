@@ -402,6 +402,18 @@ like
 	" Switch to gin-diff buffer
 	:GinDiff -- %
 <
+Users can define "GinLocal" buffer local command on those buffers like
+>
+	function! s:define_gin_local() abort
+	  command! -buffer -bar GinLocal execute 'edit' gin#util#expand('%')
+	endfunction
+
+	augroup my-gin-local
+	  autocmd BufReadCmd ginedit://* call s:define_gin_local()
+	  autocmd BufReadCmd gindiff://* call s:define_gin_local()
+	  autocmd BufReadCmd ginlog://* call s:define_gin_local()
+	augroup END
+<
 
 -----------------------------------------------------------------------------
 VARIABLES					*gin-variables*
