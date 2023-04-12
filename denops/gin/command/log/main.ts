@@ -16,6 +16,7 @@ import {
 } from "../../util/cmd.ts";
 import { exec } from "./command.ts";
 import { edit } from "./edit.ts";
+import { read } from "./read.ts";
 
 export function main(denops: Denops): void {
   denops.dispatcher = {
@@ -40,6 +41,11 @@ export function main(denops: Denops): void {
       unknownutil.assertNumber(bufnr);
       unknownutil.assertString(bufname);
       return helper.friendlyCall(denops, () => edit(denops, bufnr, bufname));
+    },
+    "log:read": (bufnr, bufname) => {
+      unknownutil.assertNumber(bufnr);
+      unknownutil.assertString(bufname);
+      return helper.friendlyCall(denops, () => read(denops, bufnr, bufname));
     },
   };
 }
@@ -271,13 +277,33 @@ async function command(
     ...builtinOpts,
   ]);
   validateFlags(flags, allowedFlags);
+  const [commitish, paths] = parseResidue(residue);
   await exec(denops, {
     worktree: opts.worktree,
-    paths: residue,
+    commitish,
+    paths,
     flags,
     opener: opts.opener,
     cmdarg: formatOpts(opts, builtinOpts).join(" "),
     mods,
     bang: bang === "!",
   });
+}
+
+function parseResidue(residue: string[]): [string | undefined, string[]] {
+  const index = residue.indexOf("--");
+  const head = index === -1 ? residue : residue.slice(0, index);
+  const tail = index === -1 ? [] : residue.slice(index + 1);
+  // GinLog [{options}]
+  // GinLog [{options}] {commitish}
+  // GinLog [{options}] -- {pathspec}...
+  // GinLog [{options}] {commitish} -- {pathspec}...
+  switch (head.length) {
+    case 0:
+      return [undefined, tail];
+    case 1:
+      return [head[0], tail];
+    default:
+      throw new Error("Invalid number of arguments");
+  }
 }
