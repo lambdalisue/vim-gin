@@ -389,7 +389,7 @@ example for details.
 <
 							*gin-commands-file*
 Users can get a proper git path of gin's file like buffer with
-|gin#util#rexpand()| function. This function is used internally to resolve "%"
+|gin#util#expand()| function. This function is used internally to resolve "%"
 applied to Gin command so users can switch between gin's file like buffers
 like
 >
