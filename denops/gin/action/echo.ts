@@ -1,6 +1,6 @@
-import type { Denops } from "https://deno.land/x/denops_std@v4.1.0/mod.ts";
-import * as batch from "https://deno.land/x/denops_std@v4.1.0/batch/mod.ts";
-import * as helper from "https://deno.land/x/denops_std@v4.1.0/helper/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v4.1.5/mod.ts";
+import * as batch from "https://deno.land/x/denops_std@v4.1.5/batch/mod.ts";
+import * as helper from "https://deno.land/x/denops_std@v4.1.5/helper/mod.ts";
 import { define, GatherCandidates, Range } from "./core.ts";
 
 export type Candidate = unknown;

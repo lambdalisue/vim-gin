@@ -1,18 +1,18 @@
-import type { Denops } from "https://deno.land/x/denops_std@v4.1.0/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v4.1.5/mod.ts";
 import { unnullish } from "https://deno.land/x/unnullish@v1.0.0/mod.ts";
 import * as unknownutil from "https://deno.land/x/unknownutil@v2.1.0/mod.ts";
-import * as batch from "https://deno.land/x/denops_std@v4.1.0/batch/mod.ts";
-import * as buffer from "https://deno.land/x/denops_std@v4.1.0/buffer/mod.ts";
-import * as option from "https://deno.land/x/denops_std@v4.1.0/option/mod.ts";
-import * as vars from "https://deno.land/x/denops_std@v4.1.0/variable/mod.ts";
+import * as batch from "https://deno.land/x/denops_std@v4.1.5/batch/mod.ts";
+import * as buffer from "https://deno.land/x/denops_std@v4.1.5/buffer/mod.ts";
+import * as option from "https://deno.land/x/denops_std@v4.1.5/option/mod.ts";
+import * as vars from "https://deno.land/x/denops_std@v4.1.5/variable/mod.ts";
 import {
   builtinOpts,
   parseOpts,
   validateOpts,
-} from "https://deno.land/x/denops_std@v4.1.0/argument/mod.ts";
+} from "https://deno.land/x/denops_std@v4.1.5/argument/mod.ts";
 import {
   parse as parseBufname,
-} from "https://deno.land/x/denops_std@v4.1.0/bufname/mod.ts";
+} from "https://deno.land/x/denops_std@v4.1.5/bufname/mod.ts";
 import {
   buildDecorationsFromAnsiEscapeCode,
 } from "../../util/ansi_escape_code.ts";

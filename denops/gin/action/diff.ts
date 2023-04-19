@@ -1,5 +1,5 @@
-import type { Denops } from "https://deno.land/x/denops_std@v4.1.0/mod.ts";
-import * as batch from "https://deno.land/x/denops_std@v4.1.0/batch/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v4.1.5/mod.ts";
+import * as batch from "https://deno.land/x/denops_std@v4.1.5/batch/mod.ts";
 import { alias, define, GatherCandidates, Range } from "./core.ts";
 import {
   exec as execDiff,
