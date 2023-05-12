@@ -9,12 +9,8 @@ Deno.test("run() runs 'git' and return a process", async () => {
   const proc = run(["version"], {
     stdout: "piped",
   });
-  const [status, stdout] = await Promise.all([
-    proc.status(),
-    proc.output(),
-  ]);
-  proc.close();
-  assert(status.success);
+  const { code, stdout } = await proc.output();
+  assert(code === 0);
   assert(decodeUtf8(stdout).startsWith("git version"));
 });
 
@@ -23,12 +19,8 @@ Deno.test("run() runs 'git' and return a process (noOptionalLocks)", async () =>
     stdout: "piped",
     noOptionalLocks: true,
   });
-  const [status, stdout] = await Promise.all([
-    proc.status(),
-    proc.output(),
-  ]);
-  proc.close();
-  assert(status.success);
+  const { code, stdout } = await proc.output();
+  assert(code === 0);
   assert(decodeUtf8(stdout).startsWith("git version"));
 });
 
