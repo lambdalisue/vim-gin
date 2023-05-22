@@ -114,15 +114,15 @@ async function jump(
   finder: Finder,
   parser: Parser,
 ): Promise<void> {
-  const [lnum, column, content, bufname] = await batch.gather(
+  const [lnum, column, content, bufname] = await batch.collect(
     denops,
-    async (denops) => {
-      await fn.line(denops, ".");
-      await fn.col(denops, ".");
-      await fn.getline(denops, 1, "$");
-      await fn.bufname(denops, "%");
-    },
-  ) as [number, number, string[], string];
+    (denops) => [
+      fn.line(denops, "."),
+      fn.col(denops, "."),
+      fn.getline(denops, 1, "$"),
+      fn.bufname(denops, "%"),
+    ],
+  );
   const { expr, params } = parseBufname(bufname);
   const jump = finder(lnum - 1, content);
   if (!jump) {

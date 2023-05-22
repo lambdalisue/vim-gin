@@ -28,19 +28,19 @@ export async function exec(
 ): Promise<void> {
   const [verbose, noSupplements, supplementHeight, disableDefaultMappings] =
     await batch
-      .gather(
+      .collect(
         denops,
-        async (denops) => {
-          await option.verbose.get(denops);
-          await vars.g.get(denops, "gin_chaperon_supplement_disable", 0);
-          await vars.g.get(denops, "gin_chaperon_supplement_height", 10);
-          await vars.g.get(
+        (denops) => [
+          option.verbose.get(denops),
+          vars.g.get(denops, "gin_chaperon_supplement_disable", 0),
+          vars.g.get(denops, "gin_chaperon_supplement_height", 10),
+          vars.g.get(
             denops,
             "gin_chaperon_disable_default_mappings",
             false,
-          );
-        },
-      ) as [number, unknown, unknown, unknown];
+          ),
+        ],
+      );
   unknownutil.assertNumber(noSupplements);
   unknownutil.assertNumber(supplementHeight);
   unknownutil.assertBoolean(disableDefaultMappings);

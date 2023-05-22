@@ -130,11 +130,11 @@ async function getRange(denops: Denops): Promise<Range> {
   if (rangeInternal) {
     return rangeInternal;
   }
-  const [mode, line1, line2] = await batch.gather(denops, async (denops) => {
-    await fn.mode(denops);
-    await fn.line(denops, ".");
-    await fn.line(denops, "v");
-  }) as [string, number, number];
+  const [mode, line1, line2] = await batch.collect(denops, (denops) => [
+    fn.mode(denops),
+    fn.line(denops, "."),
+    fn.line(denops, "v"),
+  ]);
   if (mode === "n") {
     return [line1, line1];
   }

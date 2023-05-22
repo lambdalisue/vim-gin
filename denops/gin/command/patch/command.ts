@@ -25,17 +25,17 @@ export async function exec(
   filename: string,
   options: ExecOptions = {},
 ): Promise<void> {
-  const [verbose, disableDefaultMappings] = await batch.gather(
+  const [verbose, disableDefaultMappings] = await batch.collect(
     denops,
-    async (denops) => {
-      await option.verbose.get(denops);
-      await vars.g.get(
+    (denops) => [
+      option.verbose.get(denops),
+      vars.g.get(
         denops,
         "gin_patch_disable_default_mappings",
         false,
-      );
-    },
-  ) as [number, unknown];
+      ),
+    ],
+  );
   unknownutil.assertBoolean(disableDefaultMappings);
 
   const worktree = await findWorktreeFromDenops(denops, {

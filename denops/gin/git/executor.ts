@@ -41,13 +41,13 @@ export async function execute(
   args: string[],
   options: ExecuteOptions = {},
 ): Promise<ExecuteResult> {
-  const [env, verbose] = await batch.gather(
+  const [env, verbose] = await batch.collect(
     denops,
-    async (denops) => {
-      await fn.environ(denops);
-      await option.verbose.get(denops);
-    },
-  ) as [Record<string, string>, number];
+    (denops) => [
+      fn.environ(denops) as Promise<Record<string, string>>,
+      option.verbose.get(denops),
+    ],
+  );
 
   const worktree = await findWorktreeFromDenops(denops, {
     worktree: options.worktree,

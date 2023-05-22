@@ -111,16 +111,17 @@ async function gatherCandidates(
   bufnr: number,
   [start, end]: Range,
 ): Promise<Entry[]> {
-  const [content, patternStr] = await batch.gather(denops, async (denops) => {
-    await fn.getbufline(
+  const [content, patternStr] = await batch.collect(denops, (denops) => [
+    fn.getbufline(
       denops,
       bufnr,
       Math.max(start, 1),
       Math.max(end, 1),
-    );
-    await vars.g.get(denops, "gin_log_parse_pattern");
-  }) as [string[], string | undefined];
-  const pattern = unnullish(patternStr, (v) => new RegExp(v));
+    ),
+    vars.g.get(denops, "gin_log_parse_pattern"),
+  ]);
+
+  const pattern = unnullish(patternStr, (v) => new RegExp(ensureString(v)));
   const result = parseLog(content, pattern);
   return result.entries;
 }

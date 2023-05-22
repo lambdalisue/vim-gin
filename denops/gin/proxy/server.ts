@@ -1,5 +1,5 @@
 import type { Denops } from "https://deno.land/x/denops_std@v5.0.0/mod.ts";
-import * as anonymous from "https://deno.land/x/denops_std@v5.0.0/anonymous/mod.ts";
+import * as lambda from "https://deno.land/x/denops_std@v5.0.0/lambda/mod.ts";
 import * as autocmd from "https://deno.land/x/denops_std@v5.0.0/autocmd/mod.ts";
 import * as batch from "https://deno.land/x/denops_std@v5.0.0/batch/mod.ts";
 import * as buffer from "https://deno.land/x/denops_std@v5.0.0/buffer/mod.ts";
@@ -18,12 +18,12 @@ export async function listen(denops: Denops): Promise<void> {
     hostname: "127.0.0.1",
     port: 0,
   });
-  const [disableAskpass, disableEditor] = await batch.gather(
+  const [disableAskpass, disableEditor] = await batch.collect(
     denops,
-    async (denops) => {
-      await vars.g.get(denops, "gin_proxy_disable_askpass");
-      await vars.g.get(denops, "gin_proxy_disable_editor");
-    },
+    (denops) => [
+      vars.g.get(denops, "gin_proxy_disable_askpass"),
+      vars.g.get(denops, "gin_proxy_disable_editor"),
+    ],
   );
   await batch.batch(denops, async (denops) => {
     await vars.e.set(
@@ -130,9 +130,9 @@ async function edit(
 
   const auname = `gin_editor_${winid}_${bufnr}`;
   const waiter = deferred<void>();
-  const [waiterId] = anonymous.once(denops, () => {
+  const waiterId = lambda.register(denops, () => {
     waiter.resolve();
-  });
+  }, { once: true });
   await batch.batch(denops, async (denops) => {
     await autocmd.group(denops, auname, (helper) => {
       helper.remove("*", `<buffer=${bufnr}>`);

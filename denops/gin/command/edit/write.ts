@@ -34,15 +34,15 @@ export async function exec(
   relpath: string,
   options: ExecOptions,
 ): Promise<void> {
-  const [verbose, fileencoding, fileformat, content] = await batch.gather(
+  const [verbose, fileencoding, fileformat, content] = await batch.collect(
     denops,
-    async (denops) => {
-      await option.verbose.get(denops);
-      await fn.getbufvar(denops, bufnr, "&fileencoding");
-      await fn.getbufvar(denops, bufnr, "&fileformat");
-      await fn.getbufline(denops, bufnr, 1, "$");
-    },
-  ) as [number, string, string, string[]];
+    (denops) => [
+      option.verbose.get(denops),
+      option.fileencoding.getBuffer(denops, bufnr),
+      option.fileformat.getBuffer(denops, bufnr),
+      fn.getbufline(denops, bufnr, 1, "$"),
+    ],
+  );
 
   const worktree = await findWorktreeFromDenops(denops, {
     worktree: options.worktree,
