@@ -1,5 +1,5 @@
-import * as fs from "https://deno.land/std@0.184.0/fs/mod.ts";
-import * as path from "https://deno.land/std@0.184.0/path/mod.ts";
+import * as fs from "https://deno.land/std@0.188.0/fs/mod.ts";
+import * as path from "https://deno.land/std@0.188.0/path/mod.ts";
 
 const beginMarker = `${"<".repeat(7)} `;
 const endMarker = `${">".repeat(7)} `;

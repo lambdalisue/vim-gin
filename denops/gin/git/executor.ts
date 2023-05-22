@@ -1,7 +1,7 @@
-import type { Denops } from "https://deno.land/x/denops_std@v4.1.5/mod.ts";
-import * as batch from "https://deno.land/x/denops_std@v4.1.5/batch/mod.ts";
-import * as fn from "https://deno.land/x/denops_std@v4.1.5/function/mod.ts";
-import * as option from "https://deno.land/x/denops_std@v4.1.5/option/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v5.0.0/mod.ts";
+import * as batch from "https://deno.land/x/denops_std@v5.0.0/batch/mod.ts";
+import * as fn from "https://deno.land/x/denops_std@v5.0.0/function/mod.ts";
+import * as option from "https://deno.land/x/denops_std@v5.0.0/option/mod.ts";
 import { decodeUtf8 } from "../util/text.ts";
 import { removeAnsiEscapeCode } from "../util/ansi_escape_code.ts";
 import { findWorktreeFromDenops } from "./worktree.ts";
