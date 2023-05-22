@@ -1,13 +1,13 @@
-import type { Denops } from "https://deno.land/x/denops_std@v4.1.5/mod.ts";
-import * as helper from "https://deno.land/x/denops_std@v4.1.5/helper/mod.ts";
-import * as unknownutil from "https://deno.land/x/unknownutil@v2.1.0/mod.ts";
-import * as vars from "https://deno.land/x/denops_std@v4.1.5/variable/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v5.0.0/mod.ts";
+import * as helper from "https://deno.land/x/denops_std@v5.0.0/helper/mod.ts";
+import * as unknownutil from "https://deno.land/x/unknownutil@v2.1.1/mod.ts";
+import * as vars from "https://deno.land/x/denops_std@v5.0.0/variable/mod.ts";
 import {
   builtinOpts,
   formatOpts,
   parse,
   validateOpts,
-} from "https://deno.land/x/denops_std@v4.1.5/argument/mod.ts";
+} from "https://deno.land/x/denops_std@v5.0.0/argument/mod.ts";
 import {
   normCmdArgs,
   parseDisableDefaultArgs,

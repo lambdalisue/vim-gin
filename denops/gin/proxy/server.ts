@@ -1,14 +1,14 @@
-import type { Denops } from "https://deno.land/x/denops_std@v4.1.5/mod.ts";
-import * as anonymous from "https://deno.land/x/denops_std@v4.1.5/anonymous/mod.ts";
-import * as autocmd from "https://deno.land/x/denops_std@v4.1.5/autocmd/mod.ts";
-import * as batch from "https://deno.land/x/denops_std@v4.1.5/batch/mod.ts";
-import * as buffer from "https://deno.land/x/denops_std@v4.1.5/buffer/mod.ts";
-import * as fn from "https://deno.land/x/denops_std@v4.1.5/function/mod.ts";
-import * as vars from "https://deno.land/x/denops_std@v4.1.5/variable/mod.ts";
-import * as unknownutil from "https://deno.land/x/unknownutil@v2.1.0/mod.ts";
-import * as path from "https://deno.land/std@0.184.0/path/mod.ts";
-import * as streams from "https://deno.land/std@0.184.0/streams/mod.ts";
-import { deferred } from "https://deno.land/std@0.184.0/async/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v5.0.0/mod.ts";
+import * as lambda from "https://deno.land/x/denops_std@v5.0.0/lambda/mod.ts";
+import * as autocmd from "https://deno.land/x/denops_std@v5.0.0/autocmd/mod.ts";
+import * as batch from "https://deno.land/x/denops_std@v5.0.0/batch/mod.ts";
+import * as buffer from "https://deno.land/x/denops_std@v5.0.0/buffer/mod.ts";
+import * as fn from "https://deno.land/x/denops_std@v5.0.0/function/mod.ts";
+import * as vars from "https://deno.land/x/denops_std@v5.0.0/variable/mod.ts";
+import * as unknownutil from "https://deno.land/x/unknownutil@v2.1.1/mod.ts";
+import * as path from "https://deno.land/std@0.188.0/path/mod.ts";
+import * as streams from "https://deno.land/std@0.188.0/streams/mod.ts";
+import { deferred } from "https://deno.land/std@0.188.0/async/mod.ts";
 import { decodeUtf8, encodeUtf8 } from "../util/text.ts";
 
 const recordPattern = /^([^:]+?):(.*)$/;
@@ -18,12 +18,12 @@ export async function listen(denops: Denops): Promise<void> {
     hostname: "127.0.0.1",
     port: 0,
   });
-  const [disableAskpass, disableEditor] = await batch.gather(
+  const [disableAskpass, disableEditor] = await batch.collect(
     denops,
-    async (denops) => {
-      await vars.g.get(denops, "gin_proxy_disable_askpass");
-      await vars.g.get(denops, "gin_proxy_disable_editor");
-    },
+    (denops) => [
+      vars.g.get(denops, "gin_proxy_disable_askpass"),
+      vars.g.get(denops, "gin_proxy_disable_editor"),
+    ],
   );
   await batch.batch(denops, async (denops) => {
     await vars.e.set(
@@ -130,9 +130,9 @@ async function edit(
 
   const auname = `gin_editor_${winid}_${bufnr}`;
   const waiter = deferred<void>();
-  const [waiterId] = anonymous.once(denops, () => {
+  const waiterId = lambda.register(denops, () => {
     waiter.resolve();
-  });
+  }, { once: true });
   await batch.batch(denops, async (denops) => {
     await autocmd.group(denops, auname, (helper) => {
       helper.remove("*", `<buffer=${bufnr}>`);
