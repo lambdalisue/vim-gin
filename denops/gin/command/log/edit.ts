@@ -1,19 +1,19 @@
-import type { Denops } from "https://deno.land/x/denops_std@v5.0.0/mod.ts";
-import { unnullish } from "https://deno.land/x/unnullish@v1.0.1/mod.ts";
-import { ensureString } from "https://deno.land/x/unknownutil@v2.1.1/mod.ts";
-import * as fn from "https://deno.land/x/denops_std@v5.0.0/function/mod.ts";
-import * as batch from "https://deno.land/x/denops_std@v5.0.0/batch/mod.ts";
-import * as buffer from "https://deno.land/x/denops_std@v5.0.0/buffer/mod.ts";
-import * as option from "https://deno.land/x/denops_std@v5.0.0/option/mod.ts";
-import * as vars from "https://deno.land/x/denops_std@v5.0.0/variable/mod.ts";
-import { parse as parseBufname } from "https://deno.land/x/denops_std@v5.0.0/bufname/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v4.1.5/mod.ts";
+import { unnullish } from "https://deno.land/x/unnullish@v1.0.0/mod.ts";
+import { ensureString } from "https://deno.land/x/unknownutil@v2.1.0/mod.ts";
+import * as fn from "https://deno.land/x/denops_std@v4.1.5/function/mod.ts";
+import * as batch from "https://deno.land/x/denops_std@v4.1.5/batch/mod.ts";
+import * as buffer from "https://deno.land/x/denops_std@v4.1.5/buffer/mod.ts";
+import * as option from "https://deno.land/x/denops_std@v4.1.5/option/mod.ts";
+import * as vars from "https://deno.land/x/denops_std@v4.1.5/variable/mod.ts";
+import { parse as parseBufname } from "https://deno.land/x/denops_std@v4.1.5/bufname/mod.ts";
 import {
   builtinOpts,
   Flags,
   formatFlags,
   parseOpts,
   validateOpts,
-} from "https://deno.land/x/denops_std@v5.0.0/argument/mod.ts";
+} from "https://deno.land/x/denops_std@v4.1.5/argument/mod.ts";
 import { bind } from "../../command/bare/command.ts";
 import { exec as execBuffer } from "../../command/buffer/edit.ts";
 import { init as initActionCore, Range } from "../../action/core.ts";
@@ -111,17 +111,16 @@ async function gatherCandidates(
   bufnr: number,
   [start, end]: Range,
 ): Promise<Entry[]> {
-  const [content, patternStr] = await batch.collect(denops, (denops) => [
-    fn.getbufline(
+  const [content, patternStr] = await batch.gather(denops, async (denops) => {
+    await fn.getbufline(
       denops,
       bufnr,
       Math.max(start, 1),
       Math.max(end, 1),
-    ),
-    vars.g.get(denops, "gin_log_parse_pattern"),
-  ]);
-
-  const pattern = unnullish(patternStr, (v) => new RegExp(ensureString(v)));
+    );
+    await vars.g.get(denops, "gin_log_parse_pattern");
+  }) as [string[], string | undefined];
+  const pattern = unnullish(patternStr, (v) => new RegExp(v));
   const result = parseLog(content, pattern);
   return result.entries;
 }

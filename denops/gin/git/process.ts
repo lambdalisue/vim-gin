@@ -1,29 +1,26 @@
 import { decodeUtf8 } from "../util/text.ts";
 
-export type RunOptions = Omit<Deno.CommandOptions, "cmd"> & {
+export type RunOptions = Omit<Deno.RunOptions, "cmd"> & {
   noOptionalLocks?: boolean;
   printCommand?: boolean;
 };
 
-export function run(
-  args: string[],
-  options: RunOptions = {},
-): Deno.ChildProcess {
-  args.unshift("--no-pager", "--literal-pathspecs");
+export function run(args: string[], options: RunOptions = {}): Deno.Process {
+  const cmd = ["git", "--no-pager", "--literal-pathspecs"];
   if (options.noOptionalLocks) {
-    args.unshift("--no-optional-locks");
+    cmd.push("--no-optional-locks");
   }
+  cmd.push(...args);
   if (options.printCommand) {
-    console.debug(`Run 'git ${args.join(" ")}' on '${options.cwd}'`);
+    console.debug(`Run '${cmd.join(" ")}' on '${options.cwd}'`);
   }
-  const command = new Deno.Command("git", {
-    args,
+  return Deno.run({
+    cmd,
     stdout: options.stdout,
     stderr: options.stderr,
     cwd: options.cwd,
     env: options.env,
   });
-  return command.spawn();
 }
 
 export class ExecuteError extends Error {
@@ -47,9 +44,14 @@ export async function execute(
     stdout: "piped",
     stderr: "piped",
   });
-  const { code, stdout, stderr } = await proc.output();
-  if (code) {
-    throw new ExecuteError(args, code, stdout, stderr);
+  const [status, stdout, stderr] = await Promise.all([
+    proc.status(),
+    proc.output(),
+    proc.stderrOutput(),
+  ]);
+  proc.close();
+  if (!status.success) {
+    throw new ExecuteError(args, status.code, stdout, stderr);
   }
   return stdout;
 }

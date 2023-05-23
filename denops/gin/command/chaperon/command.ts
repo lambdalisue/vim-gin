@@ -1,12 +1,12 @@
-import type { Denops } from "https://deno.land/x/denops_std@v5.0.0/mod.ts";
-import * as batch from "https://deno.land/x/denops_std@v5.0.0/batch/mod.ts";
-import * as fn from "https://deno.land/x/denops_std@v5.0.0/function/mod.ts";
-import * as mapping from "https://deno.land/x/denops_std@v5.0.0/mapping/mod.ts";
-import * as vars from "https://deno.land/x/denops_std@v5.0.0/variable/mod.ts";
-import * as unknownutil from "https://deno.land/x/unknownutil@v2.1.1/mod.ts";
-import * as path from "https://deno.land/std@0.188.0/path/mod.ts";
-import * as option from "https://deno.land/x/denops_std@v5.0.0/option/mod.ts";
-import * as buffer from "https://deno.land/x/denops_std@v5.0.0/buffer/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v4.1.5/mod.ts";
+import * as batch from "https://deno.land/x/denops_std@v4.1.5/batch/mod.ts";
+import * as fn from "https://deno.land/x/denops_std@v4.1.5/function/mod.ts";
+import * as mapping from "https://deno.land/x/denops_std@v4.1.5/mapping/mod.ts";
+import * as vars from "https://deno.land/x/denops_std@v4.1.5/variable/mod.ts";
+import * as unknownutil from "https://deno.land/x/unknownutil@v2.1.0/mod.ts";
+import * as path from "https://deno.land/std@0.184.0/path/mod.ts";
+import * as option from "https://deno.land/x/denops_std@v4.1.5/option/mod.ts";
+import * as buffer from "https://deno.land/x/denops_std@v4.1.5/buffer/mod.ts";
 import { findWorktreeFromDenops } from "../../git/worktree.ts";
 import { exec as execEdit } from "../edit/command.ts";
 import { AliasHead, getInProgressAliasHead, stripConflicts } from "./util.ts";
@@ -28,19 +28,19 @@ export async function exec(
 ): Promise<void> {
   const [verbose, noSupplements, supplementHeight, disableDefaultMappings] =
     await batch
-      .collect(
+      .gather(
         denops,
-        (denops) => [
-          option.verbose.get(denops),
-          vars.g.get(denops, "gin_chaperon_supplement_disable", 0),
-          vars.g.get(denops, "gin_chaperon_supplement_height", 10),
-          vars.g.get(
+        async (denops) => {
+          await option.verbose.get(denops);
+          await vars.g.get(denops, "gin_chaperon_supplement_disable", 0);
+          await vars.g.get(denops, "gin_chaperon_supplement_height", 10);
+          await vars.g.get(
             denops,
             "gin_chaperon_disable_default_mappings",
             false,
-          ),
-        ],
-      );
+          );
+        },
+      ) as [number, unknown, unknown, unknown];
   unknownutil.assertNumber(noSupplements);
   unknownutil.assertNumber(supplementHeight);
   unknownutil.assertBoolean(disableDefaultMappings);

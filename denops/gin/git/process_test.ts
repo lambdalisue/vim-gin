@@ -1,7 +1,7 @@
 import {
   assert,
   assertRejects,
-} from "https://deno.land/std@0.188.0/testing/asserts.ts";
+} from "https://deno.land/std@0.184.0/testing/asserts.ts";
 import { decodeUtf8 } from "../util/text.ts";
 import { execute, ExecuteError, run } from "./process.ts";
 
@@ -9,8 +9,12 @@ Deno.test("run() runs 'git' and return a process", async () => {
   const proc = run(["version"], {
     stdout: "piped",
   });
-  const { code, stdout } = await proc.output();
-  assert(code === 0);
+  const [status, stdout] = await Promise.all([
+    proc.status(),
+    proc.output(),
+  ]);
+  proc.close();
+  assert(status.success);
   assert(decodeUtf8(stdout).startsWith("git version"));
 });
 
@@ -19,8 +23,12 @@ Deno.test("run() runs 'git' and return a process (noOptionalLocks)", async () =>
     stdout: "piped",
     noOptionalLocks: true,
   });
-  const { code, stdout } = await proc.output();
-  assert(code === 0);
+  const [status, stdout] = await Promise.all([
+    proc.status(),
+    proc.output(),
+  ]);
+  proc.close();
+  assert(status.success);
   assert(decodeUtf8(stdout).startsWith("git version"));
 });
 
