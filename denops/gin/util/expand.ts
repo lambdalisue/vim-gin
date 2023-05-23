@@ -1,6 +1,6 @@
-import type { Denops } from "https://deno.land/x/denops_std@v5.0.0/mod.ts";
-import * as fn from "https://deno.land/x/denops_std@v5.0.0/function/mod.ts";
-import { parse as parseBufname } from "https://deno.land/x/denops_std@v5.0.0/bufname/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v4.1.5/mod.ts";
+import * as fn from "https://deno.land/x/denops_std@v4.1.5/function/mod.ts";
+import { parse as parseBufname } from "https://deno.land/x/denops_std@v4.1.5/bufname/mod.ts";
 import { GIN_FILE_BUFFER_PROTOCOLS } from "../global.ts";
 
 export async function expand(denops: Denops, expr: string): Promise<string> {
