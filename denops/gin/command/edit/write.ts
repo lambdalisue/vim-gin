@@ -1,12 +1,12 @@
-import type { Denops } from "https://deno.land/x/denops_std@v4.1.5/mod.ts";
-import * as path from "https://deno.land/std@0.184.0/path/mod.ts";
-import * as fs from "https://deno.land/std@0.184.0/fs/mod.ts";
-import * as batch from "https://deno.land/x/denops_std@v4.1.5/batch/mod.ts";
-import * as fn from "https://deno.land/x/denops_std@v4.1.5/function/mod.ts";
-import * as option from "https://deno.land/x/denops_std@v4.1.5/option/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v5.0.0/mod.ts";
+import * as path from "https://deno.land/std@0.188.0/path/mod.ts";
+import * as fs from "https://deno.land/std@0.188.0/fs/mod.ts";
+import * as batch from "https://deno.land/x/denops_std@v5.0.0/batch/mod.ts";
+import * as fn from "https://deno.land/x/denops_std@v5.0.0/function/mod.ts";
+import * as option from "https://deno.land/x/denops_std@v5.0.0/option/mod.ts";
 import {
   parse as parseBufname,
-} from "https://deno.land/x/denops_std@v4.1.5/bufname/mod.ts";
+} from "https://deno.land/x/denops_std@v5.0.0/bufname/mod.ts";
 import { findWorktreeFromDenops } from "../../git/worktree.ts";
 import { exec as execBare } from "../../command/bare/command.ts";
 
@@ -34,15 +34,15 @@ export async function exec(
   relpath: string,
   options: ExecOptions,
 ): Promise<void> {
-  const [verbose, fileencoding, fileformat, content] = await batch.gather(
+  const [verbose, fileencoding, fileformat, content] = await batch.collect(
     denops,
-    async (denops) => {
-      await option.verbose.get(denops);
-      await fn.getbufvar(denops, bufnr, "&fileencoding");
-      await fn.getbufvar(denops, bufnr, "&fileformat");
-      await fn.getbufline(denops, bufnr, 1, "$");
-    },
-  ) as [number, string, string, string[]];
+    (denops) => [
+      option.verbose.get(denops),
+      option.fileencoding.getBuffer(denops, bufnr),
+      option.fileformat.getBuffer(denops, bufnr),
+      fn.getbufline(denops, bufnr, 1, "$"),
+    ],
+  );
 
   const worktree = await findWorktreeFromDenops(denops, {
     worktree: options.worktree,

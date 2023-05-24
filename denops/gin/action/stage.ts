@@ -1,5 +1,5 @@
-import type { Denops } from "https://deno.land/x/denops_std@v4.1.5/mod.ts";
-import * as batch from "https://deno.land/x/denops_std@v4.1.5/batch/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v5.0.0/mod.ts";
+import * as batch from "https://deno.land/x/denops_std@v5.0.0/batch/mod.ts";
 import { define, GatherCandidates, Range } from "./core.ts";
 import { exec as execBare } from "../command/bare/command.ts";
 import { doResetFile } from "./reset_file.ts";

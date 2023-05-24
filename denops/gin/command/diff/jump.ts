@@ -1,12 +1,12 @@
-import type { Denops } from "https://deno.land/x/denops_std@v4.1.5/mod.ts";
-import * as unknownutil from "https://deno.land/x/unknownutil@v2.1.0/mod.ts";
-import * as path from "https://deno.land/std@0.184.0/path/mod.ts";
-import * as batch from "https://deno.land/x/denops_std@v4.1.5/batch/mod.ts";
-import * as buffer from "https://deno.land/x/denops_std@v4.1.5/buffer/mod.ts";
-import * as fn from "https://deno.land/x/denops_std@v4.1.5/function/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v5.0.0/mod.ts";
+import * as unknownutil from "https://deno.land/x/unknownutil@v2.1.1/mod.ts";
+import * as path from "https://deno.land/std@0.188.0/path/mod.ts";
+import * as batch from "https://deno.land/x/denops_std@v5.0.0/batch/mod.ts";
+import * as buffer from "https://deno.land/x/denops_std@v5.0.0/buffer/mod.ts";
+import * as fn from "https://deno.land/x/denops_std@v5.0.0/function/mod.ts";
 import {
   parse as parseBufname,
-} from "https://deno.land/x/denops_std@v4.1.5/bufname/mod.ts";
+} from "https://deno.land/x/denops_std@v5.0.0/bufname/mod.ts";
 import { exec as execEdit } from "../edit/command.ts";
 import { Commitish, INDEX, parseCommitish, WORKTREE } from "./commitish.ts";
 
@@ -114,15 +114,15 @@ async function jump(
   finder: Finder,
   parser: Parser,
 ): Promise<void> {
-  const [lnum, column, content, bufname] = await batch.gather(
+  const [lnum, column, content, bufname] = await batch.collect(
     denops,
-    async (denops) => {
-      await fn.line(denops, ".");
-      await fn.col(denops, ".");
-      await fn.getline(denops, 1, "$");
-      await fn.bufname(denops, "%");
-    },
-  ) as [number, number, string[], string];
+    (denops) => [
+      fn.line(denops, "."),
+      fn.col(denops, "."),
+      fn.getline(denops, 1, "$"),
+      fn.bufname(denops, "%"),
+    ],
+  );
   const { expr, params } = parseBufname(bufname);
   const jump = finder(lnum - 1, content);
   if (!jump) {
