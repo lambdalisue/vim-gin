@@ -1,4 +1,4 @@
-import type { Denops } from "https://deno.land/x/denops_std@v4.1.5/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v5.0.0/mod.ts";
 import { listen } from "./server.ts";
 
 export function main(denops: Denops): void {

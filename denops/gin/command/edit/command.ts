@@ -1,10 +1,10 @@
-import type { Denops } from "https://deno.land/x/denops_std@v4.1.5/mod.ts";
-import * as path from "https://deno.land/std@0.184.0/path/mod.ts";
-import * as buffer from "https://deno.land/x/denops_std@v4.1.5/buffer/mod.ts";
-import * as option from "https://deno.land/x/denops_std@v4.1.5/option/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v5.0.0/mod.ts";
+import * as path from "https://deno.land/std@0.188.0/path/mod.ts";
+import * as buffer from "https://deno.land/x/denops_std@v5.0.0/buffer/mod.ts";
+import * as option from "https://deno.land/x/denops_std@v5.0.0/option/mod.ts";
 import {
   format as formatBufname,
-} from "https://deno.land/x/denops_std@v4.1.5/bufname/mod.ts";
+} from "https://deno.land/x/denops_std@v5.0.0/bufname/mod.ts";
 import { findWorktreeFromDenops } from "../../git/worktree.ts";
 
 export type ExecOptions = {

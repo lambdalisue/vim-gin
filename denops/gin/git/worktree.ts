@@ -1,9 +1,8 @@
-import type { Denops } from "https://deno.land/x/denops_std@v4.1.5/mod.ts";
-import * as batch from "https://deno.land/x/denops_std@v4.1.5/batch/mod.ts";
-import { parse as parseBufname } from "https://deno.land/x/denops_std@v4.1.5/bufname/mod.ts";
-import * as fn from "https://deno.land/x/denops_std@v4.1.5/function/mod.ts";
-import * as path from "https://deno.land/std@0.184.0/path/mod.ts";
-import * as unknownutil from "https://deno.land/x/unknownutil@v2.1.0/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v5.0.0/mod.ts";
+import * as batch from "https://deno.land/x/denops_std@v5.0.0/batch/mod.ts";
+import { parse as parseBufname } from "https://deno.land/x/denops_std@v5.0.0/bufname/mod.ts";
+import * as fn from "https://deno.land/x/denops_std@v5.0.0/function/mod.ts";
+import * as path from "https://deno.land/std@0.188.0/path/mod.ts";
 import { GIN_BUFFER_PROTOCOLS } from "../global.ts";
 import { expand } from "../util/expand.ts";
 import { find } from "./finder.ts";
@@ -70,15 +69,13 @@ async function listWorktreeSuspectsFromDenops(
   denops: Denops,
   verbose?: boolean,
 ): Promise<string[]> {
-  const [cwd, bufname] = await batch.gather(
+  const [cwd, bufname] = await batch.collect(
     denops,
-    async (denops) => {
-      await fn.getcwd(denops);
-      await fn.expand(denops, "%:p");
-    },
+    (denops) => [
+      fn.getcwd(denops),
+      fn.expand(denops, "%:p") as Promise<string>,
+    ],
   );
-  unknownutil.assertString(cwd);
-  unknownutil.assertString(bufname);
   if (verbose) {
     console.debug("listWorktreeSuspectsFromDenops");
     console.debug(`  cwd: ${cwd}`);
