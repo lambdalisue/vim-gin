@@ -10,9 +10,7 @@ import {
   parseOpts,
   validateOpts,
 } from "https://deno.land/x/denops_std@v5.0.0/argument/mod.ts";
-import {
-  parse as parseBufname,
-} from "https://deno.land/x/denops_std@v5.0.0/bufname/mod.ts";
+import { parse as parseBufname } from "https://deno.land/x/denops_std@v5.0.0/bufname/mod.ts";
 import { execute } from "../../git/executor.ts";
 import { formatTreeish } from "./util.ts";
 
@@ -21,7 +19,7 @@ export async function edit(
   bufnr: number,
   bufname: string,
 ): Promise<void> {
-  const cmdarg = await vars.v.get(denops, "cmdarg") as string;
+  const cmdarg = (await vars.v.get(denops, "cmdarg")) as string;
   const [opts, _] = parseOpts(cmdarg.split(" "));
   validateOpts(opts, ["enc", "encoding", "ff", "fileformat"]);
   const { scheme, expr, params, fragment } = parseBufname(bufname);
@@ -54,6 +52,7 @@ export async function exec(
   const { stdout } = await execute(denops, args, {
     worktree: options.worktree,
     throwOnError: true,
+    stdoutIndicator: "null",
   });
   const { content, fileformat, fileencoding } = await buffer.decode(
     denops,

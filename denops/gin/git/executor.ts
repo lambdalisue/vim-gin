@@ -1,9 +1,11 @@
 import type { Denops } from "https://deno.land/x/denops_std@v5.0.0/mod.ts";
+import { readAll } from "https://deno.land/x/streamtools@v0.5.0/read_all.ts";
 import * as batch from "https://deno.land/x/denops_std@v5.0.0/batch/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v5.0.0/function/mod.ts";
 import * as option from "https://deno.land/x/denops_std@v5.0.0/option/mod.ts";
 import { decodeUtf8 } from "../util/text.ts";
 import { removeAnsiEscapeCode } from "../util/ansi_escape_code.ts";
+import { IndicatorStream } from "../util/indicator_stream.ts";
 import { findWorktreeFromDenops } from "./worktree.ts";
 import { run } from "./process.ts";
 
@@ -28,6 +30,8 @@ export type ExecuteOptions = {
   worktree?: string;
   throwOnError?: boolean;
   processor?: string[];
+  stdoutIndicator?: string;
+  stderrIndicator?: string;
 };
 
 export type ExecuteResult = {
@@ -64,7 +68,17 @@ export async function execute(
     env,
   });
 
-  const { success, stdout, stderr } = await proc.output();
+  const stdoutIndicator = options.stdoutIndicator ?? "echo";
+  const stderrIndicator = options.stderrIndicator ?? "echo";
+  const [success, stdout, stderr] = await Promise.all([
+    proc.status.then((status) => status.success),
+    readAll(proc.stdout.pipeThrough(
+      buildIndicatorStream(denops, stdoutIndicator),
+    )),
+    readAll(proc.stderr.pipeThrough(
+      buildIndicatorStream(denops, stderrIndicator),
+    )),
+  ]);
 
   // Early return when execution has failed
   if (!success) {
@@ -116,4 +130,32 @@ async function postProcessor(
     proc.output(),
   ]);
   return result;
+}
+
+function buildIndicatorStream(
+  denops: Denops,
+  name: string,
+): IndicatorStream {
+  const indicator = {
+    async open(id: string) {
+      await denops.call(
+        `gin#indicator#${name}#open`,
+        id,
+      );
+    },
+    async write(id: string, content: string[]) {
+      await denops.call(
+        `gin#indicator#${name}#write`,
+        id,
+        content,
+      );
+    },
+    async close(id: string) {
+      await denops.call(
+        `gin#indicator#${name}#close`,
+        id,
+      );
+    },
+  };
+  return new IndicatorStream(indicator);
 }
