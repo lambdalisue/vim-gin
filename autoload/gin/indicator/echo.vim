@@ -13,7 +13,7 @@ function gin#indicator#echo#open(id) abort
 endfunction
 
 function gin#indicator#echo#write(id, chunk) abort
-  if s:saved is v:null
+  if s:saved is v:null || len(a:chunk) is# 0
     return
   endif
   let &cmdheight = max([&cmdheight, len(a:chunk)])

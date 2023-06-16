@@ -27,7 +27,7 @@ export class IndicatorStream extends TransformStream<Uint8Array, Uint8Array> {
       },
       async transform(chunk, controller) {
         const text = removeAnsiEscapeCode(decoder.decode(chunk));
-        await indicator.write(id, text.split("\n"));
+        await indicator.write(id, text.trim().split("\n"));
         controller.enqueue(chunk);
       },
       flush() {
