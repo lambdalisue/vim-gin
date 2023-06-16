@@ -80,6 +80,9 @@ guise.vim~
 It can live together with the plugins mentioned above because the environment
 variable names used are different.
 
+Use |g:gin_proxy_editor_opener| to specify the opener command to open the
+buffer.
+
 Use |g:gin_proxy_disable_askpass| and/or |g:gin_proxy_disable_editor| to
 disable this proxy feature.
 
@@ -483,6 +486,12 @@ VARIABLES					*gin-variables*
 	Disable overriding "GIT_EDITOR" to proxy editors.
 
 	Default: 0
+
+*g:gin_proxy_editor_opener*
+	Opener command (e.g. "split", "vsplit", "tabedit") to open a buffer
+	on proxy editors.
+
+	Default: "tabedit"
 
 *g:gin_status_default_args*
 	Specify default arguments of |:GinStatus|.
