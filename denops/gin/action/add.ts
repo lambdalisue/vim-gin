@@ -43,5 +43,5 @@ async function doAdd(
     ...extraArgs,
     "--",
     ...xs.map((x) => x.path),
-  ]);
+  ], { stdoutIndicator: "null" });
 }
