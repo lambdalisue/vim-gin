@@ -32,6 +32,9 @@ switch (status) {
   case "ok":
     Deno.exit(0);
     /* fall through */
+  case "cancel":
+    Deno.exit(1);
+    /* fall through */
   case "err":
     console.error(value);
     Deno.exit(1);
