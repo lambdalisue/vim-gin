@@ -9,6 +9,8 @@ export type ExecOptions = {
   worktree?: string;
   encoding?: string;
   fileformat?: string;
+  stdoutIndicator?: string;
+  stderrIndicator?: string;
 };
 
 export async function exec(
@@ -20,6 +22,8 @@ export async function exec(
   const { stdout, stderr } = await execute(denops, args, {
     worktree: options.worktree,
     throwOnError: true,
+    stdoutIndicator: options.stdoutIndicator,
+    stderrIndicator: options.stderrIndicator,
   });
   const encoding = options.encoding ?? "utf8";
   const decoder = new TextDecoder(encoding);

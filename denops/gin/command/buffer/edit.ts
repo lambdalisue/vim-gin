@@ -52,6 +52,8 @@ export type ExecOptions = {
   monochrome?: boolean;
   encoding?: string;
   fileformat?: string;
+  stdoutIndicator?: string;
+  stderrIndicator?: string;
 };
 
 export async function exec(
@@ -78,6 +80,8 @@ export async function exec(
     processor: options.processor,
     worktree: options.worktree,
     throwOnError: true,
+    stdoutIndicator: options.stdoutIndicator ?? "null",
+    stderrIndicator: options.stderrIndicator,
   });
   const { content, fileformat, fileencoding } = await buffer.decode(
     denops,
