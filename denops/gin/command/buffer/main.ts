@@ -1,6 +1,6 @@
 import type { Denops } from "https://deno.land/x/denops_std@v5.0.1/mod.ts";
 import { unnullish } from "https://deno.land/x/unnullish@v1.0.1/unnullish.ts";
-import * as unknownutil from "https://deno.land/x/unknownutil@v2.1.1/mod.ts#^";
+import { assert, is } from "https://deno.land/x/unknownutil@v3.0.0/mod.ts#^";
 import * as helper from "https://deno.land/x/denops_std@v5.0.1/helper/mod.ts";
 import * as buffer from "https://deno.land/x/denops_std@v5.0.1/buffer/mod.ts";
 import {
@@ -19,9 +19,9 @@ export function main(denops: Denops): void {
   denops.dispatcher = {
     ...denops.dispatcher,
     "buffer:command": (bang, mods, args) => {
-      unknownutil.assertString(bang);
-      unknownutil.assertString(mods);
-      unknownutil.assertArray(args, unknownutil.isString);
+      assert(bang, is.String);
+      assert(mods, is.String);
+      assert(args, is.ArrayOf(is.String));
       const silent = parseSilent(mods);
       return helper.ensureSilent(denops, silent, () => {
         return helper.friendlyCall(
@@ -31,16 +31,16 @@ export function main(denops: Denops): void {
       });
     },
     "buffer:edit": (bufnr, bufname) => {
-      unknownutil.assertNumber(bufnr);
-      unknownutil.assertString(bufname);
+      assert(bufnr, is.Number);
+      assert(bufname, is.String);
       return helper.friendlyCall(
         denops,
         () => edit(denops, bufnr, bufname),
       );
     },
     "buffer:read": (bufnr, bufname) => {
-      unknownutil.assertNumber(bufnr);
-      unknownutil.assertString(bufname);
+      assert(bufnr, is.Number);
+      assert(bufname, is.String);
       return helper.friendlyCall(
         denops,
         () => read(denops, bufnr, bufname),

@@ -1,5 +1,5 @@
 import type { Denops } from "https://deno.land/x/denops_std@v5.0.1/mod.ts";
-import * as unknownutil from "https://deno.land/x/unknownutil@v2.1.1/mod.ts#^";
+import { assert, is } from "https://deno.land/x/unknownutil@v3.0.0/mod.ts#^";
 import * as helper from "https://deno.land/x/denops_std@v5.0.1/helper/mod.ts";
 import * as vars from "https://deno.land/x/denops_std@v5.0.1/variable/mod.ts";
 import {
@@ -23,9 +23,9 @@ export function main(denops: Denops): void {
   denops.dispatcher = {
     ...denops.dispatcher,
     "diff:command": (bang, mods, args) => {
-      unknownutil.assertString(bang);
-      unknownutil.assertString(mods);
-      unknownutil.assertArray(args, unknownutil.isString);
+      assert(bang, is.String);
+      assert(mods, is.String);
+      assert(args, is.ArrayOf(is.String));
       const [disableDefaultArgs, realArgs] = parseDisableDefaultArgs(args);
       const silent = parseSilent(mods);
       return helper.ensureSilent(denops, silent, () => {
@@ -39,37 +39,25 @@ export function main(denops: Denops): void {
       });
     },
     "diff:edit": (bufnr, bufname) => {
-      unknownutil.assertNumber(bufnr);
-      unknownutil.assertString(bufname);
+      assert(bufnr, is.Number);
+      assert(bufname, is.String);
       return helper.friendlyCall(denops, () => edit(denops, bufnr, bufname));
     },
     "diff:read": (bufnr, bufname) => {
-      unknownutil.assertNumber(bufnr);
-      unknownutil.assertString(bufname);
+      assert(bufnr, is.Number);
+      assert(bufname, is.String);
       return helper.friendlyCall(denops, () => read(denops, bufnr, bufname));
     },
     "diff:jump:new": (mods) => {
-      if (mods) {
-        unknownutil.assertString(mods);
-      } else {
-        unknownutil.assertUndefined(mods);
-      }
+      assert(mods, is.OneOf([is.String, is.Undefined]));
       return helper.friendlyCall(denops, () => jumpNew(denops, mods ?? ""));
     },
     "diff:jump:old": (mods) => {
-      if (mods) {
-        unknownutil.assertString(mods);
-      } else {
-        unknownutil.assertUndefined(mods);
-      }
+      assert(mods, is.OneOf([is.String, is.Undefined]));
       return helper.friendlyCall(denops, () => jumpOld(denops, mods ?? ""));
     },
     "diff:jump:smart": (mods) => {
-      if (mods) {
-        unknownutil.assertString(mods);
-      } else {
-        unknownutil.assertUndefined(mods);
-      }
+      assert(mods, is.OneOf([is.String, is.Undefined]));
       return helper.friendlyCall(denops, () => jumpSmart(denops, mods ?? ""));
     },
   };
@@ -110,7 +98,7 @@ async function command(
       "gin_diff_default_args",
       [],
     );
-    unknownutil.assertArray(defaultArgs, unknownutil.isString);
+    assert(defaultArgs, is.ArrayOf(is.String));
     args = [...defaultArgs, ...args];
   }
   const [opts, flags, residue] = parse(await normCmdArgs(denops, args));

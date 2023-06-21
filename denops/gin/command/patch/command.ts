@@ -5,7 +5,7 @@ import * as fn from "https://deno.land/x/denops_std@v5.0.1/function/mod.ts";
 import * as mapping from "https://deno.land/x/denops_std@v5.0.1/mapping/mod.ts";
 import * as vars from "https://deno.land/x/denops_std@v5.0.1/variable/mod.ts";
 import * as option from "https://deno.land/x/denops_std@v5.0.1/option/mod.ts";
-import * as unknownutil from "https://deno.land/x/unknownutil@v2.1.1/mod.ts#^";
+import { assert, is } from "https://deno.land/x/unknownutil@v3.0.0/mod.ts#^";
 import * as buffer from "https://deno.land/x/denops_std@v5.0.1/buffer/mod.ts";
 import { findWorktreeFromDenops } from "../../git/worktree.ts";
 import { exec as execEdit } from "../edit/command.ts";
@@ -36,7 +36,7 @@ export async function exec(
       ),
     ],
   );
-  unknownutil.assertBoolean(disableDefaultMappings);
+  assert(disableDefaultMappings, is.Boolean);
 
   const worktree = await findWorktreeFromDenops(denops, {
     worktree: options.worktree,

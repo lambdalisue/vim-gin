@@ -1,9 +1,5 @@
 import type { Denops } from "https://deno.land/x/denops_std@v5.0.1/mod.ts";
-import {
-  assertArray,
-  isNumber,
-  isString,
-} from "https://deno.land/x/unknownutil@v2.1.1/mod.ts#^";
+import { assert, is } from "https://deno.land/x/unknownutil@v3.0.0/mod.ts#^";
 import { unnullish } from "https://deno.land/x/unnullish@v1.0.1/mod.ts";
 import * as itertools from "https://deno.land/x/itertools@v1.1.1/mod.ts";
 import * as ansiEscapeCode from "https://deno.land/x/ansi_escape_code@v1.0.2/mod.ts";
@@ -23,7 +19,7 @@ export async function buildDecorationsFromAnsiEscapeCode(
   content: string[],
 ): Promise<[string[], Decoration[]]> {
   const colors = await denops.call("gin#internal#util#ansi_escape_code#colors");
-  assertArray(colors, isString);
+  assert(colors, is.ArrayOf(is.String));
   const trimmed: string[] = [];
   const decorations: Decoration[] = [];
   const highlights: Map<string, ansiEscapeCode.Sgr> = new Map();
@@ -117,7 +113,7 @@ function highlightExprFromSgr(
     unnullish(sgr.foreground, (v) => {
       if (v === "default") {
         return undefined;
-      } else if (isNumber(v)) {
+      } else if (is.Number(v)) {
         return `ctermfg=${v} guifg=${colors[v]}`;
       } else {
         return `guifg=#${formatColor(v)}`;
@@ -126,7 +122,7 @@ function highlightExprFromSgr(
     unnullish(sgr.background, (v) => {
       if (v === "default") {
         return undefined;
-      } else if (isNumber(v)) {
+      } else if (is.Number(v)) {
         return `ctermbg=${v} guibg=${colors[v]}`;
       } else {
         return `guibg=#${formatColor(v)}`;
@@ -139,7 +135,7 @@ function highlightExprFromSgr(
 function formatColor(color: ansiEscapeCode.Color): string {
   if (color === "default") {
     return "";
-  } else if (isNumber(color)) {
+  } else if (is.Number(color)) {
     return color.toString();
   } else {
     return color

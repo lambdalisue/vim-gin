@@ -4,7 +4,7 @@ import * as batch from "https://deno.land/x/denops_std@v5.0.1/batch/mod.ts";
 import * as buffer from "https://deno.land/x/denops_std@v5.0.1/buffer/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v5.0.1/function/mod.ts";
 import * as vars from "https://deno.land/x/denops_std@v5.0.1/variable/mod.ts";
-import * as unknownutil from "https://deno.land/x/unknownutil@v2.1.1/mod.ts#^";
+import { ensure, is } from "https://deno.land/x/unknownutil@v3.0.0/mod.ts#^";
 import * as path from "https://deno.land/std@0.192.0/path/mod.ts";
 import * as streams from "https://deno.land/std@0.192.0/streams/mod.ts";
 import { deferred } from "https://deno.land/std@0.192.0/async/mod.ts";
@@ -30,7 +30,7 @@ export async function listen(denops: Denops): Promise<void> {
       "GIN_PROXY_ADDRESS",
       JSON.stringify(listener.addr),
     );
-    if (!unknownutil.ensureBoolean(disableAskpass ?? false)) {
+    if (!ensure(disableAskpass ?? false, is.Boolean)) {
       const script = path.fromFileUrl(new URL("askpass.ts", import.meta.url));
       await vars.e.set(
         denops,
@@ -38,7 +38,7 @@ export async function listen(denops: Denops): Promise<void> {
         denops.meta.platform === "windows" ? `"${script}"` : `'${script}'`,
       );
     }
-    if (!unknownutil.ensureBoolean(disableEditor ?? false)) {
+    if (!ensure(disableEditor ?? false, is.Boolean)) {
       const script = path.fromFileUrl(new URL("editor.ts", import.meta.url));
       await vars.e.set(
         denops,
