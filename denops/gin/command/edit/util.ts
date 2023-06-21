@@ -1,11 +1,11 @@
-import * as unknownutil from "https://deno.land/x/unknownutil@v2.1.1/mod.ts";
+import { assert, is } from "https://deno.land/x/unknownutil@v3.0.0/mod.ts#^";
 
 export function formatTreeish(
   commitish: string | string[] | undefined,
   relpath: string,
 ): [] | [string] {
   if (commitish) {
-    unknownutil.assertString(commitish);
+    assert(commitish, is.String);
     return [`${commitish}:${relpath}`];
   } else {
     return [`:${relpath}`];

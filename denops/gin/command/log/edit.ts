@@ -1,19 +1,19 @@
-import type { Denops } from "https://deno.land/x/denops_std@v5.0.0/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v5.0.1/mod.ts";
 import { unnullish } from "https://deno.land/x/unnullish@v1.0.1/mod.ts";
-import { ensureString } from "https://deno.land/x/unknownutil@v2.1.1/mod.ts";
-import * as fn from "https://deno.land/x/denops_std@v5.0.0/function/mod.ts";
-import * as batch from "https://deno.land/x/denops_std@v5.0.0/batch/mod.ts";
-import * as buffer from "https://deno.land/x/denops_std@v5.0.0/buffer/mod.ts";
-import * as option from "https://deno.land/x/denops_std@v5.0.0/option/mod.ts";
-import * as vars from "https://deno.land/x/denops_std@v5.0.0/variable/mod.ts";
-import { parse as parseBufname } from "https://deno.land/x/denops_std@v5.0.0/bufname/mod.ts";
+import { ensure, is } from "https://deno.land/x/unknownutil@v3.0.0/mod.ts#^";
+import * as fn from "https://deno.land/x/denops_std@v5.0.1/function/mod.ts";
+import * as batch from "https://deno.land/x/denops_std@v5.0.1/batch/mod.ts";
+import * as buffer from "https://deno.land/x/denops_std@v5.0.1/buffer/mod.ts";
+import * as option from "https://deno.land/x/denops_std@v5.0.1/option/mod.ts";
+import * as vars from "https://deno.land/x/denops_std@v5.0.1/variable/mod.ts";
+import { parse as parseBufname } from "https://deno.land/x/denops_std@v5.0.1/bufname/mod.ts";
 import {
   builtinOpts,
   Flags,
   formatFlags,
   parseOpts,
   validateOpts,
-} from "https://deno.land/x/denops_std@v5.0.0/argument/mod.ts";
+} from "https://deno.land/x/denops_std@v5.0.1/argument/mod.ts";
 import { bind } from "../../command/bare/command.ts";
 import { exec as execBuffer } from "../../command/buffer/edit.ts";
 import { init as initActionCore, Range } from "../../action/core.ts";
@@ -40,7 +40,7 @@ export async function edit(
   const { expr, params, fragment } = parseBufname(bufname);
   await exec(denops, bufnr, {
     worktree: expr,
-    commitish: unnullish(params?.commitish, ensureString),
+    commitish: unnullish(params?.commitish, (x) => ensure(x, is.String)),
     paths: unnullish(fragment, JSON.parse),
     flags: {
       ...params,
@@ -120,7 +120,10 @@ async function gatherCandidates(
     ),
     vars.g.get(denops, "gin_log_parse_pattern"),
   ]);
-  const pattern = unnullish(patternStr, (v) => new RegExp(ensureString(v)));
+  const pattern = unnullish(
+    patternStr,
+    (v) => new RegExp(ensure(v, is.String)),
+  );
   const result = parseLog(content, pattern);
   return result.entries;
 }

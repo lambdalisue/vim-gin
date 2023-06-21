@@ -1,13 +1,13 @@
-import type { Denops } from "https://deno.land/x/denops_std@v5.0.0/mod.ts";
-import * as unknownutil from "https://deno.land/x/unknownutil@v2.1.1/mod.ts";
-import * as vars from "https://deno.land/x/denops_std@v5.0.0/variable/mod.ts";
-import * as helper from "https://deno.land/x/denops_std@v5.0.0/helper/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v5.0.1/mod.ts";
+import { assert, is } from "https://deno.land/x/unknownutil@v3.0.0/mod.ts#^";
+import * as vars from "https://deno.land/x/denops_std@v5.0.1/variable/mod.ts";
+import * as helper from "https://deno.land/x/denops_std@v5.0.1/helper/mod.ts";
 import {
   builtinOpts,
   formatOpts,
   parseOpts,
   validateOpts,
-} from "https://deno.land/x/denops_std@v5.0.0/argument/mod.ts";
+} from "https://deno.land/x/denops_std@v5.0.1/argument/mod.ts";
 import {
   normCmdArgs,
   parseDisableDefaultArgs,
@@ -22,9 +22,9 @@ export function main(denops: Denops): void {
   denops.dispatcher = {
     ...denops.dispatcher,
     "edit:command": (bang, mods, args) => {
-      unknownutil.assertString(bang);
-      unknownutil.assertString(mods);
-      unknownutil.assertArray(args, unknownutil.isString);
+      assert(bang, is.String);
+      assert(mods, is.String);
+      assert(args, is.ArrayOf(is.String));
       const [disableDefaultArgs, realArgs] = parseDisableDefaultArgs(args);
       const silent = parseSilent(mods);
       return helper.ensureSilent(denops, silent, () => {
@@ -38,18 +38,18 @@ export function main(denops: Denops): void {
       });
     },
     "edit:edit": (bufnr, bufname) => {
-      unknownutil.assertNumber(bufnr);
-      unknownutil.assertString(bufname);
+      assert(bufnr, is.Number);
+      assert(bufname, is.String);
       return helper.friendlyCall(denops, () => edit(denops, bufnr, bufname));
     },
     "edit:read": (bufnr, bufname) => {
-      unknownutil.assertNumber(bufnr);
-      unknownutil.assertString(bufname);
+      assert(bufnr, is.Number);
+      assert(bufname, is.String);
       return helper.friendlyCall(denops, () => read(denops, bufnr, bufname));
     },
     "edit:write": (bufnr, bufname) => {
-      unknownutil.assertNumber(bufnr);
-      unknownutil.assertString(bufname);
+      assert(bufnr, is.Number);
+      assert(bufname, is.String);
       return helper.friendlyCall(denops, () => write(denops, bufnr, bufname));
     },
   };
@@ -72,7 +72,7 @@ async function command(
       "gin_edit_default_args",
       [],
     );
-    unknownutil.assertArray(defaultArgs, unknownutil.isString);
+    assert(defaultArgs, is.ArrayOf(is.String));
     args = [...defaultArgs, ...args];
   }
   const [opts, residue] = parseOpts(await normCmdArgs(denops, args));

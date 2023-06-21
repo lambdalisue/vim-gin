@@ -1,13 +1,13 @@
-import type { Denops } from "https://deno.land/x/denops_std@v5.0.0/mod.ts";
-import { ensureString } from "https://deno.land/x/unknownutil@v2.1.1/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v5.0.1/mod.ts";
+import { ensure, is } from "https://deno.land/x/unknownutil@v3.0.0/mod.ts#^";
 import { unnullish } from "https://deno.land/x/unnullish@v1.0.1/mod.ts";
-import * as buffer from "https://deno.land/x/denops_std@v5.0.0/buffer/mod.ts";
-import * as vars from "https://deno.land/x/denops_std@v5.0.0/variable/mod.ts";
+import * as buffer from "https://deno.land/x/denops_std@v5.0.1/buffer/mod.ts";
+import * as vars from "https://deno.land/x/denops_std@v5.0.1/variable/mod.ts";
 import {
   parseOpts,
   validateOpts,
-} from "https://deno.land/x/denops_std@v5.0.0/argument/mod.ts";
-import { parse as parseBufname } from "https://deno.land/x/denops_std@v5.0.0/bufname/mod.ts";
+} from "https://deno.land/x/denops_std@v5.0.1/argument/mod.ts";
+import { parse as parseBufname } from "https://deno.land/x/denops_std@v5.0.1/bufname/mod.ts";
 import { execute } from "../../git/executor.ts";
 import { formatTreeish } from "./util.ts";
 
@@ -25,7 +25,7 @@ export async function read(
   }
   await exec(denops, bufnr, fragment, {
     worktree: expr,
-    commitish: unnullish(params?.commitish, ensureString),
+    commitish: unnullish(params?.commitish, (v) => ensure(v, is.String)),
     encoding: opts.enc ?? opts.encoding,
     fileformat: opts.ff ?? opts.fileformat,
   });

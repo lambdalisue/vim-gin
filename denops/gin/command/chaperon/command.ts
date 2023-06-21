@@ -1,12 +1,12 @@
-import type { Denops } from "https://deno.land/x/denops_std@v5.0.0/mod.ts";
-import * as batch from "https://deno.land/x/denops_std@v5.0.0/batch/mod.ts";
-import * as fn from "https://deno.land/x/denops_std@v5.0.0/function/mod.ts";
-import * as mapping from "https://deno.land/x/denops_std@v5.0.0/mapping/mod.ts";
-import * as vars from "https://deno.land/x/denops_std@v5.0.0/variable/mod.ts";
-import * as unknownutil from "https://deno.land/x/unknownutil@v2.1.1/mod.ts";
-import * as path from "https://deno.land/std@0.188.0/path/mod.ts";
-import * as option from "https://deno.land/x/denops_std@v5.0.0/option/mod.ts";
-import * as buffer from "https://deno.land/x/denops_std@v5.0.0/buffer/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v5.0.1/mod.ts";
+import * as batch from "https://deno.land/x/denops_std@v5.0.1/batch/mod.ts";
+import * as fn from "https://deno.land/x/denops_std@v5.0.1/function/mod.ts";
+import * as mapping from "https://deno.land/x/denops_std@v5.0.1/mapping/mod.ts";
+import * as vars from "https://deno.land/x/denops_std@v5.0.1/variable/mod.ts";
+import { assert, is } from "https://deno.land/x/unknownutil@v3.0.0/mod.ts#^";
+import * as path from "https://deno.land/std@0.192.0/path/mod.ts";
+import * as option from "https://deno.land/x/denops_std@v5.0.1/option/mod.ts";
+import * as buffer from "https://deno.land/x/denops_std@v5.0.1/buffer/mod.ts";
 import { findWorktreeFromDenops } from "../../git/worktree.ts";
 import { exec as execEdit } from "../edit/command.ts";
 import { AliasHead, getInProgressAliasHead, stripConflicts } from "./util.ts";
@@ -41,9 +41,9 @@ export async function exec(
           ),
         ],
       );
-  unknownutil.assertNumber(noSupplements);
-  unknownutil.assertNumber(supplementHeight);
-  unknownutil.assertBoolean(disableDefaultMappings);
+  assert(noSupplements, is.Number);
+  assert(supplementHeight, is.Number);
+  assert(disableDefaultMappings, is.Boolean);
 
   const worktree = await findWorktreeFromDenops(denops, {
     worktree: options.worktree,

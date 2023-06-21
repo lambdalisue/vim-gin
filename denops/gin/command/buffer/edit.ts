@@ -1,18 +1,18 @@
-import type { Denops } from "https://deno.land/x/denops_std@v5.0.0/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v5.0.1/mod.ts";
 import { unnullish } from "https://deno.land/x/unnullish@v1.0.1/mod.ts";
-import * as unknownutil from "https://deno.land/x/unknownutil@v2.1.1/mod.ts";
-import * as batch from "https://deno.land/x/denops_std@v5.0.0/batch/mod.ts";
-import * as buffer from "https://deno.land/x/denops_std@v5.0.0/buffer/mod.ts";
-import * as option from "https://deno.land/x/denops_std@v5.0.0/option/mod.ts";
-import * as vars from "https://deno.land/x/denops_std@v5.0.0/variable/mod.ts";
+import { ensure, is } from "https://deno.land/x/unknownutil@v3.0.0/mod.ts#^";
+import * as batch from "https://deno.land/x/denops_std@v5.0.1/batch/mod.ts";
+import * as buffer from "https://deno.land/x/denops_std@v5.0.1/buffer/mod.ts";
+import * as option from "https://deno.land/x/denops_std@v5.0.1/option/mod.ts";
+import * as vars from "https://deno.land/x/denops_std@v5.0.1/variable/mod.ts";
 import {
   builtinOpts,
   parseOpts,
   validateOpts,
-} from "https://deno.land/x/denops_std@v5.0.0/argument/mod.ts";
+} from "https://deno.land/x/denops_std@v5.0.1/argument/mod.ts";
 import {
   parse as parseBufname,
-} from "https://deno.land/x/denops_std@v5.0.0/bufname/mod.ts";
+} from "https://deno.land/x/denops_std@v5.0.1/bufname/mod.ts";
 import {
   buildDecorationsFromAnsiEscapeCode,
 } from "../../util/ansi_escape_code.ts";
@@ -30,14 +30,14 @@ export async function edit(
   if (!fragment) {
     throw new Error(`A buffer '${scheme}://' requires a fragment part`);
   }
-  const args = unknownutil.ensureArray(
+  const args = ensure(
     fragment.replace(/\$$/, "").split(" "),
-    unknownutil.isString,
+    is.ArrayOf(is.String),
   );
   await exec(denops, bufnr, args, {
     processor: unnullish(
       params?.processor,
-      (v) => unknownutil.ensureString(v).split(" "),
+      (v) => ensure(v, is.String).split(" "),
     ),
     worktree: expr,
     monochrome: "monochrome" in (params ?? {}),

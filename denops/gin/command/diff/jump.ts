@@ -1,12 +1,12 @@
-import type { Denops } from "https://deno.land/x/denops_std@v5.0.0/mod.ts";
-import * as unknownutil from "https://deno.land/x/unknownutil@v2.1.1/mod.ts";
-import * as path from "https://deno.land/std@0.188.0/path/mod.ts";
-import * as batch from "https://deno.land/x/denops_std@v5.0.0/batch/mod.ts";
-import * as buffer from "https://deno.land/x/denops_std@v5.0.0/buffer/mod.ts";
-import * as fn from "https://deno.land/x/denops_std@v5.0.0/function/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v5.0.1/mod.ts";
+import { ensure, is } from "https://deno.land/x/unknownutil@v3.0.0/mod.ts#^";
+import * as path from "https://deno.land/std@0.192.0/path/mod.ts";
+import * as batch from "https://deno.land/x/denops_std@v5.0.1/batch/mod.ts";
+import * as buffer from "https://deno.land/x/denops_std@v5.0.1/buffer/mod.ts";
+import * as fn from "https://deno.land/x/denops_std@v5.0.1/function/mod.ts";
 import {
   parse as parseBufname,
-} from "https://deno.land/x/denops_std@v5.0.0/bufname/mod.ts";
+} from "https://deno.land/x/denops_std@v5.0.1/bufname/mod.ts";
 import { exec as execEdit } from "../edit/command.ts";
 import { Commitish, INDEX, parseCommitish, WORKTREE } from "./commitish.ts";
 
@@ -131,7 +131,7 @@ async function jump(
   }
   const filename = path.join(expr, jump.path.replace(/^[ab]\//, ""));
   const cached = "cached" in (params ?? {});
-  const commitish = unknownutil.ensureString(params?.commitish ?? "");
+  const commitish = ensure(params?.commitish ?? "", is.String);
   const target = parser(commitish, cached);
   if (target === INDEX) {
     await execEdit(denops, filename, {
