@@ -28,7 +28,10 @@ export async function edit(
   }
   await exec(denops, bufnr, fragment, {
     worktree: expr,
-    commitish: unnullish(params?.commitish, (v) => ensure(v, is.String)),
+    commitish: unnullish(
+      params?.commitish,
+      (v) => ensure(v, is.String, { message: "commitish must be string" }),
+    ),
     encoding: opts.enc ?? opts.encoding,
     fileformat: opts.ff ?? opts.fileformat,
   });

@@ -40,7 +40,10 @@ export async function edit(
   const { expr, params, fragment } = parseBufname(bufname);
   await exec(denops, bufnr, {
     worktree: expr,
-    commitish: unnullish(params?.commitish, (x) => ensure(x, is.String)),
+    commitish: unnullish(
+      params?.commitish,
+      (x) => ensure(x, is.String, { message: "commitish must be string" }),
+    ),
     paths: unnullish(fragment, JSON.parse),
     flags: {
       ...params,
@@ -122,7 +125,12 @@ async function gatherCandidates(
   ]);
   const pattern = unnullish(
     patternStr,
-    (v) => new RegExp(ensure(v, is.String)),
+    (v) =>
+      new RegExp(
+        ensure(v, is.String, {
+          message: "g:gin_log_parse_pattern must be string",
+        }),
+      ),
   );
   const result = parseLog(content, pattern);
   return result.entries;

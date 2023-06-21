@@ -22,9 +22,9 @@ export function main(denops: Denops): void {
   denops.dispatcher = {
     ...denops.dispatcher,
     "edit:command": (bang, mods, args) => {
-      assert(bang, is.String);
-      assert(mods, is.String);
-      assert(args, is.ArrayOf(is.String));
+      assert(bang, is.String, { message: "bang must be string" });
+      assert(mods, is.String, { message: "mods must be string" });
+      assert(args, is.ArrayOf(is.String), { message: "args must be string[]" });
       const [disableDefaultArgs, realArgs] = parseDisableDefaultArgs(args);
       const silent = parseSilent(mods);
       return helper.ensureSilent(denops, silent, () => {
@@ -38,18 +38,18 @@ export function main(denops: Denops): void {
       });
     },
     "edit:edit": (bufnr, bufname) => {
-      assert(bufnr, is.Number);
-      assert(bufname, is.String);
+      assert(bufnr, is.Number, { message: "bufnr must be number" });
+      assert(bufname, is.String, { message: "bufname must be string" });
       return helper.friendlyCall(denops, () => edit(denops, bufnr, bufname));
     },
     "edit:read": (bufnr, bufname) => {
-      assert(bufnr, is.Number);
-      assert(bufname, is.String);
+      assert(bufnr, is.Number, { message: "bufnr must be number" });
+      assert(bufname, is.String, { message: "bufname must be string" });
       return helper.friendlyCall(denops, () => read(denops, bufnr, bufname));
     },
     "edit:write": (bufnr, bufname) => {
-      assert(bufnr, is.Number);
-      assert(bufname, is.String);
+      assert(bufnr, is.Number, { message: "bufnr must be number" });
+      assert(bufname, is.String, { message: "bufname must be string" });
       return helper.friendlyCall(denops, () => write(denops, bufnr, bufname));
     },
   };
@@ -72,7 +72,9 @@ async function command(
       "gin_edit_default_args",
       [],
     );
-    assert(defaultArgs, is.ArrayOf(is.String));
+    assert(defaultArgs, is.ArrayOf(is.String), {
+      message: "g:gin_edit_default_args must be string[]",
+    });
     args = [...defaultArgs, ...args];
   }
   const [opts, residue] = parseOpts(await normCmdArgs(denops, args));

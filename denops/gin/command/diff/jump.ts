@@ -131,7 +131,9 @@ async function jump(
   }
   const filename = path.join(expr, jump.path.replace(/^[ab]\//, ""));
   const cached = "cached" in (params ?? {});
-  const commitish = ensure(params?.commitish ?? "", is.String);
+  const commitish = ensure(params?.commitish ?? "", is.String, {
+    message: "commitish must be string",
+  });
   const target = parser(commitish, cached);
   if (target === INDEX) {
     await execEdit(denops, filename, {

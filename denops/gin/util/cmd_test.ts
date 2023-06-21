@@ -2,7 +2,6 @@ import { assertEquals } from "https://deno.land/std@0.192.0/testing/asserts.ts";
 import { test } from "https://deno.land/x/denops_test@v1.4.0/mod.ts";
 import * as batch from "https://deno.land/x/denops_std@v5.0.1/batch/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v5.0.1/function/mod.ts";
-import { ensure, is } from "https://deno.land/x/unknownutil@v3.0.0/mod.ts#^";
 import * as path from "https://deno.land/std@0.192.0/path/mod.ts";
 import { deadline } from "https://deno.land/std@0.192.0/async/mod.ts";
 import { normCmdArgs } from "./cmd.ts";
@@ -59,7 +58,7 @@ test({
           await denops.cmd("edit dummy1");
           await denops.cmd("file dummy2");
         });
-        const cwd = ensure(await fn.getcwd(denops), is.String);
+        const cwd = await fn.getcwd(denops);
         const src = ["%", "%:p", "%hello", "#", "#:p", "#hello"];
         const dst = await normCmdArgs(denops, src);
         const exp = [

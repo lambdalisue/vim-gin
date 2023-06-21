@@ -19,9 +19,9 @@ export function main(denops: Denops): void {
   denops.dispatcher = {
     ...denops.dispatcher,
     "chaperon:command": (bang, mods, args) => {
-      assert(bang, is.String);
-      assert(mods, is.String);
-      assert(args, is.ArrayOf(is.String));
+      assert(bang, is.String, { message: "bang must be string" });
+      assert(mods, is.String, { message: "mods must be string" });
+      assert(args, is.ArrayOf(is.String), { message: "args must be string[]" });
       const [disableDefaultArgs, realArgs] = parseDisableDefaultArgs(args);
       const silent = parseSilent(mods);
       return helper.ensureSilent(denops, silent, () => {
@@ -54,7 +54,9 @@ async function command(
       "gin_chaperon_default_args",
       [],
     );
-    assert(defaultArgs, is.ArrayOf(is.String));
+    assert(defaultArgs, is.ArrayOf(is.String), {
+      message: "g:gin_chaperon_default_args must be string[]",
+    });
     args = [...defaultArgs, ...args];
   }
   const [opts, _, residue] = parse(await normCmdArgs(denops, args));

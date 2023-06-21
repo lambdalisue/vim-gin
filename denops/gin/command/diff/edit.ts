@@ -30,10 +30,16 @@ export async function edit(
   await exec(denops, bufnr, {
     processor: unnullish(
       params?.processor,
-      (v) => ensure(v, is.String).split(" "),
+      (v) =>
+        ensure(v, is.String, { message: "processor must be string" }).split(
+          " ",
+        ),
     ),
     worktree: expr,
-    commitish: unnullish(params?.commitish, (v) => ensure(v, is.String)),
+    commitish: unnullish(
+      params?.commitish,
+      (v) => ensure(v, is.String, { message: "commitish must be string" }),
+    ),
     paths: unnullish(fragment, JSON.parse),
     flags: {
       ...params,

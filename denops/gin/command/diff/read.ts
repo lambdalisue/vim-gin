@@ -26,7 +26,10 @@ export async function read(
   await exec(denops, bufnr, {
     processor: unnullish(opts.processor, (v) => v.split(" ")),
     worktree: expr,
-    commitish: unnullish(params?.commitish, (v) => ensure(v, is.String)),
+    commitish: unnullish(
+      params?.commitish,
+      (v) => ensure(v, is.String, { message: "commitish must be string" }),
+    ),
     paths: unnullish(fragment, JSON.parse),
     flags: {
       ...params,

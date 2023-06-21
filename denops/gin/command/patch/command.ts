@@ -36,7 +36,9 @@ export async function exec(
       ),
     ],
   );
-  assert(disableDefaultMappings, is.Boolean);
+  assert(disableDefaultMappings, is.Boolean, {
+    message: "g:gin_patch_disable_default_mappings must be boolean",
+  });
 
   const worktree = await findWorktreeFromDenops(denops, {
     worktree: options.worktree,

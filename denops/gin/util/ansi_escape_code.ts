@@ -19,7 +19,9 @@ export async function buildDecorationsFromAnsiEscapeCode(
   content: string[],
 ): Promise<[string[], Decoration[]]> {
   const colors = await denops.call("gin#internal#util#ansi_escape_code#colors");
-  assert(colors, is.ArrayOf(is.String));
+  assert(colors, is.ArrayOf(is.String), {
+    message: "gin#internal#util#ansi_escape_code#colors() must be string[]",
+  });
   const trimmed: string[] = [];
   const decorations: Decoration[] = [];
   const highlights: Map<string, ansiEscapeCode.Sgr> = new Map();

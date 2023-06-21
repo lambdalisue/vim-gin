@@ -5,7 +5,7 @@ export function formatTreeish(
   relpath: string,
 ): [] | [string] {
   if (commitish) {
-    assert(commitish, is.String);
+    assert(commitish, is.String, { message: "commitish must be string" });
     return [`${commitish}:${relpath}`];
   } else {
     return [`:${relpath}`];

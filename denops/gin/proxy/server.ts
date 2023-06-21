@@ -30,7 +30,11 @@ export async function listen(denops: Denops): Promise<void> {
       "GIN_PROXY_ADDRESS",
       JSON.stringify(listener.addr),
     );
-    if (!ensure(disableAskpass ?? false, is.Boolean)) {
+    if (
+      !ensure(disableAskpass ?? false, is.Boolean, {
+        message: "g:gin_proxy_disable_askpass must be boolean",
+      })
+    ) {
       const script = path.fromFileUrl(new URL("askpass.ts", import.meta.url));
       await vars.e.set(
         denops,
@@ -38,7 +42,11 @@ export async function listen(denops: Denops): Promise<void> {
         denops.meta.platform === "windows" ? `"${script}"` : `'${script}'`,
       );
     }
-    if (!ensure(disableEditor ?? false, is.Boolean)) {
+    if (
+      !ensure(disableEditor ?? false, is.Boolean, {
+        message: "g:gin_proxy_disable_editor must be boolean",
+      })
+    ) {
       const script = path.fromFileUrl(new URL("editor.ts", import.meta.url));
       await vars.e.set(
         denops,

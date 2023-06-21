@@ -41,9 +41,15 @@ export async function exec(
           ),
         ],
       );
-  assert(noSupplements, is.Number);
-  assert(supplementHeight, is.Number);
-  assert(disableDefaultMappings, is.Boolean);
+  assert(noSupplements, is.Number, {
+    message: "g:gin_chaperon_supplement_disable must be number",
+  });
+  assert(supplementHeight, is.Number, {
+    message: "g:gin_chaperon_supplement_height must be number",
+  });
+  assert(disableDefaultMappings, is.Boolean, {
+    message: "g:gin_chaperon_disable_default_mappings must be boolean",
+  });
 
   const worktree = await findWorktreeFromDenops(denops, {
     worktree: options.worktree,

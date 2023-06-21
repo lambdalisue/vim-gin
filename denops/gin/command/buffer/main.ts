@@ -19,9 +19,9 @@ export function main(denops: Denops): void {
   denops.dispatcher = {
     ...denops.dispatcher,
     "buffer:command": (bang, mods, args) => {
-      assert(bang, is.String);
-      assert(mods, is.String);
-      assert(args, is.ArrayOf(is.String));
+      assert(bang, is.String, { message: "bang must be string" });
+      assert(mods, is.String, { message: "mods must be string" });
+      assert(args, is.ArrayOf(is.String), { message: "args must be string[]" });
       const silent = parseSilent(mods);
       return helper.ensureSilent(denops, silent, () => {
         return helper.friendlyCall(
@@ -31,16 +31,16 @@ export function main(denops: Denops): void {
       });
     },
     "buffer:edit": (bufnr, bufname) => {
-      assert(bufnr, is.Number);
-      assert(bufname, is.String);
+      assert(bufnr, is.Number, { message: "bufnr must be number" });
+      assert(bufname, is.String, { message: "bufname must be string" });
       return helper.friendlyCall(
         denops,
         () => edit(denops, bufnr, bufname),
       );
     },
     "buffer:read": (bufnr, bufname) => {
-      assert(bufnr, is.Number);
-      assert(bufname, is.String);
+      assert(bufnr, is.Number, { message: "bufnr must be number" });
+      assert(bufname, is.String, { message: "bufname must be string" });
       return helper.friendlyCall(
         denops,
         () => read(denops, bufnr, bufname),

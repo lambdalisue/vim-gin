@@ -25,14 +25,14 @@ export async function read(
   if (!fragment) {
     throw new Error(`A buffer '${scheme}://' requires a fragment part`);
   }
-  const args = ensure(
-    fragment.replace(/\$$/, "").split(" "),
-    is.ArrayOf(is.String),
-  );
+  const args = fragment.replace(/\$$/, "").split(" ");
   await exec(denops, bufnr, args, {
     processor: unnullish(
       params?.processor,
-      (v) => ensure(v, is.String).split(" "),
+      (v) =>
+        ensure(v, is.String, { message: "processor must be string" }).split(
+          " ",
+        ),
     ),
     worktree: expr,
     encoding: opts.enc ?? opts.encoding,

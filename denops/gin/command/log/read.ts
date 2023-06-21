@@ -19,13 +19,16 @@ export async function read(
   bufnr: number,
   bufname: string,
 ): Promise<void> {
-  const cmdarg = await vars.v.get(denops, "cmdarg") as string;
+  const cmdarg = ensure(await vars.v.get(denops, "cmdarg"), is.String);
   const [opts, _] = parseOpts(cmdarg.split(" "));
   validateOpts(opts, builtinOpts);
   const { expr, params, fragment } = parseBufname(bufname);
   await exec(denops, bufnr, {
     worktree: expr,
-    commitish: unnullish(params?.commitish, (v) => ensure(v, is.String)),
+    commitish: unnullish(
+      params?.commitish,
+      (v) => ensure(v, is.String, { message: "commitish must be string" }),
+    ),
     paths: unnullish(fragment, JSON.parse),
     flags: {
       ...params,

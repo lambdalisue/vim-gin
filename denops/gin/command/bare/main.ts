@@ -12,8 +12,8 @@ export function main(denops: Denops): void {
   denops.dispatcher = {
     ...denops.dispatcher,
     "command": (mods, args) => {
-      assert(mods, is.String);
-      assert(args, is.ArrayOf(is.String));
+      assert(mods, is.String, { message: "mods must be string" });
+      assert(args, is.ArrayOf(is.String), { message: "args must be string[]" });
       const silent = parseSilent(mods);
       return helper.ensureSilent(denops, silent, () => {
         return helper.friendlyCall(denops, () => command(denops, args));
