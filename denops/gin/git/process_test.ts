@@ -1,7 +1,7 @@
 import {
   assert,
   assertRejects,
-} from "https://deno.land/std@0.188.0/testing/asserts.ts";
+} from "https://deno.land/std@0.192.0/testing/asserts.ts";
 import { decodeUtf8 } from "../util/text.ts";
 import { execute, ExecuteError, run } from "./process.ts";
 
