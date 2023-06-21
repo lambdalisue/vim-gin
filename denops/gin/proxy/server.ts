@@ -4,7 +4,7 @@ import * as batch from "https://deno.land/x/denops_std@v5.0.0/batch/mod.ts";
 import * as buffer from "https://deno.land/x/denops_std@v5.0.0/buffer/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v5.0.0/function/mod.ts";
 import * as vars from "https://deno.land/x/denops_std@v5.0.0/variable/mod.ts";
-import * as unknownutil from "https://deno.land/x/unknownutil@v2.1.1/mod.ts";
+import * as unknownutil from "https://deno.land/x/unknownutil@v2.1.1/mod.ts#^";
 import * as path from "https://deno.land/std@0.188.0/path/mod.ts";
 import * as streams from "https://deno.land/std@0.188.0/streams/mod.ts";
 import { deferred } from "https://deno.land/std@0.188.0/async/mod.ts";

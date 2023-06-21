@@ -3,7 +3,7 @@ import {
   assertArray,
   isNumber,
   isString,
-} from "https://deno.land/x/unknownutil@v2.1.1/mod.ts";
+} from "https://deno.land/x/unknownutil@v2.1.1/mod.ts#^";
 import { unnullish } from "https://deno.land/x/unnullish@v1.0.1/mod.ts";
 import * as itertools from "https://deno.land/x/itertools@v1.1.1/mod.ts";
 import * as ansiEscapeCode from "https://deno.land/x/ansi_escape_code@v1.0.2/mod.ts";
