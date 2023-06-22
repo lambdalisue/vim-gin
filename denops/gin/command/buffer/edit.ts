@@ -1,4 +1,5 @@
 import type { Denops } from "https://deno.land/x/denops_std@v5.0.1/mod.ts";
+import { emojify } from "https://deno.land/x/github_emoji@v0.1.1/mod.ts";
 import { unnullish } from "https://deno.land/x/unnullish@v1.0.1/mod.ts";
 import { ensure, is } from "https://deno.land/x/unknownutil@v3.0.0/mod.ts#^";
 import * as batch from "https://deno.land/x/denops_std@v5.0.1/batch/mod.ts";
@@ -43,6 +44,7 @@ export async function edit(
     monochrome: "monochrome" in (params ?? {}),
     encoding: opts.enc ?? opts.encoding,
     fileformat: opts.ff ?? opts.fileformat,
+    emojify: "emojify" in (params ?? {}),
   });
 }
 
@@ -52,6 +54,7 @@ export type ExecOptions = {
   monochrome?: boolean;
   encoding?: string;
   fileformat?: string;
+  emojify?: boolean;
   stdoutIndicator?: string;
   stderrIndicator?: string;
 };
@@ -96,10 +99,15 @@ export async function exec(
     denops,
     content,
   );
-  await buffer.replace(denops, bufnr, trimmed, {
-    fileformat,
-    fileencoding,
-  });
+  await buffer.replace(
+    denops,
+    bufnr,
+    options.emojify ? trimmed.map(emojify) : trimmed,
+    {
+      fileformat,
+      fileencoding,
+    },
+  );
   await buffer.decorate(denops, bufnr, decorations);
   await buffer.concrete(denops, bufnr);
   await buffer.ensure(denops, bufnr, async () => {

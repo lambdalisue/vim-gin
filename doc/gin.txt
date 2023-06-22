@@ -121,6 +121,9 @@ COMMANDS					*gin-commands*
 		Displays the result in black and white without coloring.
 		Use this option when the resulting data is large and coloring
 		may cause performance problems.
+	
+	++emojify
+		Replace all ":emoji:" with emoji characters.
 
 	++processor={processor}
 		Specifies the processor program that will process the result.
@@ -269,6 +272,11 @@ COMMANDS					*gin-commands*
 							*:GinLog*
 :GinLog[!][&] [{++option}...] [{commitish}] [-- {pathspec}...]
 	Open a "gin-log" buffer to show a git log.
+	
+	The following options are valid as {++option}:
+
+	++emojify
+		Replace all ":emoji:" with emoji characters.
 
 	See |gin-commands-options| for common {++option}.
 		

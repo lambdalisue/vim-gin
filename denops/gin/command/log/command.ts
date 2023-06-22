@@ -15,6 +15,7 @@ export type ExecOptions = {
   paths?: string[];
   flags?: Flags;
   opener?: string;
+  emojify?: boolean;
   cmdarg?: string;
   mods?: string;
   bang?: boolean;
@@ -41,6 +42,7 @@ export async function exec(
     params: {
       ...options.flags ?? {},
       commitish: options.commitish,
+      emojify: unnullish(options.emojify, (v) => v ? "" : undefined),
     },
     fragment: unnullish(paths, JSON.stringify),
   });

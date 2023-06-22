@@ -61,6 +61,7 @@ async function command(
     "worktree",
     "monochrome",
     "opener",
+    "emojify",
     ...builtinOpts,
   ]);
   return exec(denops, residue, {
@@ -68,6 +69,7 @@ async function command(
     worktree: opts.worktree,
     monochrome: unnullish(opts.monochrome, () => true),
     opener: opts.opener,
+    emojify: unnullish(opts.emojify, () => true),
     cmdarg: formatOpts(opts, builtinOpts).join(" "),
     mods,
     bang: bang === "!",
