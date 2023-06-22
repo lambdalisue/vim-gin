@@ -1,4 +1,5 @@
 import type { Denops } from "https://deno.land/x/denops_std@v5.0.1/mod.ts";
+import { emojify } from "https://deno.land/x/github_emoji@v0.1.1/mod.ts";
 import { unnullish } from "https://deno.land/x/unnullish@v1.0.1/mod.ts";
 import { ensure, is } from "https://deno.land/x/unknownutil@v3.0.0/mod.ts#^";
 import * as buffer from "https://deno.land/x/denops_std@v5.0.1/buffer/mod.ts";
@@ -37,6 +38,7 @@ export async function read(
     worktree: expr,
     encoding: opts.enc ?? opts.encoding,
     fileformat: opts.ff ?? opts.fileformat,
+    emojify: "emojify" in (params ?? {}),
   });
 }
 
@@ -45,6 +47,7 @@ export type ExecOptions = {
   worktree?: string;
   encoding?: string;
   fileformat?: string;
+  emojify?: boolean;
   lnum?: number;
 };
 
@@ -68,7 +71,12 @@ export async function exec(
       fileencoding: options.encoding,
     },
   );
-  await buffer.append(denops, bufnr, content, {
-    lnum: options.lnum,
-  });
+  await buffer.append(
+    denops,
+    bufnr,
+    options.emojify ? content.map(emojify) : content,
+    {
+      lnum: options.lnum,
+    },
+  );
 }

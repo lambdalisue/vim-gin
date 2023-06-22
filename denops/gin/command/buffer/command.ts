@@ -12,6 +12,7 @@ export type ExecOptions = {
   worktree?: string;
   monochrome?: boolean;
   opener?: string;
+  emojify?: boolean;
   cmdarg?: string;
   mods?: string;
   bang?: boolean;
@@ -33,6 +34,7 @@ export async function exec(
     params: {
       processor: unnullish(options.processor, (v) => v.join(" ")),
       monochrome: unnullish(options.monochrome, (v) => v ? "" : undefined),
+      emojify: unnullish(options.emojify, (v) => v ? "" : undefined),
     },
     fragment: `${args.join(" ")}$`,
   });

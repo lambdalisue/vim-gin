@@ -1,4 +1,5 @@
 import type { Denops } from "https://deno.land/x/denops_std@v5.0.1/mod.ts";
+import { unnullish } from "https://deno.land/x/unnullish@v1.0.1/unnullish.ts";
 import * as helper from "https://deno.land/x/denops_std@v5.0.1/helper/mod.ts";
 import { assert, is } from "https://deno.land/x/unknownutil@v3.0.0/mod.ts#^";
 import * as vars from "https://deno.land/x/denops_std@v5.0.1/variable/mod.ts";
@@ -276,6 +277,7 @@ async function command(
   validateOpts(opts, [
     "worktree",
     "opener",
+    "emojify",
     ...builtinOpts,
   ]);
   validateFlags(flags, allowedFlags);
@@ -286,6 +288,7 @@ async function command(
     paths,
     flags,
     opener: opts.opener,
+    emojify: unnullish(opts.emojify, () => true),
     cmdarg: formatOpts(opts, builtinOpts).join(" "),
     mods,
     bang: bang === "!",

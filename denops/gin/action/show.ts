@@ -23,7 +23,14 @@ export async function init(
         bufnr,
         `show:${opener}`,
         (denops, bufnr, range) =>
-          doShow(denops, bufnr, range, opener, gatherCandidates),
+          doShow(denops, bufnr, range, opener, false, gatherCandidates),
+      );
+      await define(
+        denops,
+        bufnr,
+        `show:${opener}:emojify`,
+        (denops, bufnr, range) =>
+          doShow(denops, bufnr, range, opener, true, gatherCandidates),
       );
     }
     await alias(
@@ -31,6 +38,12 @@ export async function init(
       bufnr,
       "show",
       "show:edit",
+    );
+    await alias(
+      denops,
+      bufnr,
+      "show:emojify",
+      "show:edit:emojify",
     );
   });
 }
@@ -40,12 +53,14 @@ async function doShow(
   bufnr: number,
   range: Range,
   opener: string,
+  emojify: boolean,
   gatherCandidates: GatherCandidates<Candidate>,
 ): Promise<void> {
   const xs = await gatherCandidates(denops, bufnr, range);
   for (const x of xs) {
     await execBuffer(denops, ["show", x.commit], {
       opener,
+      emojify,
     });
   }
 }

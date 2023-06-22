@@ -36,6 +36,7 @@ export async function read(
     },
     encoding: opts.enc ?? opts.encoding,
     fileformat: opts.ff ?? opts.fileformat,
+    emojify: "emojify" in (params ?? {}),
   });
 }
 
@@ -46,6 +47,7 @@ export type ExecOptions = {
   flags?: Flags;
   encoding?: string;
   fileformat?: string;
+  emojify?: boolean;
 };
 
 export async function exec(
@@ -65,5 +67,6 @@ export async function exec(
     worktree: options.worktree,
     encoding: options.encoding,
     fileformat: options.fileformat,
+    emojify: options.emojify,
   });
 }
