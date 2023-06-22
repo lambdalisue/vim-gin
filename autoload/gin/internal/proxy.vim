@@ -47,6 +47,7 @@ function s:confirm(bufnr) abort
     echohl None
   endtry
   redraw
-  call denops#request('gin', l:waiter, [l:result =~# '^\%(\|[yY]\%(es\)?\)$' ? v:true : v:false])
+  let l:success = l:result ==# '' || l:result =~? '^y\%[es]$'
+  call denops#request('gin', l:waiter, [l:success ? v:true : v:false])
   bwipeout
 endfunction
