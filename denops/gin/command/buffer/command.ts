@@ -32,7 +32,7 @@ export async function exec(
     expr: worktree,
     params: {
       processor: unnullish(options.processor, (v) => v.join(" ")),
-      monochrome: unnullish(options.monochrome, () => ""),
+      monochrome: unnullish(options.monochrome, (v) => v ? "" : undefined),
     },
     fragment: `${args.join(" ")}$`,
   });
