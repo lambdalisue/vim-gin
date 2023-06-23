@@ -8,7 +8,7 @@ function gin#internal#proxy#init(waiter) abort
   command! -buffer -nargs=0 Cancel call s:cancel()
   augroup gin_internal_proxy_init
     autocmd! * <buffer>
-    autocmd QuitPre <buffer> ++once call s:confirm(expand('<afile>'))
+    autocmd QuitPre <buffer> ++nested ++once call s:confirm(expand('<afile>'))
   augroup END
 endfunction
 
