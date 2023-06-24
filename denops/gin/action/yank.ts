@@ -1,8 +1,7 @@
 import type { Denops } from "https://deno.land/x/denops_std@v5.0.1/mod.ts";
 import * as batch from "https://deno.land/x/denops_std@v5.0.1/batch/mod.ts";
-import * as fn from "https://deno.land/x/denops_std@v5.0.1/function/mod.ts";
-import { v } from "https://deno.land/x/denops_std@v5.0.1/variable/mod.ts";
 import { define, GatherCandidates, Range } from "./core.ts";
+import { yank } from "../util/yank.ts";
 
 export type Candidate = { value: string };
 
@@ -43,6 +42,5 @@ async function doYank(
 ): Promise<void> {
   const xs = await gatherCandidates(denops, bufnr, range);
   const txt = xs.map((v) => v.value).join("\n");
-  const reg = await v.get(denops, "register");
-  await fn.setreg(denops, reg, txt);
+  await yank(denops, txt);
 }
