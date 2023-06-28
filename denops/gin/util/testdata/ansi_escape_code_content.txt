@@ -1,0 +1,5 @@
+[1mbold[0m
+[3mitalic[0m
+[4munderline[0m
+[9mstrikethrough[0m
+[31mred[0m
