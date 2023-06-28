@@ -136,6 +136,13 @@ function buildIndicatorStream(
   denops: Denops,
   name: string,
 ): IndicatorStream {
+  if (name === "null") {
+    return new IndicatorStream({
+      async open() {},
+      async write() {},
+      async close() {},
+    });
+  }
   const indicator = {
     async open(id: string) {
       await denops.call(
