@@ -1,0 +1,107 @@
+export const snapshot = {};
+
+snapshot[`buildDecorationsFromAnsiEscapeCode (vim) 1`] = `
+{
+  content: [
+    "\\x1b[1mbold\\x1b[0m",
+    "\\x1b[3mitalic\\x1b[0m",
+    "\\x1b[4munderline\\x1b[0m",
+    "\\x1b[9mstrikethrough\\x1b[0m",
+    "\\x1b[31mred\\x1b[0m",
+    "",
+  ],
+  decorations: [
+    {
+      column: 1,
+      highlight: "GinColorBold",
+      length: 4,
+      line: 1,
+    },
+    {
+      column: 1,
+      highlight: "GinColorItalic",
+      length: 6,
+      line: 2,
+    },
+    {
+      column: 1,
+      highlight: "GinColorUnderline",
+      length: 9,
+      line: 3,
+    },
+    {
+      column: 1,
+      highlight: "GinColorStrike",
+      length: 13,
+      line: 4,
+    },
+    {
+      column: 1,
+      highlight: "GinColorF1",
+      length: 3,
+      line: 5,
+    },
+  ],
+  trimmed: [
+    "bold",
+    "italic",
+    "underline",
+    "strikethrough",
+    "red",
+    "",
+  ],
+}
+`;
+
+snapshot[`buildDecorationsFromAnsiEscapeCode (nvim) 1`] = `
+{
+  content: [
+    "\\x1b[1mbold\\x1b[0m",
+    "\\x1b[3mitalic\\x1b[0m",
+    "\\x1b[4munderline\\x1b[0m",
+    "\\x1b[9mstrikethrough\\x1b[0m",
+    "\\x1b[31mred\\x1b[0m",
+    "",
+  ],
+  decorations: [
+    {
+      column: 1,
+      highlight: "GinColorBold",
+      length: 4,
+      line: 1,
+    },
+    {
+      column: 1,
+      highlight: "GinColorItalic",
+      length: 6,
+      line: 2,
+    },
+    {
+      column: 1,
+      highlight: "GinColorUnderline",
+      length: 9,
+      line: 3,
+    },
+    {
+      column: 1,
+      highlight: "GinColorStrike",
+      length: 13,
+      line: 4,
+    },
+    {
+      column: 1,
+      highlight: "GinColorF1",
+      length: 3,
+      line: 5,
+    },
+  ],
+  trimmed: [
+    "bold",
+    "italic",
+    "underline",
+    "strikethrough",
+    "red",
+    "",
+  ],
+}
+`;

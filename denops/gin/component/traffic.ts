@@ -1,5 +1,5 @@
 import type { Denops } from "https://deno.land/x/denops_std@v5.0.1/mod.ts";
-import { Cache } from "https://deno.land/x/local_cache@1.0/mod.ts";
+import { Cache } from "https://deno.land/x/ttl_cache@v0.1.1/mod.ts";
 import { decodeUtf8 } from "../util/text.ts";
 import { findWorktreeFromDenops } from "../git/worktree.ts";
 import { execute } from "../git/process.ts";
@@ -11,16 +11,15 @@ const cache = new Cache<string, Data>(100);
 async function getData(
   denops: Denops,
 ): Promise<Data> {
-  if (cache.has("data")) {
-    return cache.get("data");
-  }
-  const worktree = await findWorktreeFromDenops(denops);
-  const result = await Promise.all([
-    getAhead(worktree),
-    getBehind(worktree),
-  ]);
-  cache.set("data", result);
-  return result;
+  return cache.get("data") ?? await (async () => {
+    const worktree = await findWorktreeFromDenops(denops);
+    const result = await Promise.all([
+      getAhead(worktree),
+      getBehind(worktree),
+    ]);
+    cache.set("data", result);
+    return result;
+  })();
 }
 
 async function getAhead(cwd: string): Promise<number> {
