@@ -65,7 +65,7 @@ export async function exec(
     restore = () => Deno.remove(original);
   }
   try {
-    await fs.ensureFile(original);
+    await fs.copy(f, original);
     await Deno.writeTextFile(original, `${content.join("\n")}\n`);
     await fn.setbufvar(denops, bufnr, "&modified", 0);
     await execBare(denops, [
