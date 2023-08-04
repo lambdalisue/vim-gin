@@ -80,6 +80,10 @@ guise.vim~
 It can live together with the plugins mentioned above because the environment
 variable names used are different.
 
+It asks if users want to apply or cancel changes when |:quit| command is
+invoked. Answer "yes" to apply changes and others to cancel changes. Or use
+:Accept or :Cancel buffer local command to directly apply or cancel changes.
+
 Use |g:gin_proxy_editor_opener| to specify the opener command to open the
 buffer.
 
