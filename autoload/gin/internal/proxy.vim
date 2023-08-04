@@ -34,8 +34,13 @@ function s:reset() abort
 endfunction
 
 function s:confirm(bufnr) abort
+  if get(g:, 'gin_proxy_apply_without_confirm', 0)
+    call s:apply()
+    return
+  endif
   echohl Comment
   echo 'Hint: Use `:Apply` or `:Cancel` to apply or cancel changes directly'
+  echo 'Hint: Use `let g:gin_proxy_apply_without_confirm = 1` to apply changes without confirmation'
   echohl Title
   try
     let l:result = gin#internal#util#input(#{
