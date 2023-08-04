@@ -34,7 +34,6 @@ function s:reset() abort
 endfunction
 
 function s:confirm(bufnr) abort
-  let l:waiter = getbufvar(a:bufnr, 'gin_internal_proxy_waiter')
   echohl Comment
   echo 'Hint: Use `:Apply` or `:Cancel` to apply or cancel changes directly'
   echohl Title
@@ -47,7 +46,9 @@ function s:confirm(bufnr) abort
     echohl None
   endtry
   redraw
-  let l:success = l:result ==# '' || l:result =~? '^y\%[es]$'
-  call denops#request('gin', l:waiter, [l:success ? v:true : v:false])
-  bwipeout
+  if l:result ==# '' || l:result =~? '^y\%[es]$'
+    call s:apply()
+  else
+    call s:cancel()
+  endif
 endfunction
