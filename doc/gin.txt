@@ -168,6 +168,39 @@ COMMANDS					*gin-commands*
 	Use a bang (!) to forcibly open a buffer.
 	Use an ampersand (&) to temporary disable default arguments.
 
+							*:GinBrowse*
+:GinBrowse[&] [{++option}...] [{flags}] [{commitish}]
+	Open a system browser to visit the hosting service webpage of the
+	repository. If no {commitish} is given, it defaults to HEAD.
+
+	The following options are valid as {++option}:
+
+	++yank
+		Yank the URL to the clipboard.
+
+	See |gin-commands-options| for common {++option}.
+
+	The following flags are valid as {flags}:
+
+	--commit
+	--home
+	-n, --no-browser
+	--path={PATH}
+	--permalink
+	--pr
+	--remote={REMOTE}
+
+	It uses "git-browse" command as a module internally so see usage of
+	that for detail about each {flags}.
+	
+	https://deno.land/x/git_browse
+
+	See |g:gin_browse_aliases| to define aliases of REMOTE to support
+	arbitrary domain (e.g. GitHub Enterprise).
+
+	Users can specify default arguments by |g:gin_browse_default_args|.
+	Use an ampersand (&) to temporary disable default arguments.
+
 							*:GinCd*
 							*:GinLcd*
 							*:GinTcd*
@@ -444,6 +477,22 @@ VARIABLES					*gin-variables*
 	Disable default mappings on buffers shown by |:GinBranch|.
 
 	Default: 0
+
+*g:gin_browse_aliases*
+	Define a REMOTE alias for a specific hosting service on |:GinBrowse|
+	command. This is useful for example GitHub Enterprise with a custom
+	domain like
+>
+	let g:gin_browse_aliases = {
+	      \ 'github.on.my.custom.domain.com': 'github.com',
+	      \}
+<
+	Default: {}
+
+*g:gin_browse_default_args*
+	Specify default arguments of |:GinBrowse|.
+
+	Default: []
 
 *g:gin_chaperon_default_args*
 	Specify default arguments of |:GinChaperon|.

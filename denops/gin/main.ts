@@ -6,6 +6,7 @@ import { main as mainProxy } from "./proxy/main.ts";
 import { main as mainUtil } from "./util/main.ts";
 
 import { main as mainBranch } from "./command/branch/main.ts";
+import { main as mainBrowse } from "./command/browse/main.ts";
 import { main as mainChaperon } from "./command/chaperon/main.ts";
 import { main as mainDiff } from "./command/diff/main.ts";
 import { main as mainEdit } from "./command/edit/main.ts";
@@ -24,6 +25,7 @@ export function main(denops: Denops): void {
   mainUtil(denops);
 
   mainBranch(denops);
+  mainBrowse(denops);
   mainChaperon(denops);
   mainDiff(denops);
   mainEdit(denops);
