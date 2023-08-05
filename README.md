@@ -16,6 +16,8 @@ without announcements.**
 - `Gin` to call a raw git command and echo the result
 - `GinBuffer` to call a raw git command and open a result buffer
 - `GinBranch` to see `git branch` of a repository
+- `GinBrowse` to visit the hosting service webpage of a repository (powered by
+  [git-browse](https://deno.land/x/git_browse))
 - `GinCd/GinLcd/GinTcd` to invoke `cd/lcd/tcd` to the repository root
 - `GinChaperon` to solve git conflicts (like `git mergetool`)
 - `GinDiff` to see `git diff` of a file
