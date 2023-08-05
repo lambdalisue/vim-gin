@@ -435,6 +435,16 @@ Users can define "GinLocal" buffer local command on those buffers like
 -----------------------------------------------------------------------------
 VARIABLES					*gin-variables*
 
+*g:gin_branch_default_args*
+	Specify default arguments of |:GinBranch|.
+
+	Default: []
+
+*g:gin_branch_disable_default_mappings*
+	Disable default mappings on buffers shown by |:GinBranch|.
+
+	Default: 0
+
 *g:gin_chaperon_default_args*
 	Specify default arguments of |:GinChaperon|.
 
