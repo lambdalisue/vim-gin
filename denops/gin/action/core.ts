@@ -4,7 +4,7 @@ import * as buffer from "https://deno.land/x/denops_std@v5.0.1/buffer/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v5.0.1/function/mod.ts";
 import * as helper from "https://deno.land/x/denops_std@v5.0.1/helper/mod.ts";
 import * as mapping from "https://deno.land/x/denops_std@v5.0.1/mapping/mod.ts";
-import { assert, is } from "https://deno.land/x/unknownutil@v3.0.0/mod.ts#^";
+import { assert, is } from "https://deno.land/x/unknownutil@v3.4.0/mod.ts#^";
 
 let rangeInternal: Range | undefined;
 
