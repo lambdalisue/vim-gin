@@ -1,6 +1,6 @@
 export const snapshot = {};
 
-snapshot[`buildDecorationsFromAnsiEscapeCode (vim) 1`] = `
+snapshot[`buildDecorationsFromAnsiEscapeCode (nvim) 1`] = `
 {
   content: [
     "\\x1b[1mbold\\x1b[0m",
@@ -53,7 +53,7 @@ snapshot[`buildDecorationsFromAnsiEscapeCode (vim) 1`] = `
 }
 `;
 
-snapshot[`buildDecorationsFromAnsiEscapeCode (nvim) 1`] = `
+snapshot[`buildDecorationsFromAnsiEscapeCode (vim) 1`] = `
 {
   content: [
     "\\x1b[1mbold\\x1b[0m",
