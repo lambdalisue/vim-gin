@@ -1,0 +1,7 @@
+  gin-blame          b2a1c55 [main: ahead 1, behind 5] WIP
+* main               227f6c0 [origin/main] Merge pull request #102 from lambdalisue/upgrade-git-browse
+  support-bang-bk    de1f346 [support-bang: gone] :+1: A bang (!) to forcibly open a buffer
+  support-read       ecf6a74 [origin/support-read: gone] :+1: Add `postProcessor` options
+  support-references f1d2830 [origin/support-references: ahead 12, behind 8] :shower: Remove unused variables
+  upgrade-deps       3ecec96 [origin/upgrade-deps: gone] :herb: Force a custom serializer of `assertSnapshot`
+  upgrade-git-browse 3a534bc [origin/upgrade-git-browse: gone] :package: Upgrade git-browse

@@ -2,7 +2,7 @@ const branchAliasPattern = /^\s{2}(remotes\/([^\/]+)\/(\S+))\s+-> (\S+)$/;
 const remoteBranchPattern =
   /^\s{2}(remotes\/([^\/]+)\/(\S+))\s+([a-f0-9]+) (.*)$/;
 const localBranchPattern =
-  /^([* ]) (\(.*?\)|\S+)\s+([a-f0-9]+) (?:\[(\S+)(?:: [^\]]+)?\] )?(.*)$/;
+  /^([*+ ]) (\(.*?\)|\S+)\s+([a-f0-9]+) (?:\((.*)\) )?(?:\[(\S+)(?:: [^\]]+)?\] )?(.*)$/;
 
 export class GitBranchParseError extends Error {
   constructor(message: string) {
@@ -18,6 +18,7 @@ type LocalBranch = {
   target: string;
   branch: string;
   commit: string;
+  worktree?: string;
   upstream?: string;
   message: string;
 };
@@ -81,8 +82,9 @@ export function parse(content: string[]): GitBranchResult {
         target: m3[2],
         branch: m3[2],
         commit: m3[3],
-        upstream: m3[4] ?? undefined,
-        message: m3[5],
+        worktree: m3[4] ?? undefined,
+        upstream: m3[5] ?? undefined,
+        message: m3[6],
       };
     }
     throw new Error(`Failed to parse 'git branch' record '${record}'`);
