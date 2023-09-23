@@ -1,5 +1,5 @@
 import type { Denops } from "https://deno.land/x/denops_std@v5.0.1/mod.ts";
-import { assert, is } from "https://deno.land/x/unknownutil@v3.4.0/mod.ts#^";
+import { assert, is } from "https://deno.land/x/unknownutil@v3.6.0/mod.ts#^";
 import * as vars from "https://deno.land/x/denops_std@v5.0.1/variable/mod.ts";
 import * as helper from "https://deno.land/x/denops_std@v5.0.1/helper/mod.ts";
 import {
