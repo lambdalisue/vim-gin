@@ -14,7 +14,7 @@ import {
   validateFlags,
   validateOpts,
 } from "https://deno.land/x/denops_std@v5.0.1/argument/mod.ts";
-import { normCmdArgs, parseDisableDefaultArgs } from "../../util/cmd.ts";
+import { normCmdArgs } from "../../util/cmd.ts";
 import { exec } from "./command.ts";
 
 type Range = readonly [number, number];
@@ -27,12 +27,10 @@ export function main(denops: Denops): void {
     "browse:command": (args, range) => {
       assert(args, is.ArrayOf(is.String), { name: "args" });
       assert(range, is.OneOf([is.Undefined, isRange]), { name: "range" });
-      const [disableDefaultArgs, realArgs] = parseDisableDefaultArgs(args);
       return helper.friendlyCall(
         denops,
         () =>
-          command(denops, realArgs, {
-            disableDefaultArgs,
+          command(denops, args, {
             range,
           }),
       );
@@ -41,7 +39,6 @@ export function main(denops: Denops): void {
 }
 
 type CommandOptions = {
-  disableDefaultArgs?: boolean;
   range?: Range;
 };
 
@@ -50,17 +47,16 @@ async function command(
   args: string[],
   options: CommandOptions = {},
 ): Promise<void> {
-  if (!options.disableDefaultArgs) {
-    const defaultArgs = await vars.g.get(
-      denops,
-      "gin_browse_default_args",
-      [],
+  if (args.length === 0) {
+    args = ensure(
+      await vars.g.get(denops, "gin_browse_default_args", []),
+      is.ArrayOf(is.String),
+      {
+        name: "g:gin_browse_default_args",
+      },
     );
-    assert(defaultArgs, is.ArrayOf(is.String), {
-      name: "g:gin_browse_default_args",
-    });
-    args = [...defaultArgs, ...args];
   }
+
   const [opts, flags, residue] = parse(await normCmdArgs(denops, args));
   validateFlags(flags, [
     "remote",
