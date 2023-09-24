@@ -1,4 +1,4 @@
-import { assertEquals } from "https://deno.land/std@0.202.0/testing/asserts.ts";
+import { assertEquals } from "https://deno.land/std@0.202.0/assert/mod.ts";
 import { findJumpNew, findJumpOld, Jump } from "./jump.ts";
 
 const example = (await Deno.readTextFile(

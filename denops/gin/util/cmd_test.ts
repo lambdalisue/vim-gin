@@ -1,4 +1,4 @@
-import { assertEquals } from "https://deno.land/std@0.202.0/testing/asserts.ts";
+import { assertEquals } from "https://deno.land/std@0.202.0/assert/mod.ts";
 import * as batch from "https://deno.land/x/denops_std@v5.0.1/batch/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v5.0.1/function/mod.ts";
 import * as path from "https://deno.land/std@0.202.0/path/mod.ts";
