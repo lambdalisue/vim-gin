@@ -1,6 +1,6 @@
 import type { Denops } from "https://deno.land/x/denops_std@v5.0.1/mod.ts";
 import { unnullish } from "https://deno.land/x/unnullish@v1.0.1/mod.ts";
-import { ensure, is } from "https://deno.land/x/unknownutil@v3.6.0/mod.ts#^";
+import { ensure, is } from "https://deno.land/x/unknownutil@v3.9.0/mod.ts#^";
 import * as vars from "https://deno.land/x/denops_std@v5.0.1/variable/mod.ts";
 import {
   parse as parseBufname,
