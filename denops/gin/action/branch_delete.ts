@@ -1,7 +1,6 @@
 import type { Denops } from "https://deno.land/x/denops_std@v5.0.1/mod.ts";
 import * as batch from "https://deno.land/x/denops_std@v5.0.1/batch/mod.ts";
 import { define, GatherCandidates, Range } from "./core.ts";
-import { exec as execBare } from "../command/bare/command.ts";
 
 export type Candidate =
   | { kind: "remote"; branch: string; remote: string }
@@ -43,7 +42,7 @@ async function doDelete(
       case "alias":
         continue;
       case "remote":
-        await execBare(denops, [
+        await denops.dispatch("gin", "command", "", [
           "push",
           "--delete",
           x.remote,
@@ -51,7 +50,7 @@ async function doDelete(
         ]);
         break;
       default:
-        await execBare(denops, [
+        await denops.dispatch("gin", "command", "", [
           "branch",
           force ? "-D" : "-d",
           x.branch,

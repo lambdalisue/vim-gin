@@ -1,10 +1,6 @@
 import type { Denops } from "https://deno.land/x/denops_std@v5.0.1/mod.ts";
 import * as batch from "https://deno.land/x/denops_std@v5.0.1/batch/mod.ts";
 import { alias, define, GatherCandidates, Range } from "./core.ts";
-import {
-  exec as execDiff,
-  ExecOptions as ExecDiffOptions,
-} from "../command/diff/command.ts";
 
 export type Candidate = { path: string };
 
@@ -26,7 +22,7 @@ export async function init(
         bufnr,
         `diff:local:${opener}`,
         (denops, bufnr, range) =>
-          doDiff(denops, bufnr, range, opener, {}, gatherCandidates),
+          doDiff(denops, bufnr, range, opener, [], gatherCandidates),
       );
       await define(
         denops,
@@ -38,7 +34,7 @@ export async function init(
             bufnr,
             range,
             opener,
-            { flags: { "cached": "" } },
+            ["--cached"],
             gatherCandidates,
           ),
       );
@@ -52,7 +48,7 @@ export async function init(
             bufnr,
             range,
             opener,
-            { commitish: "HEAD" },
+            ["HEAD"],
             gatherCandidates,
           ),
       );
@@ -89,15 +85,16 @@ async function doDiff(
   bufnr: number,
   range: Range,
   opener: string,
-  options: ExecDiffOptions,
+  extraArgs: string[],
   gatherCandidates: GatherCandidates<Candidate>,
 ): Promise<void> {
   const xs = await gatherCandidates(denops, bufnr, range);
   for (const x of xs) {
-    await execDiff(denops, {
-      opener,
-      paths: [x.path],
-      ...options,
-    });
+    await denops.dispatch("gin", "diff:command", "", "", [
+      `++opener=${opener}`,
+      ...extraArgs,
+      "--",
+      x.path,
+    ]);
   }
 }

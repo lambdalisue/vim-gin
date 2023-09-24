@@ -1,10 +1,6 @@
 import type { Denops } from "https://deno.land/x/denops_std@v5.0.1/mod.ts";
 import * as batch from "https://deno.land/x/denops_std@v5.0.1/batch/mod.ts";
 import { alias, define, GatherCandidates, Range } from "./core.ts";
-import {
-  exec as execPatch,
-  ExecOptions as ExecPatchOptions,
-} from "../command/patch/command.ts";
 
 export type Candidate = { path: string };
 
@@ -19,21 +15,21 @@ export async function init(
       bufnr,
       "patch:both",
       (denops, bufnr, range) =>
-        doPatch(denops, bufnr, range, {}, gatherCandidates),
+        doPatch(denops, bufnr, range, [], gatherCandidates),
     );
     await define(
       denops,
       bufnr,
       "patch:head",
       (denops, bufnr, range) =>
-        doPatch(denops, bufnr, range, { noWorktree: true }, gatherCandidates),
+        doPatch(denops, bufnr, range, ["++no-worktree"], gatherCandidates),
     );
     await define(
       denops,
       bufnr,
       "patch:worktree",
       (denops, bufnr, range) =>
-        doPatch(denops, bufnr, range, { noHead: true }, gatherCandidates),
+        doPatch(denops, bufnr, range, ["++no-head"], gatherCandidates),
     );
     await alias(
       denops,
@@ -48,14 +44,15 @@ async function doPatch(
   denops: Denops,
   bufnr: number,
   range: Range,
-  options: ExecPatchOptions,
+  extraArgs: string[],
   gatherCandidates: GatherCandidates<Candidate>,
 ): Promise<void> {
   const xs = await gatherCandidates(denops, bufnr, range);
   for (const x of xs) {
-    await execPatch(denops, x.path, {
-      opener: "tabedit",
-      ...options,
-    });
+    await denops.dispatch("gin", "patch:command", "", "", [
+      `++opener=tabedit`,
+      ...extraArgs,
+      x.path,
+    ]);
   }
 }
