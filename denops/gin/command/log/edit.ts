@@ -16,8 +16,9 @@ import {
 } from "https://deno.land/x/denops_std@v5.0.1/argument/mod.ts";
 import { bind } from "../../command/bare/command.ts";
 import { exec as execBuffer } from "../../command/buffer/edit.ts";
-import { init as initActionCore, Range } from "../../action/core.ts";
+import { init as initActionBrowse } from "../../action/browse.ts";
 import { init as initActionCherryPick } from "../../action/cherry_pick.ts";
+import { init as initActionCore, Range } from "../../action/core.ts";
 import { init as initActionEcho } from "../../action/echo.ts";
 import { init as initActionMerge } from "../../action/merge.ts";
 import { init as initActionRebase } from "../../action/rebase.ts";
@@ -90,6 +91,7 @@ export async function exec(
     await batch.batch(denops, async (denops) => {
       await bind(denops, bufnr);
       await initActionCore(denops, bufnr);
+      await initActionBrowse(denops, bufnr, gatherCandidates);
       await initActionCherryPick(denops, bufnr, gatherCandidates);
       await initActionEcho(denops, bufnr, gatherCandidates);
       await initActionMerge(denops, bufnr, gatherCandidates);
