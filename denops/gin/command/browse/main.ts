@@ -78,7 +78,7 @@ async function command(
   ]);
   const commitish = parseResidue(residue);
   const path = unnullish(
-    await ensurePath(denops, opts.path),
+    await ensurePath(denops, flags["path"]),
     (p) => formatPath(p, options.range),
   );
   await exec(denops, commitish ?? "HEAD", {
@@ -112,7 +112,7 @@ function parseResidue(
 
 async function ensurePath(
   denops: Denops,
-  path?: string,
+  path?: unknown,
 ): Promise<string | undefined> {
   if (path) {
     return ensure(path, is.String, {
