@@ -15,6 +15,7 @@ import { exec as execBuffer } from "../../command/buffer/edit.ts";
 import { init as initActionBranchDelete } from "../../action/branch_delete.ts";
 import { init as initActionBranchMove } from "../../action/branch_move.ts";
 import { init as initActionBranchNew } from "../../action/branch_new.ts";
+import { init as initActionBrowse } from "../../action/browse.ts";
 import { init as initActionCore, Range } from "../../action/core.ts";
 import { init as initActionEcho } from "../../action/echo.ts";
 import { init as initActionLog } from "../../action/log.ts";
@@ -74,6 +75,10 @@ export async function exec(
       await initActionBranchDelete(denops, bufnr, gatherCandidates);
       await initActionBranchMove(denops, bufnr, gatherCandidates);
       await initActionBranchNew(denops, bufnr, gatherCandidates);
+      await initActionBrowse(denops, bufnr, async (denops, bufnr, range) => {
+        const xs = await gatherCandidates(denops, bufnr, range);
+        return xs.map((b) => ({ commit: b.target, ...b }));
+      });
       await initActionEcho(denops, bufnr, gatherCandidates);
       await initActionLog(denops, bufnr, async (denops, bufnr, range) => {
         const xs = await gatherCandidates(denops, bufnr, range);
