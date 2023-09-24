@@ -36,7 +36,7 @@ jobs:
     steps:
       - run: git config --global core.autocrlf false
         if: runner.os == 'Windows'
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: denoland/setup-deno@v1
         with:
           deno-version: "${{ matrix.version }}"
@@ -65,10 +65,10 @@ jobs:
       - run: git config --global init.defaultBranch main
       - run: git config --global core.autocrlf false
         if: runner.os == 'Windows'
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           path: "./repo"
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           repository: "vim-denops/denops.vim"
           path: "./denops.vim"
