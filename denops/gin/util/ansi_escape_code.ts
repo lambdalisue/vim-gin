@@ -20,7 +20,7 @@ export async function buildDecorationsFromAnsiEscapeCode(
 ): Promise<[string[], Decoration[]]> {
   const colors = await denops.call("gin#internal#util#ansi_escape_code#colors");
   assert(colors, is.ArrayOf(is.String), {
-    message: "gin#internal#util#ansi_escape_code#colors() must be string[]",
+    name: "gin#internal#util#ansi_escape_code#colors()",
   });
   const trimmed: string[] = [];
   const decorations: Decoration[] = [];

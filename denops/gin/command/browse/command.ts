@@ -29,7 +29,7 @@ export async function exec(
     vars.g.get(denops, "git_browse_aliases", {}),
   ]);
   assert(aliases, is.RecordOf(is.String), {
-    message: "g:git_browse_aliases must be a string dictionary",
+    name: "g:git_browse_aliases",
   });
 
   const worktree = await findWorktreeFromDenops(denops, {

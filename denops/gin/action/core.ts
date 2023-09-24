@@ -181,9 +181,7 @@ async function doRepeat(
     await helper.echo(denops, "[gin] Nothing to repeat");
     return;
   }
-  assert(name, is.String, {
-    message: `b:denops_action_previous on buffer ${bufnr} must be string`,
-  });
+  assert(name, is.String, { name: `b:denops_action_previous` });
   await call(denops, name, range);
 }
 

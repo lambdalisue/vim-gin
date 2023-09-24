@@ -25,10 +25,8 @@ export function main(denops: Denops): void {
   denops.dispatcher = {
     ...denops.dispatcher,
     "browse:command": (args, range) => {
-      assert(args, is.ArrayOf(is.String), { message: "args must be string[]" });
-      assert(range, is.OneOf([is.Undefined, isRange]), {
-        message: "range must be undefined | [number, number]",
-      });
+      assert(args, is.ArrayOf(is.String), { name: "args" });
+      assert(range, is.OneOf([is.Undefined, isRange]), { name: "range" });
       const [disableDefaultArgs, realArgs] = parseDisableDefaultArgs(args);
       return helper.friendlyCall(
         denops,
@@ -59,7 +57,7 @@ async function command(
       [],
     );
     assert(defaultArgs, is.ArrayOf(is.String), {
-      message: "g:gin_browse_default_args must be string[]",
+      name: "g:gin_browse_default_args",
     });
     args = [...defaultArgs, ...args];
   }

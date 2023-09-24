@@ -8,18 +8,18 @@ export function main(denops: Denops): void {
   denops.dispatcher = {
     ...denops.dispatcher,
     "util:reload": (bufnr) => {
-      assert(bufnr, is.Number, { message: "bufnr must be number" });
+      assert(bufnr, is.Number, { name: "bufnr" });
       return buffer.reload(denops, bufnr);
     },
 
     "util:expand": (expr) => {
-      assert(expr, is.String, { message: "expr must be string" });
+      assert(expr, is.String, { name: "expr" });
       return expand(denops, expr);
     },
 
     "util:worktree": (worktree) => {
-      assert(worktree, is.OneOf([is.String, is.Undefined]), {
-        message: "worktree must be string | undefined",
+      assert(worktree, is.OptionalOf(is.String), {
+        name: "worktree",
       });
       return findWorktreeFromDenops(denops, { worktree });
     },

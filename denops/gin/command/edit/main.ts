@@ -22,9 +22,9 @@ export function main(denops: Denops): void {
   denops.dispatcher = {
     ...denops.dispatcher,
     "edit:command": (bang, mods, args) => {
-      assert(bang, is.String, { message: "bang must be string" });
-      assert(mods, is.String, { message: "mods must be string" });
-      assert(args, is.ArrayOf(is.String), { message: "args must be string[]" });
+      assert(bang, is.String, { name: "bang" });
+      assert(mods, is.String, { name: "mods" });
+      assert(args, is.ArrayOf(is.String), { name: "args" });
       const [disableDefaultArgs, realArgs] = parseDisableDefaultArgs(args);
       const silent = parseSilent(mods);
       return helper.ensureSilent(denops, silent, () => {
@@ -38,18 +38,18 @@ export function main(denops: Denops): void {
       });
     },
     "edit:edit": (bufnr, bufname) => {
-      assert(bufnr, is.Number, { message: "bufnr must be number" });
-      assert(bufname, is.String, { message: "bufname must be string" });
+      assert(bufnr, is.Number, { name: "bufnr" });
+      assert(bufname, is.String, { name: "bufname" });
       return helper.friendlyCall(denops, () => edit(denops, bufnr, bufname));
     },
     "edit:read": (bufnr, bufname) => {
-      assert(bufnr, is.Number, { message: "bufnr must be number" });
-      assert(bufname, is.String, { message: "bufname must be string" });
+      assert(bufnr, is.Number, { name: "bufnr" });
+      assert(bufname, is.String, { name: "bufname" });
       return helper.friendlyCall(denops, () => read(denops, bufnr, bufname));
     },
     "edit:write": (bufnr, bufname) => {
-      assert(bufnr, is.Number, { message: "bufnr must be number" });
-      assert(bufname, is.String, { message: "bufname must be string" });
+      assert(bufnr, is.Number, { name: "bufnr" });
+      assert(bufname, is.String, { name: "bufname" });
       return helper.friendlyCall(denops, () => write(denops, bufnr, bufname));
     },
   };
@@ -73,7 +73,7 @@ async function command(
       [],
     );
     assert(defaultArgs, is.ArrayOf(is.String), {
-      message: "g:gin_edit_default_args must be string[]",
+      name: "g:gin_edit_default_args",
     });
     args = [...defaultArgs, ...args];
   }

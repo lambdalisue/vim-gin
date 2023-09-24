@@ -19,9 +19,9 @@ export function main(denops: Denops): void {
   denops.dispatcher = {
     ...denops.dispatcher,
     "patch:command": (bang, mods, args) => {
-      assert(bang, is.String, { message: "bang must be string" });
-      assert(mods, is.String, { message: "mods must be string" });
-      assert(args, is.ArrayOf(is.String), { message: "args must be string[]" });
+      assert(bang, is.String, { name: "bang" });
+      assert(mods, is.String, { name: "mods" });
+      assert(args, is.ArrayOf(is.String), { name: "args" });
       const [disableDefaultArgs, realArgs] = parseDisableDefaultArgs(args);
       const silent = parseSilent(mods);
       return helper.ensureSilent(denops, silent, () => {
@@ -55,7 +55,7 @@ async function command(
       [],
     );
     assert(defaultArgs, is.ArrayOf(is.String), {
-      message: "g:gin_patch_default_args must be string[]",
+      name: "g:gin_patch_default_args",
     });
     args = [...defaultArgs, ...args];
   }

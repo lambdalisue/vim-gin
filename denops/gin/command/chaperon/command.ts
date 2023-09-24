@@ -42,13 +42,13 @@ export async function exec(
         ],
       );
   assert(noSupplements, is.Number, {
-    message: "g:gin_chaperon_supplement_disable must be number",
+    name: "g:gin_chaperon_supplement_disable",
   });
   assert(supplementHeight, is.Number, {
-    message: "g:gin_chaperon_supplement_height must be number",
+    name: "g:gin_chaperon_supplement_height",
   });
   assert(disableDefaultMappings, is.Boolean, {
-    message: "g:gin_chaperon_disable_default_mappings must be boolean",
+    name: "g:gin_chaperon_disable_default_mappings",
   });
 
   const worktree = await findWorktreeFromDenops(denops, {
