@@ -7,14 +7,12 @@ import {
 } from "https://deno.land/x/unknownutil@v3.9.0/mod.ts#^";
 import * as batch from "https://deno.land/x/denops_std@v5.0.1/batch/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v5.0.1/function/mod.ts";
-import * as vars from "https://deno.land/x/denops_std@v5.0.1/variable/mod.ts";
 import * as helper from "https://deno.land/x/denops_std@v5.0.1/helper/mod.ts";
 import {
   parse,
-  validateFlags,
   validateOpts,
 } from "https://deno.land/x/denops_std@v5.0.1/argument/mod.ts";
-import { normCmdArgs } from "../../util/cmd.ts";
+import { fillCmdArgs, normCmdArgs } from "../../util/cmd.ts";
 import { exec } from "./command.ts";
 
 type Range = readonly [number, number];
@@ -47,31 +45,15 @@ async function command(
   args: string[],
   options: CommandOptions = {},
 ): Promise<void> {
-  if (args.length === 0) {
-    args = ensure(
-      await vars.g.get(denops, "gin_browse_default_args", []),
-      is.ArrayOf(is.String),
-      {
-        name: "g:gin_browse_default_args",
-      },
-    );
-  }
+  args = await fillCmdArgs(denops, args, "browse");
+  args = await normCmdArgs(denops, args);
 
-  const [opts, flags, residue] = parse(await normCmdArgs(denops, args));
-  validateFlags(flags, [
-    "remote",
-    "permalink",
-    "path",
-    "home",
-    "commit",
-    "pr",
-    "n",
-    "no-browser",
-  ]);
+  const [opts, flags, residue] = parse(args);
   validateOpts(opts, [
     "worktree",
     "yank",
   ]);
+
   const commitish = parseResidue(residue);
   const path = unnullish(
     await ensurePath(denops, opts.path),

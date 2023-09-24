@@ -1,19 +1,13 @@
 import type { Denops } from "https://deno.land/x/denops_std@v5.0.1/mod.ts";
-import {
-  assert,
-  ensure,
-  is,
-} from "https://deno.land/x/unknownutil@v3.9.0/mod.ts#^";
+import { assert, is } from "https://deno.land/x/unknownutil@v3.9.0/mod.ts#^";
 import * as helper from "https://deno.land/x/denops_std@v5.0.1/helper/mod.ts";
-import * as vars from "https://deno.land/x/denops_std@v5.0.1/variable/mod.ts";
 import {
   builtinOpts,
   formatOpts,
   parse,
-  validateFlags,
   validateOpts,
 } from "https://deno.land/x/denops_std@v5.0.1/argument/mod.ts";
-import { normCmdArgs, parseSilent } from "../../util/cmd.ts";
+import { fillCmdArgs, normCmdArgs, parseSilent } from "../../util/cmd.ts";
 import { exec } from "./command.ts";
 import { edit } from "./edit.ts";
 import { read } from "./read.ts";
@@ -59,48 +53,22 @@ export function main(denops: Denops): void {
   };
 }
 
-const allowedFlags = [
-  "R",
-  "b",
-  "w",
-  "I",
-  "cached",
-  "staged",
-  "renames",
-  "diff-filter",
-  "ignore-cr-at-eol",
-  "ignore-space-at-eol",
-  "ignore-space-change",
-  "ignore-all-space",
-  "ignore-blank-lines",
-  "ignore-matching-lines",
-  "ignore-submodules",
-];
-
 async function command(
   denops: Denops,
   bang: string,
   mods: string,
   args: string[],
 ): Promise<void> {
-  if (args.length === 0) {
-    args = ensure(
-      await vars.g.get(denops, "gin_diff_default_args", []),
-      is.ArrayOf(is.String),
-      {
-        name: "g:gin_diff_default_args",
-      },
-    );
-  }
+  args = await fillCmdArgs(denops, args, "diff");
+  args = await normCmdArgs(denops, args);
 
-  const [opts, flags, residue] = parse(await normCmdArgs(denops, args));
+  const [opts, flags, residue] = parse(args);
   validateOpts(opts, [
     "processor",
     "worktree",
     "opener",
     ...builtinOpts,
   ]);
-  validateFlags(flags, allowedFlags);
   const [commitish, paths] = parseResidue(residue);
   await exec(denops, {
     processor: opts.processor?.split(" "),

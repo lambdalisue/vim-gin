@@ -164,8 +164,9 @@ COMMANDS					*gin-commands*
 	Several default mappings are defined in the buffer. Use "help" action
 	to see mappings or disable by |g:gin_branch_disable_default_mappings|.
 
-	Users can specify default arguments by |g:gin_branch_default_args|.
-	See |gin-commands-default-args| for detail.
+	Users can specify default and/or persistemt arguments of the command.
+	See |gin-commands-default-args| and/or |gin-commands-persistent-args|
+	for detail.
 
 	Use a bang (!) to forcibly open a buffer.
 
@@ -199,8 +200,9 @@ COMMANDS					*gin-commands*
 	See |g:gin_browse_aliases| to define aliases of REMOTE to support
 	arbitrary domain (e.g. GitHub Enterprise).
 
-	Users can specify default arguments by |g:gin_browse_default_args|.
-	See |gin-commands-default-args| for detail.
+	Users can specify default and/or persistemt arguments of the command.
+	See |gin-commands-default-args| and/or |gin-commands-persistent-args|
+	for detail.
 
 							*:GinCd*
 							*:GinLcd*
@@ -240,8 +242,9 @@ COMMANDS					*gin-commands*
 	OURS~
 	|<Plug>(gin-diffget)|		Assigned to "do" in default.
 
-	Users can specify default arguments by |g:gin_chaperon_default_args|.
-	See |gin-commands-default-args| for detail.
+	Users can specify default and/or persistemt arguments of the command.
+	See |gin-commands-default-args| and/or |gin-commands-persistent-args|
+	for detail.
 
 	Use a bang (!) to forcibly open a buffer.
 
@@ -291,8 +294,9 @@ COMMANDS					*gin-commands*
 	|<Plug>(gin-diffjump-old)|	Assigned to "g<CR>" in default.
 	|<Plug>(gin-diffjump-new)|	Assigned to "<C-g><CR>" in default.
 
-	Users can specify default arguments by |g:gin_diff_default_args|.
-	See |gin-commands-default-args| for detail.
+	Users can specify default and/or persistemt arguments of the command.
+	See |gin-commands-default-args| and/or |gin-commands-persistent-args|
+	for detail.
 
 	Use a bang (!) to forcibly open a buffer.
 
@@ -329,8 +333,9 @@ COMMANDS					*gin-commands*
 	Several default mappings are defined in the buffer. Use "help" action
 	to see mappings or disable by |g:gin_log_disable_default_mappings|.
 
-	Users can specify default arguments by |g:gin_log_default_args|.
-	See |gin-commands-default-args| for detail.
+	Users can specify default and/or persistemt arguments of the command.
+	See |gin-commands-default-args| and/or |gin-commands-persistent-args|
+	for detail.
 
 	Use a bang (!) to forcibly open a buffer.
 
@@ -365,8 +370,9 @@ COMMANDS					*gin-commands*
 	|<Plug>(gin-diffput)|		Assigned to "dp" in default.
 	|<Plug>(gin-diffget)|		Assigned to "do" in default.
 
-	Users can specify default arguments by |g:gin_patch_default_args|.
-	See |gin-commands-default-args| for detail.
+	Users can specify default and/or persistemt arguments of the command.
+	See |gin-commands-default-args| and/or |gin-commands-persistent-args|
+	for detail.
 
 	Use a bang (!) to forcibly open a buffer.
 
@@ -389,8 +395,9 @@ COMMANDS					*gin-commands*
 	Several default mappings are defined in the buffer. Use "help" action
 	to see mappings or disable by |g:gin_status_disable_default_mappings|.
 
-	Users can specify default arguments by |g:gin_status_default_args|.
-	See |gin-commands-default-args| for detail.
+	Users can specify default and/or persistemt arguments of the command.
+	See |gin-commands-default-args| and/or |gin-commands-persistent-args|
+	for detail.
 
 	Use a bang (!) to forcibly open a buffer.
 
@@ -474,11 +481,19 @@ Users can define "GinLocal" buffer local command on those buffers like
 <
 						*gin-commands-default-args*
 Users can specify default arguments that is used when no arguments are given
-for each Gin commands by variable like "g: gin_{command}_default_args".
+for each Gin commands by variable like "g:gin_{command}_default_args".
 For example, to specify default arguments for |:GinLog|, use
 "g:gin_log_default_args" variable like
 >
 	let g:gin_log_default_args = ['--graph', '--decorate']
+<
+						*gin-commands-persistent-args*
+Users can specify persistent arguments that is always prepended to arguments
+of each Gin commands by variable like "g:gin_{command}_persistent_args".
+For example, to specify persistent arguments for |:GinLog|, use
+"g:gin_log_persistent_args" variable like
+>
+	let g:gin_log_persistent_args = ['++emojify']
 <
 
 -----------------------------------------------------------------------------
@@ -486,6 +501,11 @@ VARIABLES					*gin-variables*
 
 *g:gin_branch_default_args*
 	Specify default arguments of |:GinBranch|.
+
+	Default: []
+
+*g:gin_branch_persistent_args*
+	Specify persistent arguments of |:GinBranch|.
 
 	Default: []
 
@@ -510,8 +530,18 @@ VARIABLES					*gin-variables*
 
 	Default: []
 
+*g:gin_browse_persistent_args*
+	Specify persistent arguments of |:GinBrowse|.
+
+	Default: []
+
 *g:gin_chaperon_default_args*
 	Specify default arguments of |:GinChaperon|.
+
+	Default: []
+
+*g:gin_chaperon_persistent_args*
+	Specify persistent arguments of |:GinChaperon|.
 
 	Default: []
 
@@ -536,6 +566,11 @@ VARIABLES					*gin-variables*
 
 	Default: []
 
+*g:gin_diff_persistent_args*
+	Specify persistent arguments of |:GinDiff|.
+
+	Default: []
+
 *g:gin_diff_disable_default_mappings*
 	Disable default mappings on buffers shown by |:GinDiff|.
 
@@ -546,8 +581,18 @@ VARIABLES					*gin-variables*
 
 	Default: []
 
+*g:gin_edit_persistent_args*
+	Specify persistent arguments of |:GinEdit|.
+
+	Default: []
+
 *g:gin_log_default_args*
 	Specify default arguments of |:GinLog|.
+
+	Default: []
+
+*g:gin_log_persistent_args*
+	Specify persistent arguments of |:GinLog|.
 
 	Default: []
 
@@ -558,6 +603,11 @@ VARIABLES					*gin-variables*
 
 *g:gin_patch_default_args*
 	Specify default arguments of |:GinPatch|.
+
+	Default: []
+
+*g:gin_patch_persistent_args*
+	Specify persistent arguments of |:GinPatch|.
 
 	Default: []
 
@@ -589,6 +639,11 @@ VARIABLES					*gin-variables*
 
 *g:gin_status_default_args*
 	Specify default arguments of |:GinStatus|.
+
+	Default: []
+
+*g:gin_status_persistent_args*
+	Specify persistent arguments of |:GinStatus|.
 
 	Default: []
 

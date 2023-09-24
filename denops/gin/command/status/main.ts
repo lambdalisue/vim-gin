@@ -1,11 +1,6 @@
 import type { Denops } from "https://deno.land/x/denops_std@v5.0.1/mod.ts";
-import {
-  assert,
-  ensure,
-  is,
-} from "https://deno.land/x/unknownutil@v3.9.0/mod.ts#^";
+import { assert, is } from "https://deno.land/x/unknownutil@v3.9.0/mod.ts#^";
 import * as helper from "https://deno.land/x/denops_std@v5.0.1/helper/mod.ts";
-import * as vars from "https://deno.land/x/denops_std@v5.0.1/variable/mod.ts";
 import {
   builtinOpts,
   formatOpts,
@@ -13,7 +8,7 @@ import {
   validateFlags,
   validateOpts,
 } from "https://deno.land/x/denops_std@v5.0.1/argument/mod.ts";
-import { normCmdArgs, parseSilent } from "../../util/cmd.ts";
+import { fillCmdArgs, normCmdArgs, parseSilent } from "../../util/cmd.ts";
 import { exec } from "./command.ts";
 import { edit } from "./edit.ts";
 
@@ -56,17 +51,10 @@ async function command(
   mods: string,
   args: string[],
 ): Promise<void> {
-  if (args.length === 0) {
-    args = ensure(
-      await vars.g.get(denops, "gin_status_default_args", []),
-      is.ArrayOf(is.String),
-      {
-        name: "g:gin_status_default_args",
-      },
-    );
-  }
+  args = await fillCmdArgs(denops, args, "status");
+  args = await normCmdArgs(denops, args);
 
-  const [opts, flags, residue] = parse(await normCmdArgs(denops, args));
+  const [opts, flags, residue] = parse(args);
   validateOpts(opts, [
     "worktree",
     "opener",
