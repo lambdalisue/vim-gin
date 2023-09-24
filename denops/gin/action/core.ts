@@ -95,7 +95,8 @@ export async function define(
 ): Promise<void> {
   denops.dispatcher = {
     ...denops.dispatcher,
-    [`action:action:${name}`]: async () => {
+    [`action:action:${name}`]: async (bufnr) => {
+      assert(bufnr, is.Number);
       await helper.friendlyCall(denops, async () => {
         await buffer.ensure(denops, bufnr, async () => {
           const range = await getRange(denops);
@@ -107,7 +108,7 @@ export async function define(
   await mapping.map(
     denops,
     `<Plug>(gin-action-${name})`,
-    `<Cmd>call denops#request('gin', 'action:action:${name}', [])<CR>`,
+    `<Cmd>call denops#request('gin', 'action:action:${name}', [${bufnr}])<CR>`,
     { ...options, buffer: true, silent: true, noremap: true },
   );
 }
@@ -175,7 +176,6 @@ async function doRepeat(
     denops,
     bufnr,
     "denops_action_previous",
-    null,
   );
   if (!name) {
     await helper.echo(denops, "[gin] Nothing to repeat");

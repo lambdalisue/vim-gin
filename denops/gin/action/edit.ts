@@ -2,10 +2,6 @@ import type { Denops } from "https://deno.land/x/denops_std@v5.0.1/mod.ts";
 import * as batch from "https://deno.land/x/denops_std@v5.0.1/batch/mod.ts";
 import * as buffer from "https://deno.land/x/denops_std@v5.0.1/buffer/mod.ts";
 import { alias, define, GatherCandidates, Range } from "./core.ts";
-import {
-  exec as execEdit,
-  ExecOptions as ExecEditOptions,
-} from "../command/edit/command.ts";
 
 export type Candidate = { path: string };
 
@@ -34,7 +30,7 @@ export async function init(
         bufnr,
         `edit:cached:${opener}`,
         (denops, bufnr, range) =>
-          doEdit(denops, bufnr, range, opener, {}, gatherCandidates),
+          doEdit(denops, bufnr, range, opener, [], gatherCandidates),
       );
       await define(
         denops,
@@ -46,7 +42,7 @@ export async function init(
             bufnr,
             range,
             opener,
-            { commitish: "HEAD" },
+            ["HEAD"],
             gatherCandidates,
           ),
       );
@@ -83,15 +79,16 @@ async function doEdit(
   bufnr: number,
   range: Range,
   opener: string,
-  options: ExecEditOptions,
+  extraArgs: string[],
   gatherCandidates: GatherCandidates<Candidate>,
 ): Promise<void> {
   const xs = await gatherCandidates(denops, bufnr, range);
   for (const x of xs) {
-    await execEdit(denops, x.path, {
-      opener,
-      ...options,
-    });
+    await denops.dispatch("gin", "edit:command", "", "", [
+      `++opener=${opener}`,
+      ...extraArgs,
+      x.path,
+    ]);
   }
 }
 

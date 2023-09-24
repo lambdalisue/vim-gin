@@ -143,7 +143,7 @@ COMMANDS					*gin-commands*
 	Use a bang (!) to forcibly open a buffer.
 
 							*:GinBranch*
-:GinBranch[!][&] [{++option}...] [{flags}] [-- {pattern}...]
+:GinBranch[!] [{++option}...] [{flags}] [-- {pattern}...]
 	Open a "gin-branch" buffer to show a branch list. If {pattern} is
 	given, it is used as a shell wildcard to restrict the output to
 	matching branches. If multiple patterns are given, a branch is shown
@@ -164,12 +164,14 @@ COMMANDS					*gin-commands*
 	Several default mappings are defined in the buffer. Use "help" action
 	to see mappings or disable by |g:gin_branch_disable_default_mappings|.
 
-	Users can specify default arguments by |g:gin_branch_default_args|.
+	Users can specify default and/or persistemt arguments of the command.
+	See |gin-commands-default-args| and/or |gin-commands-persistent-args|
+	for detail.
+
 	Use a bang (!) to forcibly open a buffer.
-	Use an ampersand (&) to temporary disable default arguments.
 
 							*:GinBrowse*
-:GinBrowse[&] [{++option}...] [{flags}] [{commitish}]
+:GinBrowse [{++option}...] [{flags}] [{commitish}]
 	Open a system browser to visit the hosting service webpage of the
 	repository. If no {commitish} is given, it defaults to HEAD.
 
@@ -198,8 +200,9 @@ COMMANDS					*gin-commands*
 	See |g:gin_browse_aliases| to define aliases of REMOTE to support
 	arbitrary domain (e.g. GitHub Enterprise).
 
-	Users can specify default arguments by |g:gin_browse_default_args|.
-	Use an ampersand (&) to temporary disable default arguments.
+	Users can specify default and/or persistemt arguments of the command.
+	See |gin-commands-default-args| and/or |gin-commands-persistent-args|
+	for detail.
 
 							*:GinCd*
 							*:GinLcd*
@@ -211,7 +214,7 @@ COMMANDS					*gin-commands*
 	directory. Commands call |cd|, |lcd|, and |tcd| respectively.
 	
 							*:GinChaperon*
-:GinChaperon[!][&] [++{option}...] {path}
+:GinChaperon[!] [++{option}...] {path}
 	Open three main buffers (THEIRS, WORKTREE, and OURS) and three
 	supplemental buffers to solve conflicts on {path}.
 
@@ -239,17 +242,20 @@ COMMANDS					*gin-commands*
 	OURS~
 	|<Plug>(gin-diffget)|		Assigned to "do" in default.
 
-	Users can specify default arguments by |g:gin_chaperon_default_args|.
+	Users can specify default and/or persistemt arguments of the command.
+	See |gin-commands-default-args| and/or |gin-commands-persistent-args|
+	for detail.
+
 	Use a bang (!) to forcibly open a buffer.
-	Use an ampersand (&) to temporary disable default arguments.
 
 	Use |g:gin_chaperon_supplement_disable| to disable supplemental
 	buffers.
+
 	Use |g:gin_chaperon_supplement_height| to regulate the height of
 	supplemental buffers.
 
 							*:GinDiff*
-:GinDiff[!][&] [{++option}...] [{flags}] [{commitish}] [-- {path}...]
+:GinDiff[!] [{++option}...] [{flags}] [{commitish}] [-- {path}...]
 	Open a "gin-diff" buffer to show changes between the working tree and
 	the index or a tree, changes between the index and a tree, changes
 	between two trees.
@@ -288,12 +294,14 @@ COMMANDS					*gin-commands*
 	|<Plug>(gin-diffjump-old)|	Assigned to "g<CR>" in default.
 	|<Plug>(gin-diffjump-new)|	Assigned to "<C-g><CR>" in default.
 
-	Users can specify default arguments by |g:gin_diff_default_args|.
+	Users can specify default and/or persistemt arguments of the command.
+	See |gin-commands-default-args| and/or |gin-commands-persistent-args|
+	for detail.
+
 	Use a bang (!) to forcibly open a buffer.
-	Use an ampersand (&) to temporary disable default arguments.
 
 							*:GinEdit*
-:GinEdit[!][&] [{++option}...] [{commitish}] {path}
+:GinEdit[!] [{++option}...] [{commitish}] {path}
 	Open a "gin-edit" buffer to show a corresponding content of {path} in
 	the index or the commitish.
 	If no {commitish} is specified, it opens a buffer that shows content
@@ -305,11 +313,12 @@ COMMANDS					*gin-commands*
 	See |gin-commands-options| for common {++option}.
 
 	Users can specify default arguments by |g:gin_edit_default_args|.
+	See |gin-commands-default-args| for detail.
+
 	Use a bang (!) to forcibly open a buffer.
-	Use an ampersand (&) to temporary disable default arguments.
 
 							*:GinLog*
-:GinLog[!][&] [{++option}...] [{commitish}] [-- {pathspec}...]
+:GinLog[!] [{++option}...] [{commitish}] [-- {pathspec}...]
 	Open a "gin-log" buffer to show a git log.
 	
 	The following options are valid as {++option}:
@@ -324,12 +333,14 @@ COMMANDS					*gin-commands*
 	Several default mappings are defined in the buffer. Use "help" action
 	to see mappings or disable by |g:gin_log_disable_default_mappings|.
 
-	Users can specify default arguments by |g:gin_log_default_args|.
+	Users can specify default and/or persistemt arguments of the command.
+	See |gin-commands-default-args| and/or |gin-commands-persistent-args|
+	for detail.
+
 	Use a bang (!) to forcibly open a buffer.
-	Use an ampersand (&) to temporary disable default arguments.
 
 							*:GinPatch*
-:GinPatch[!][&] [{++option}...] {path}
+:GinPatch[!] [{++option}...] {path}
 	Open three buffers (HEAD, INDEX, and WORKTREE) to patch changes of
 	{path}.
 
@@ -359,12 +370,14 @@ COMMANDS					*gin-commands*
 	|<Plug>(gin-diffput)|		Assigned to "dp" in default.
 	|<Plug>(gin-diffget)|		Assigned to "do" in default.
 
-	Users can specify default arguments by |g:gin_patch_default_args|.
+	Users can specify default and/or persistemt arguments of the command.
+	See |gin-commands-default-args| and/or |gin-commands-persistent-args|
+	for detail.
+
 	Use a bang (!) to forcibly open a buffer.
-	Use an ampersand (&) to temporary disable default arguments.
 
 							*:GinStatus*
-:GinStatus[!][&] [{++option}...] [{flags}] [-- {pathspec}...]
+:GinStatus[!] [{++option}...] [{flags}] [-- {pathspec}...]
 	Open a "gin-status" buffer to show a status.
 
 	See |gin-commands-options| for common {++option}.
@@ -382,9 +395,11 @@ COMMANDS					*gin-commands*
 	Several default mappings are defined in the buffer. Use "help" action
 	to see mappings or disable by |g:gin_status_disable_default_mappings|.
 
-	Users can specify default arguments by |g:gin_status_default_args|.
+	Users can specify default and/or persistemt arguments of the command.
+	See |gin-commands-default-args| and/or |gin-commands-persistent-args|
+	for detail.
+
 	Use a bang (!) to forcibly open a buffer.
-	Use an ampersand (&) to temporary disable default arguments.
 
 							*gin-commands-options*
 Gin supports several options starts with double plus signs (++) as:
@@ -464,12 +479,33 @@ Users can define "GinLocal" buffer local command on those buffers like
 	  autocmd BufReadCmd ginlog://* call s:define_gin_local()
 	augroup END
 <
+						*gin-commands-default-args*
+Users can specify default arguments that is used when no arguments are given
+for each Gin commands by variable like "g:gin_{command}_default_args".
+For example, to specify default arguments for |:GinLog|, use
+"g:gin_log_default_args" variable like
+>
+	let g:gin_log_default_args = ['--graph', '--decorate']
+<
+						*gin-commands-persistent-args*
+Users can specify persistent arguments that is always prepended to arguments
+of each Gin commands by variable like "g:gin_{command}_persistent_args".
+For example, to specify persistent arguments for |:GinLog|, use
+"g:gin_log_persistent_args" variable like
+>
+	let g:gin_log_persistent_args = ['++emojify']
+<
 
 -----------------------------------------------------------------------------
 VARIABLES					*gin-variables*
 
 *g:gin_branch_default_args*
 	Specify default arguments of |:GinBranch|.
+
+	Default: []
+
+*g:gin_branch_persistent_args*
+	Specify persistent arguments of |:GinBranch|.
 
 	Default: []
 
@@ -494,8 +530,18 @@ VARIABLES					*gin-variables*
 
 	Default: []
 
+*g:gin_browse_persistent_args*
+	Specify persistent arguments of |:GinBrowse|.
+
+	Default: []
+
 *g:gin_chaperon_default_args*
 	Specify default arguments of |:GinChaperon|.
+
+	Default: []
+
+*g:gin_chaperon_persistent_args*
+	Specify persistent arguments of |:GinChaperon|.
 
 	Default: []
 
@@ -520,6 +566,11 @@ VARIABLES					*gin-variables*
 
 	Default: []
 
+*g:gin_diff_persistent_args*
+	Specify persistent arguments of |:GinDiff|.
+
+	Default: []
+
 *g:gin_diff_disable_default_mappings*
 	Disable default mappings on buffers shown by |:GinDiff|.
 
@@ -530,8 +581,18 @@ VARIABLES					*gin-variables*
 
 	Default: []
 
+*g:gin_edit_persistent_args*
+	Specify persistent arguments of |:GinEdit|.
+
+	Default: []
+
 *g:gin_log_default_args*
 	Specify default arguments of |:GinLog|.
+
+	Default: []
+
+*g:gin_log_persistent_args*
+	Specify persistent arguments of |:GinLog|.
 
 	Default: []
 
@@ -542,6 +603,11 @@ VARIABLES					*gin-variables*
 
 *g:gin_patch_default_args*
 	Specify default arguments of |:GinPatch|.
+
+	Default: []
+
+*g:gin_patch_persistent_args*
+	Specify persistent arguments of |:GinPatch|.
 
 	Default: []
 
@@ -573,6 +639,11 @@ VARIABLES					*gin-variables*
 
 *g:gin_status_default_args*
 	Specify default arguments of |:GinStatus|.
+
+	Default: []
+
+*g:gin_status_persistent_args*
+	Specify persistent arguments of |:GinStatus|.
 
 	Default: []
 

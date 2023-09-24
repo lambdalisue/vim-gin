@@ -1,7 +1,6 @@
 import type { Denops } from "https://deno.land/x/denops_std@v5.0.1/mod.ts";
 import * as batch from "https://deno.land/x/denops_std@v5.0.1/batch/mod.ts";
 import { alias, define, GatherCandidates, Range } from "./core.ts";
-import { exec as execBuffer } from "../command/buffer/command.ts";
 
 export type Candidate = { commit: string };
 
@@ -58,9 +57,11 @@ async function doShow(
 ): Promise<void> {
   const xs = await gatherCandidates(denops, bufnr, range);
   for (const x of xs) {
-    await execBuffer(denops, ["show", x.commit], {
-      opener,
-      emojify,
-    });
+    await denops.dispatch("gin", "buffer:command", "", "", [
+      `++opener=${opener}`,
+      ...(emojify ? [`++emojify`] : []),
+      "show",
+      x.commit,
+    ]);
   }
 }

@@ -1,13 +1,9 @@
 import type { Denops } from "https://deno.land/x/denops_std@v5.0.1/mod.ts";
+import { assert, is } from "https://deno.land/x/unknownutil@v3.9.0/mod.ts#^";
+import * as batch from "https://deno.land/x/denops_std@v5.0.1/batch/mod.ts";
+import * as vars from "https://deno.land/x/denops_std@v5.0.1/variable/mod.ts";
 import { Silent } from "https://deno.land/x/denops_std@v5.0.1/helper/mod.ts";
 import { expand } from "./expand.ts";
-
-export function parseDisableDefaultArgs(args: string[]): [boolean, string[]] {
-  if (args.at(0) === "&") {
-    return [true, args.slice(1)];
-  }
-  return [false, args];
-}
 
 export function parseSilent(mods: string): Silent {
   if (mods.indexOf("silent!") !== -1) {
@@ -41,4 +37,27 @@ async function normCmdArg(
     return await p;
   }
   return arg.replaceAll(/^\\(%|#)/g, "$1");
+}
+
+export async function fillCmdArgs(
+  denops: Denops,
+  args: string[],
+  command: string,
+): Promise<string[]> {
+  const defaultArgsVarName = `gin_${command}_default_args`;
+  const persistentArgsVarName = `gin_${command}_persistent_args`;
+  const [defaultArgs, persistentArgs] = await batch.collect(
+    denops,
+    (denops) => [
+      vars.g.get(denops, defaultArgsVarName, []),
+      vars.g.get(denops, persistentArgsVarName, []),
+    ],
+  );
+  assert(defaultArgs, is.ArrayOf(is.String), {
+    name: `g:${defaultArgsVarName}`,
+  });
+  assert(persistentArgs, is.ArrayOf(is.String), {
+    name: `g:${persistentArgsVarName}`,
+  });
+  return [...persistentArgs, ...(args.length === 0 ? defaultArgs : args)];
 }

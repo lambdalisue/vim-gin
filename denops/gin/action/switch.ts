@@ -1,7 +1,6 @@
 import type { Denops } from "https://deno.land/x/denops_std@v5.0.1/mod.ts";
 import * as batch from "https://deno.land/x/denops_std@v5.0.1/batch/mod.ts";
 import { define, GatherCandidates, Range } from "./core.ts";
-import { exec as execBare } from "../command/bare/command.ts";
 
 export type Candidate = { target: string };
 
@@ -40,5 +39,9 @@ async function doSwitch(
   if (!x) {
     return;
   }
-  await execBare(denops, ["switch", ...extraArgs, x.target]);
+  await denops.dispatch("gin", "command", "", [
+    "switch",
+    ...extraArgs,
+    x.target,
+  ]);
 }

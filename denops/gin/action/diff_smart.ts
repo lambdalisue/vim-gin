@@ -1,7 +1,6 @@
 import type { Denops } from "https://deno.land/x/denops_std@v5.0.1/mod.ts";
 import * as batch from "https://deno.land/x/denops_std@v5.0.1/batch/mod.ts";
 import { alias, define, GatherCandidates, Range } from "./core.ts";
-import { exec as execDiff } from "../command/diff/command.ts";
 
 export type Candidate = { path: string; XY: string };
 
@@ -51,18 +50,18 @@ async function doDiffSmart(
   const xs = await gatherCandidates(denops, bufnr, range);
   for (const x of xs) {
     if (x.XY.startsWith(".")) {
-      await execDiff(denops, {
-        opener,
-        paths: [x.path],
-      });
+      await denops.dispatch("gin", "diff:command", "", "", [
+        `++opener=${opener}`,
+        "--",
+        x.path,
+      ]);
     } else {
-      await execDiff(denops, {
-        opener,
-        paths: [x.path],
-        flags: {
-          "cached": "",
-        },
-      });
+      await denops.dispatch("gin", "diff:command", "", "", [
+        `++opener=${opener}`,
+        "--cached",
+        "--",
+        x.path,
+      ]);
     }
   }
 }
