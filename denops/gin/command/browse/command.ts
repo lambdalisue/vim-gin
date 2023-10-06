@@ -5,10 +5,10 @@ import { systemopen } from "https://deno.land/x/systemopen@v0.2.0/mod.ts";
 import {
   getURL,
   Options,
-} from "https://deno.land/x/git_browse@v0.3.3/bin/browse.ts";
+} from "https://deno.land/x/git_browse@v0.3.4/bin/browse.ts";
 import * as batch from "https://deno.land/x/denops_std@v5.0.1/batch/mod.ts";
 import * as vars from "https://deno.land/x/denops_std@v5.0.1/variable/mod.ts";
-import * as path from "https://deno.land/std@0.202.0/path/mod.ts";
+import * as path from "https://deno.land/std@0.203.0/path/mod.ts";
 import * as option from "https://deno.land/x/denops_std@v5.0.1/option/mod.ts";
 import { findWorktreeFromDenops } from "../../git/worktree.ts";
 import { yank } from "../../util/yank.ts";

@@ -1,4 +1,4 @@
-import { assertEquals } from "https://deno.land/std@0.202.0/assert/mod.ts";
+import { assertEquals } from "https://deno.land/std@0.203.0/assert/mod.ts";
 import { stripConflicts } from "./util.ts";
 
 // https://github.com/ojacobson/conflicts

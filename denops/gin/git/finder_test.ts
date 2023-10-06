@@ -1,8 +1,8 @@
 import {
   assertEquals,
   assertRejects,
-} from "https://deno.land/std@0.202.0/assert/mod.ts";
-import * as path from "https://deno.land/std@0.202.0/path/mod.ts";
+} from "https://deno.land/std@0.203.0/assert/mod.ts";
+import * as path from "https://deno.land/std@0.203.0/path/mod.ts";
 import { find } from "./finder.ts";
 import { ExecuteError } from "./process.ts";
 
