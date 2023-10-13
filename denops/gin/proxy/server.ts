@@ -5,9 +5,9 @@ import * as buffer from "https://deno.land/x/denops_std@v5.0.1/buffer/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v5.0.1/function/mod.ts";
 import * as vars from "https://deno.land/x/denops_std@v5.0.1/variable/mod.ts";
 import { ensure, is } from "https://deno.land/x/unknownutil@v3.9.0/mod.ts#^";
-import * as path from "https://deno.land/std@0.203.0/path/mod.ts";
-import * as streams from "https://deno.land/std@0.203.0/streams/mod.ts";
-import { deferred } from "https://deno.land/std@0.203.0/async/mod.ts";
+import * as path from "https://deno.land/std@0.204.0/path/mod.ts";
+import * as streams from "https://deno.land/std@0.204.0/streams/mod.ts";
+import { deferred } from "https://deno.land/std@0.204.0/async/mod.ts";
 import { decodeUtf8, encodeUtf8 } from "../util/text.ts";
 
 const recordPattern = /^([^:]+?):(.*)$/;

@@ -1,4 +1,4 @@
-import * as path from "https://deno.land/std@0.203.0/path/mod.ts";
+import * as path from "https://deno.land/std@0.204.0/path/mod.ts";
 import {
   test as testOri,
   TestDefinition,
