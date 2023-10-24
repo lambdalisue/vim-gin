@@ -21,12 +21,6 @@ function s:apply() abort
 endfunction
 
 function s:cancel() abort
-  if &modified
-    let l:do = confirm('Cancel commit: message will be lost. Are you sure you want to cancel?', "&Yes\n&No")
-    if l:do != 1
-      return
-    endif
-  endif
   let l:waiter = b:gin_internal_proxy_waiter
   call s:reset()
   call denops#request('gin', l:waiter, [v:false])
