@@ -24,7 +24,7 @@ function s:cancel() abort
   let l:waiter = b:gin_internal_proxy_waiter
   call s:reset()
   call denops#request('gin', l:waiter, [v:false])
-  bwipeout
+  bwipeout!
 endfunction
 
 function s:reset() abort
