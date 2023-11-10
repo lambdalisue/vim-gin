@@ -177,8 +177,11 @@ COMMANDS					*gin-commands*
 
 	The following options are valid as {++option}:
 
-	++yank
+	++yank={regname}
 		Yank the URL to the clipboard.
+		{regname} is optional and defaults to |v:register|.
+		If non-empty string is given, the value is passed to the
+		{regname} argument of |setreg()|.
 
 	See |gin-commands-options| for common {++option}.
 
