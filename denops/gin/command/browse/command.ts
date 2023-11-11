@@ -15,7 +15,7 @@ import { yank } from "../../util/yank.ts";
 
 export type ExecOptions = Omit<Options, "cwd" | "aliases"> & {
   worktree?: string;
-  yank?: boolean;
+  yank?: string | boolean;
   noBrowser?: boolean;
 };
 
@@ -56,8 +56,12 @@ export async function exec(
     aliases,
   });
 
-  if (options.yank) {
-    await yank(denops, url.href);
+  if (options.yank != null && options.yank !== false) {
+    await yank(
+      denops,
+      url.href,
+      options.yank === true ? undefined : options.yank,
+    );
   }
   if (options.noBrowser) {
     await denops.cmd("echomsg url", { url: url.href });

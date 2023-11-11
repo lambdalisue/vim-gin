@@ -61,7 +61,7 @@ async function command(
   );
   await exec(denops, commitish ?? "HEAD", {
     worktree: opts.worktree,
-    yank: "yank" in opts,
+    yank: opts.yank === "" ? true : (opts.yank ?? false),
     noBrowser: ("n" in flags || "no-browser" in flags),
     remote: ensure(flags.remote, is.OneOf([is.Undefined, is.String]), {
       "message": "REMOTE in --remote={REMOTE} must be string",

@@ -10,4 +10,11 @@ test("all", "yank", async (denops, t) => {
       assertEquals(await denops.eval("getreg(v:register)"), "Hello world");
     },
   });
+  await t.step({
+    name: "sets the value to the named register a",
+    fn: async () => {
+      await yank(denops, "Hello world", "a");
+      assertEquals(await denops.eval("getreg('a')"), "Hello world");
+    },
+  });
 });
