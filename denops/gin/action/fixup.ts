@@ -14,22 +14,21 @@ export async function init(
       denops,
       bufnr,
       "fixup:fixup",
-      (denops, bufnr, range) =>
-        doFixup(denops, bufnr, range, "fixup", gatherCandidates),
+      (denops, bufnr, range) => doFixup(denops, bufnr, range, gatherCandidates),
     );
     await define(
       denops,
       bufnr,
       "fixup:amend",
       (denops, bufnr, range) =>
-        doFixup(denops, bufnr, range, "amend", gatherCandidates),
+        doFixupInteractive(denops, bufnr, range, "amend", gatherCandidates),
     );
     await define(
       denops,
       bufnr,
       "fixup:reword",
       (denops, bufnr, range) =>
-        doFixup(denops, bufnr, range, "reword", gatherCandidates),
+        doFixupInteractive(denops, bufnr, range, "reword", gatherCandidates),
     );
     await alias(
       denops,
@@ -44,14 +43,27 @@ async function doFixup(
   denops: Denops,
   bufnr: number,
   range: Range,
-  kind: "fixup" | "amend" | "reword",
   gatherCandidates: GatherCandidates<Candidate>,
 ): Promise<void> {
   const xs = await gatherCandidates(denops, bufnr, range);
   const commit = xs.map((v) => v.commit).join("\n");
-  const target = kind === "fixup" ? commit : `${kind}:${commit}`;
+  await denops.dispatch("gin", "command", "", [
+    "commit",
+    `--fixup=${commit}`,
+  ]);
+}
+
+async function doFixupInteractive(
+  denops: Denops,
+  bufnr: number,
+  range: Range,
+  kind: "amend" | "reword",
+  gatherCandidates: GatherCandidates<Candidate>,
+): Promise<void> {
+  const xs = await gatherCandidates(denops, bufnr, range);
+  const commit = xs.map((v) => v.commit).join("\n");
   // Do not block Vim so that users can edit commit message
   denops
-    .dispatch("gin", "command", "", ["commit", `--fixup=${target}`])
+    .dispatch("gin", "command", "", ["commit", `--fixup=${kind}:${commit}`])
     .catch((e) => console.error(`failed to execute git commit: ${e}`));
 }
