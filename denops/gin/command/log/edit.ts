@@ -20,6 +20,7 @@ import { init as initActionBrowse } from "../../action/browse.ts";
 import { init as initActionCherryPick } from "../../action/cherry_pick.ts";
 import { init as initActionCore, Range } from "../../action/core.ts";
 import { init as initActionEcho } from "../../action/echo.ts";
+import { init as initActionFixup } from "../../action/fixup.ts";
 import { init as initActionMerge } from "../../action/merge.ts";
 import { init as initActionRebase } from "../../action/rebase.ts";
 import { init as initActionReset } from "../../action/reset.ts";
@@ -94,6 +95,10 @@ export async function exec(
       await initActionBrowse(denops, bufnr, gatherCandidates);
       await initActionCherryPick(denops, bufnr, gatherCandidates);
       await initActionEcho(denops, bufnr, gatherCandidates);
+      await initActionFixup(denops, bufnr, async (denops, bufnr, range) => {
+        const xs = await gatherCandidates(denops, bufnr, range);
+        return xs.map((x) => ({ commit: x.commit }));
+      });
       await initActionMerge(denops, bufnr, gatherCandidates);
       await initActionRebase(denops, bufnr, gatherCandidates);
       await initActionReset(denops, bufnr, gatherCandidates);
