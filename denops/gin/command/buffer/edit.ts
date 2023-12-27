@@ -97,12 +97,12 @@ export async function exec(
   );
   const [trimmed, decorations] = await buildDecorationsFromAnsiEscapeCode(
     denops,
-    content,
+    options.emojify ? content.map(emojify) : content,
   );
   await buffer.replace(
     denops,
     bufnr,
-    options.emojify ? trimmed.map(emojify) : trimmed,
+    trimmed,
     {
       fileformat,
       fileencoding,
