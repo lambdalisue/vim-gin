@@ -7,7 +7,6 @@ import * as vars from "https://deno.land/x/denops_std@v5.0.1/variable/mod.ts";
 import { ensure, is } from "https://deno.land/x/unknownutil@v3.9.0/mod.ts#^";
 import * as path from "https://deno.land/std@0.204.0/path/mod.ts";
 import * as streams from "https://deno.land/std@0.204.0/streams/mod.ts";
-import { deferred } from "https://deno.land/std@0.204.0/async/mod.ts";
 import { decodeUtf8, encodeUtf8 } from "../util/text.ts";
 
 const recordPattern = /^([^:]+?):(.*)$/;
@@ -130,12 +129,12 @@ async function edit(
     },
   );
 
-  const waiter = deferred<boolean>();
+  const { promise, resolve } = Promise.withResolvers<boolean>();
   const waiterId = lambda.register(denops, (accept) => {
-    waiter.resolve(!!accept);
+    resolve(!!accept);
   }, { once: true });
   await buffer.ensure(denops, bufnr, async () => {
     await denops.call("gin#internal#proxy#init", waiterId);
   });
-  return waiter;
+  return promise;
 }
