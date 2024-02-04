@@ -1,5 +1,6 @@
 #!/usr/bin/env -S deno run --no-check --allow-env=GIN_PROXY_ADDRESS --allow-net=127.0.0.1
-import * as streams from "https://deno.land/std@0.204.0/streams/mod.ts";
+import { pop, push } from "https://deno.land/x/streamtools@v0.5.0/mod.ts";
+import { ensure, is } from "https://deno.land/x/unknownutil@v3.14.1/mod.ts";
 
 const resultPattern = /^([^:]+):(.*)$/;
 
@@ -17,9 +18,10 @@ const encoder = new TextEncoder();
 const decoder = new TextDecoder();
 
 const conn = await Deno.connect(addr);
-await streams.writeAll(conn, encoder.encode(`editor:${filename}`));
-await conn.closeWrite();
-const result = decoder.decode(await streams.readAll(conn));
+await push(conn.writable, encoder.encode(`editor:${filename}`));
+const result = decoder.decode(
+  ensure(await pop(conn.readable), is.InstanceOf(Uint8Array)),
+);
 conn.close();
 
 const m = result.match(resultPattern);
