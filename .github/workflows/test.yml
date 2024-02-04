@@ -4,19 +4,10 @@ on:
   schedule:
     - cron: "0 7 * * 0"
   push:
-    paths:
-      - "**/*.md"
-      - "**/*.ts"
-      - "**/*.vim"
-      - ".github/workflows/test.yml"
-      - "Makefile"
+    branches:
+      - main
   pull_request:
-    paths:
-      - "**/*.md"
-      - "**/*.ts"
-      - "**/*.vim"
-      - ".github/workflows/test.yml"
-      - "Makefile"
+  workflow_dispatch:
 
 defaults:
   run:
@@ -35,7 +26,7 @@ jobs:
       - run: git config --global core.autocrlf false
         if: runner.os == 'Windows'
       - uses: actions/checkout@v4
-      - uses: denoland/setup-deno@v1
+      - uses: denoland/setup-deno@v1.1.4
         with:
           deno-version: "${{ matrix.version }}"
       - name: Lint check
@@ -53,7 +44,7 @@ jobs:
           - macos-latest
           - ubuntu-latest
         version:
-          - "1.32.0"
+          - "1.38.x"
           - "1.x"
         host_version:
           - vim: "v9.0.1499"
@@ -64,13 +55,11 @@ jobs:
       - run: git config --global core.autocrlf false
         if: runner.os == 'Windows'
       - uses: actions/checkout@v4
-        with:
-          path: "./repo"
       - uses: actions/checkout@v4
         with:
           repository: "vim-denops/denops.vim"
-          path: "./denops.vim"
-      - uses: denoland/setup-deno@v1
+          path: ".deps/denops.vim"
+      - uses: denoland/setup-deno@v1.1.4
         with:
           deno-version: "${{ matrix.version }}"
       - uses: rhysd/action-setup-vim@v1
@@ -95,9 +84,15 @@ jobs:
         env:
           DENOPS_TEST_NVIM: ${{ steps.nvim.outputs.executable }}
       - name: Test
-        working-directory: ./repo
-        run: deno task test
+        run: deno task test:coverage
         env:
-          DENOPS_TEST_DENOPS_PATH: "../denops.vim"
+          DENOPS_TEST_DENOPS_PATH: ".deps/denops.vim"
           DENOPS_TEST_VIM_EXECUTABLE: ${{ steps.vim.outputs.executable }}
           DENOPS_TEST_NVIM_EXECUTABLE: ${{ steps.nvim.outputs.executable }}
+      - run: |
+          deno task coverage --lcov > coverage.lcov
+      - uses: codecov/codecov-action@v4
+        with:
+          os: ${{ runner.os }}
+          files: ./coverage.lcov
+          token: ${{ secrets.CODECOV_TOKEN }}
