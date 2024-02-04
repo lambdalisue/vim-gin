@@ -1,4 +1,5 @@
 /.tools
 .tool-versions
 .coverage
+.deps
 deno.lock

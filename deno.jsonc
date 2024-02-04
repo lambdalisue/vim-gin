@@ -1,5 +1,6 @@
 {
   "lock": false,
+  "exclude": ["docs/**", ".deps/**", ".coverage/**"],
   "tasks": {
     "test": "deno test -A --parallel --shuffle --doc",
     "test:coverage": "deno task test --coverage=.coverage",
