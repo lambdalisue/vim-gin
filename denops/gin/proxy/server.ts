@@ -6,7 +6,7 @@ import * as fn from "https://deno.land/x/denops_std@v5.0.1/function/mod.ts";
 import * as vars from "https://deno.land/x/denops_std@v5.0.1/variable/mod.ts";
 import { ensure, is } from "https://deno.land/x/unknownutil@v3.9.0/mod.ts#^";
 import * as path from "https://deno.land/std@0.204.0/path/mod.ts";
-import * as streams from "https://deno.land/std@0.204.0/streams/mod.ts";
+import { pop, push } from "https://deno.land/x/streamtools@v0.5.0/mod.ts";
 import { decodeUtf8, encodeUtf8 } from "../util/text.ts";
 
 const recordPattern = /^([^:]+?):(.*)$/;
@@ -63,7 +63,9 @@ async function handleConnection(
   denops: Denops,
   conn: Deno.Conn,
 ): Promise<void> {
-  const record = decodeUtf8(await streams.readAll(conn));
+  const record = decodeUtf8(
+    ensure(await pop(conn.readable), is.InstanceOf(Uint8Array)),
+  );
   const m = record.match(recordPattern);
   if (!m) {
     throw new Error(`Unexpected record '${record}' received`);
@@ -92,9 +94,9 @@ async function handleAskpass(
 ): Promise<void> {
   try {
     const value = await fn.inputsecret(denops, prompt);
-    await streams.writeAll(conn, encodeUtf8(`ok:${value}`));
+    await push(conn.writable, encodeUtf8(`ok:${value}`));
   } catch (e: unknown) {
-    await streams.writeAll(conn, encodeUtf8(`err:${e}`));
+    await push(conn.writable, encodeUtf8(`err:${e}`));
   }
 }
 
@@ -105,13 +107,13 @@ async function handleEditor(
 ): Promise<void> {
   try {
     if (await edit(denops, filename)) {
-      await streams.writeAll(conn, encodeUtf8("ok:"));
+      await push(conn.writable, encodeUtf8("ok:"));
     } else {
       await Deno.writeFile(filename, new Uint8Array());
-      await streams.writeAll(conn, encodeUtf8("cancel:"));
+      await push(conn.writable, encodeUtf8("cancel:"));
     }
   } catch (e: unknown) {
-    await streams.writeAll(conn, encodeUtf8(`err:${e}`));
+    await push(conn.writable, encodeUtf8(`err:${e}`));
   }
 }
 
