@@ -154,6 +154,7 @@ async function initTheirs(
 ): Promise<void> {
   await buffer.ensure(denops, bufnr, async () => {
     await batch.batch(denops, async (denops) => {
+      const modes: mapping.Mode[] = ["n", "x"];
       await mapping.map(
         denops,
         "<Plug>(gin-diffput)",
@@ -161,6 +162,7 @@ async function initTheirs(
         {
           buffer: true,
           noremap: true,
+          mode: modes,
         },
       );
       if (!disableDefaultMappings) {
@@ -170,6 +172,7 @@ async function initTheirs(
           "<Plug>(gin-diffput)",
           {
             buffer: true,
+            mode: modes,
           },
         );
       }
@@ -189,6 +192,7 @@ async function initWorktree(
     const content = await fn.getbufline(denops, bufnr, 1, "$");
     await buffer.replace(denops, bufnr, stripConflicts(content));
     await batch.batch(denops, async (denops) => {
+      const modes: mapping.Mode[] = ["n", "x"];
       if (bufnrTheirs) {
         await mapping.map(
           denops,
@@ -197,6 +201,7 @@ async function initWorktree(
           {
             buffer: true,
             noremap: true,
+            mode: modes,
           },
         );
         await mapping.map(
@@ -205,6 +210,7 @@ async function initWorktree(
           "<Plug>(gin-diffget-l)",
           {
             buffer: true,
+            mode: modes,
           },
         );
         if (!disableDefaultMappings) {
@@ -214,6 +220,7 @@ async function initWorktree(
             "<Plug>(gin-diffget-l)",
             {
               buffer: true,
+              mode: modes,
             },
           );
           await mapping.map(
@@ -222,6 +229,7 @@ async function initWorktree(
             "<Plug>(gin-diffget)",
             {
               buffer: true,
+              mode: modes,
             },
           );
         }
@@ -234,6 +242,7 @@ async function initWorktree(
           {
             buffer: true,
             noremap: true,
+            mode: modes,
           },
         );
         await mapping.map(
@@ -242,6 +251,7 @@ async function initWorktree(
           "<Plug>(gin-diffget-r)",
           {
             buffer: true,
+            mode: modes,
           },
         );
         if (!disableDefaultMappings) {
@@ -251,6 +261,7 @@ async function initWorktree(
             "<Plug>(gin-diffget-r)",
             {
               buffer: true,
+              mode: modes,
             },
           );
           await mapping.map(
@@ -259,6 +270,7 @@ async function initWorktree(
             "<Plug>(gin-diffget)",
             {
               buffer: true,
+              mode: modes,
             },
           );
         }
@@ -275,6 +287,7 @@ async function initOurs(
 ): Promise<void> {
   await buffer.ensure(denops, bufnr, async () => {
     await batch.batch(denops, async (denops) => {
+      const modes: mapping.Mode[] = ["n", "x"];
       await mapping.map(
         denops,
         "<Plug>(gin-diffput)",
@@ -282,6 +295,7 @@ async function initOurs(
         {
           buffer: true,
           noremap: true,
+          mode: modes,
         },
       );
       if (!disableDefaultMappings) {
@@ -291,6 +305,7 @@ async function initOurs(
           "<Plug>(gin-diffput)",
           {
             buffer: true,
+            mode: modes,
           },
         );
       }
