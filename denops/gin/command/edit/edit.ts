@@ -78,6 +78,7 @@ export async function exec(
       await option.bufhidden.setLocal(denops, "unload");
       if (options.commitish) {
         await option.buftype.setLocal(denops, "nowrite");
+        await option.modifiable.setLocal(denops, false);
       } else {
         await option.buftype.setLocal(denops, "acwrite");
         await autocmd.group(
