@@ -48,7 +48,7 @@ async function doCherryPick(
   }
   await denops.dispatch("gin", "command", "", [
     "cherry-pick",
-    ...(mainline ? [] : ["--mainline", mainline]),
+    ...(mainline === "" ? [] : ["--mainline", mainline]),
     x.commit,
   ]);
 }
