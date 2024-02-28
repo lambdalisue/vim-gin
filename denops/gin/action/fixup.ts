@@ -86,16 +86,16 @@ async function doFixupInstant(
   await denops.dispatch("gin", "command", "", [
     "commit",
     `--fixup=${commit}`,
-  ]).then(() =>
-    // autosquash without opening an editor
-    denops.dispatch("gin", "command", "", [
-      "-c",
-      "sequence.editor=:",
-      "rebase",
-      "--interactive",
-      "--autostash",
-      "--autosquash",
-      `${commit}~`,
-    ])
-  );
+  ]);
+
+  // autosquash without opening an editor
+  await denops.dispatch("gin", "command", "", [
+    "-c",
+    "sequence.editor=true",
+    "rebase",
+    "--interactive",
+    "--autostash",
+    "--autosquash",
+    `${commit}~`,
+  ]);
 }
