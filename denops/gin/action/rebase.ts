@@ -43,6 +43,9 @@ async function doRebase(
     "rebase",
     x.commit,
   ]);
+
+  // suppress false-positive detection of file changes
+  await denops.cmd("silent checktime");
 }
 
 async function doRebaseInteractive(
@@ -65,5 +68,9 @@ async function doRebaseInteractive(
     x.commit,
   ]).catch(async (e) => {
     await helper.echoerr(denops, e.toString());
-  });
+  }).then(
+    // suppress false-positive detection of file changes
+    // NOTE: must be done on resolve because the rebase is not awaited
+    () => denops.cmd("silent checktime"),
+  );
 }

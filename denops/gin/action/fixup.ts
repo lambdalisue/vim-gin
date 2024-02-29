@@ -98,4 +98,7 @@ async function doFixupInstant(
     "--autosquash",
     `${commit}~`,
   ]);
+
+  // suppress false-positive detection of file changes
+  await denops.cmd("silent checktime");
 }
