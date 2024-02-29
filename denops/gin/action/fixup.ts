@@ -30,6 +30,13 @@ export async function init(
       (denops, bufnr, range) =>
         doFixupInteractive(denops, bufnr, range, "reword", gatherCandidates),
     );
+    await define(
+      denops,
+      bufnr,
+      "fixup:instant",
+      (denops, bufnr, range) =>
+        doFixupInstant(denops, bufnr, range, gatherCandidates),
+    );
     await alias(
       denops,
       bufnr,
@@ -66,4 +73,29 @@ async function doFixupInteractive(
   denops
     .dispatch("gin", "command", "", ["commit", `--fixup=${kind}:${commit}`])
     .catch((e) => console.error(`failed to execute git commit: ${e}`));
+}
+
+async function doFixupInstant(
+  denops: Denops,
+  bufnr: number,
+  range: Range,
+  gatherCandidates: GatherCandidates<Candidate>,
+): Promise<void> {
+  const xs = await gatherCandidates(denops, bufnr, range);
+  const commit = xs.map((v) => v.commit).join("\n");
+  await denops.dispatch("gin", "command", "", [
+    "commit",
+    `--fixup=${commit}`,
+  ]);
+
+  // autosquash without opening an editor
+  await denops.dispatch("gin", "command", "", [
+    "-c",
+    "sequence.editor=true",
+    "rebase",
+    "--interactive",
+    "--autostash",
+    "--autosquash",
+    `${commit}~`,
+  ]);
 }
