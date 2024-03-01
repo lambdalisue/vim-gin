@@ -20,24 +20,31 @@ export async function init(
     await define(
       denops,
       bufnr,
-      "fixup:amend",
-      (denops, bufnr, range) =>
-        doFixupInteractive(denops, bufnr, range, "amend", gatherCandidates),
-    );
-    await define(
-      denops,
-      bufnr,
-      "fixup:reword",
-      (denops, bufnr, range) =>
-        doFixupInteractive(denops, bufnr, range, "reword", gatherCandidates),
-    );
-    await define(
-      denops,
-      bufnr,
       "fixup:instant-fixup",
       (denops, bufnr, range) =>
         doFixup(denops, bufnr, range, gatherCandidates, true),
     );
+
+    const kinds: Array<"amend" | "reword"> = ["amend", "reword"];
+    for (const kind of kinds) {
+      for (const instant of [true, false]) {
+        await define(
+          denops,
+          bufnr,
+          instant ? `fixup:instant-${kind}` : `fixup:${kind}`,
+          (denops, bufnr, range) =>
+            doFixupInteractive(
+              denops,
+              bufnr,
+              range,
+              kind,
+              gatherCandidates,
+              instant,
+            ),
+        );
+      }
+    }
+
     await alias(
       denops,
       bufnr,
@@ -88,11 +95,15 @@ async function doFixupInteractive(
   range: Range,
   kind: "amend" | "reword",
   gatherCandidates: GatherCandidates<Candidate>,
+  instant: boolean,
 ): Promise<void> {
   const xs = await gatherCandidates(denops, bufnr, range);
   const commit = xs.map((v) => v.commit).join("\n");
   // Do not block Vim so that users can edit commit message
   denops
     .dispatch("gin", "command", "", ["commit", `--fixup=${kind}:${commit}`])
-    .catch((e) => console.error(`failed to execute git commit: ${e}`));
+    .then(
+      instant ? () => doInstantSquash(denops, `${commit}~`) : undefined,
+      (e) => console.error(`failed to execute git commit: ${e}`),
+    );
 }
