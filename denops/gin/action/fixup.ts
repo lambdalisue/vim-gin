@@ -34,7 +34,7 @@ export async function init(
     await define(
       denops,
       bufnr,
-      "fixup:instant",
+      "fixup:instant-fixup",
       (denops, bufnr, range) =>
         doFixup(denops, bufnr, range, gatherCandidates, true),
     );
