@@ -25,7 +25,7 @@ export async function init(
         doFixup(denops, bufnr, range, gatherCandidates, true),
     );
 
-    const kinds: Array<"amend" | "reword"> = ["amend", "reword"];
+    const kinds = ["amend", "reword"] as const;
     for (const kind of kinds) {
       for (const instant of [true, false]) {
         await define(
