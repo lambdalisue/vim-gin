@@ -14,7 +14,8 @@ export async function init(
       denops,
       bufnr,
       "fixup:fixup",
-      (denops, bufnr, range) => doFixup(denops, bufnr, range, gatherCandidates),
+      (denops, bufnr, range) =>
+        doFixup(denops, bufnr, range, gatherCandidates, false),
     );
     await define(
       denops,
@@ -35,7 +36,7 @@ export async function init(
       bufnr,
       "fixup:instant",
       (denops, bufnr, range) =>
-        doFixupInstant(denops, bufnr, range, gatherCandidates),
+        doFixup(denops, bufnr, range, gatherCandidates, true),
     );
     await alias(
       denops,
@@ -46,11 +47,28 @@ export async function init(
   });
 }
 
+async function doInstantSquash(denops: Denops, commit: string): Promise<void> {
+  // autosquash without opening an editor
+  await denops.dispatch("gin", "command", "", [
+    "-c",
+    "sequence.editor=true",
+    "rebase",
+    "--interactive",
+    "--autostash",
+    "--autosquash",
+    `${commit}~`,
+  ]);
+
+  // suppress false-positive detection of file changes
+  await denops.cmd("silent checktime");
+}
+
 async function doFixup(
   denops: Denops,
   bufnr: number,
   range: Range,
   gatherCandidates: GatherCandidates<Candidate>,
+  instant: boolean,
 ): Promise<void> {
   const xs = await gatherCandidates(denops, bufnr, range);
   const commit = xs.map((v) => v.commit).join("\n");
@@ -58,6 +76,10 @@ async function doFixup(
     "commit",
     `--fixup=${commit}`,
   ]);
+
+  if (instant) {
+    await doInstantSquash(denops, `${commit}~`);
+  }
 }
 
 async function doFixupInteractive(
@@ -73,32 +95,4 @@ async function doFixupInteractive(
   denops
     .dispatch("gin", "command", "", ["commit", `--fixup=${kind}:${commit}`])
     .catch((e) => console.error(`failed to execute git commit: ${e}`));
-}
-
-async function doFixupInstant(
-  denops: Denops,
-  bufnr: number,
-  range: Range,
-  gatherCandidates: GatherCandidates<Candidate>,
-): Promise<void> {
-  const xs = await gatherCandidates(denops, bufnr, range);
-  const commit = xs.map((v) => v.commit).join("\n");
-  await denops.dispatch("gin", "command", "", [
-    "commit",
-    `--fixup=${commit}`,
-  ]);
-
-  // autosquash without opening an editor
-  await denops.dispatch("gin", "command", "", [
-    "-c",
-    "sequence.editor=true",
-    "rebase",
-    "--interactive",
-    "--autostash",
-    "--autosquash",
-    `${commit}~`,
-  ]);
-
-  // suppress false-positive detection of file changes
-  await denops.cmd("silent checktime");
 }
