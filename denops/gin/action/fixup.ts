@@ -14,29 +14,37 @@ export async function init(
       denops,
       bufnr,
       "fixup:fixup",
-      (denops, bufnr, range) => doFixup(denops, bufnr, range, gatherCandidates),
+      (denops, bufnr, range) =>
+        doFixup(denops, bufnr, range, gatherCandidates, false),
     );
     await define(
       denops,
       bufnr,
-      "fixup:amend",
+      "fixup:instant-fixup",
       (denops, bufnr, range) =>
-        doFixupInteractive(denops, bufnr, range, "amend", gatherCandidates),
+        doFixup(denops, bufnr, range, gatherCandidates, true),
     );
-    await define(
-      denops,
-      bufnr,
-      "fixup:reword",
-      (denops, bufnr, range) =>
-        doFixupInteractive(denops, bufnr, range, "reword", gatherCandidates),
-    );
-    await define(
-      denops,
-      bufnr,
-      "fixup:instant",
-      (denops, bufnr, range) =>
-        doFixupInstant(denops, bufnr, range, gatherCandidates),
-    );
+
+    const kinds = ["amend", "reword"] as const;
+    for (const kind of kinds) {
+      for (const instant of [true, false]) {
+        await define(
+          denops,
+          bufnr,
+          instant ? `fixup:instant-${kind}` : `fixup:${kind}`,
+          (denops, bufnr, range) =>
+            doFixupInteractive(
+              denops,
+              bufnr,
+              range,
+              kind,
+              gatherCandidates,
+              instant,
+            ),
+        );
+      }
+    }
+
     await alias(
       denops,
       bufnr,
@@ -46,48 +54,7 @@ export async function init(
   });
 }
 
-async function doFixup(
-  denops: Denops,
-  bufnr: number,
-  range: Range,
-  gatherCandidates: GatherCandidates<Candidate>,
-): Promise<void> {
-  const xs = await gatherCandidates(denops, bufnr, range);
-  const commit = xs.map((v) => v.commit).join("\n");
-  await denops.dispatch("gin", "command", "", [
-    "commit",
-    `--fixup=${commit}`,
-  ]);
-}
-
-async function doFixupInteractive(
-  denops: Denops,
-  bufnr: number,
-  range: Range,
-  kind: "amend" | "reword",
-  gatherCandidates: GatherCandidates<Candidate>,
-): Promise<void> {
-  const xs = await gatherCandidates(denops, bufnr, range);
-  const commit = xs.map((v) => v.commit).join("\n");
-  // Do not block Vim so that users can edit commit message
-  denops
-    .dispatch("gin", "command", "", ["commit", `--fixup=${kind}:${commit}`])
-    .catch((e) => console.error(`failed to execute git commit: ${e}`));
-}
-
-async function doFixupInstant(
-  denops: Denops,
-  bufnr: number,
-  range: Range,
-  gatherCandidates: GatherCandidates<Candidate>,
-): Promise<void> {
-  const xs = await gatherCandidates(denops, bufnr, range);
-  const commit = xs.map((v) => v.commit).join("\n");
-  await denops.dispatch("gin", "command", "", [
-    "commit",
-    `--fixup=${commit}`,
-  ]);
-
+async function doInstantSquash(denops: Denops, commit: string): Promise<void> {
   // autosquash without opening an editor
   await denops.dispatch("gin", "command", "", [
     "-c",
@@ -101,4 +68,42 @@ async function doFixupInstant(
 
   // suppress false-positive detection of file changes
   await denops.cmd("silent checktime");
+}
+
+async function doFixup(
+  denops: Denops,
+  bufnr: number,
+  range: Range,
+  gatherCandidates: GatherCandidates<Candidate>,
+  instant: boolean,
+): Promise<void> {
+  const xs = await gatherCandidates(denops, bufnr, range);
+  const commit = xs.map((v) => v.commit).join("\n");
+  await denops.dispatch("gin", "command", "", [
+    "commit",
+    `--fixup=${commit}`,
+  ]);
+
+  if (instant) {
+    await doInstantSquash(denops, `${commit}~`);
+  }
+}
+
+async function doFixupInteractive(
+  denops: Denops,
+  bufnr: number,
+  range: Range,
+  kind: "amend" | "reword",
+  gatherCandidates: GatherCandidates<Candidate>,
+  instant: boolean,
+): Promise<void> {
+  const xs = await gatherCandidates(denops, bufnr, range);
+  const commit = xs.map((v) => v.commit).join("\n");
+  // Do not block Vim so that users can edit commit message
+  denops
+    .dispatch("gin", "command", "", ["commit", `--fixup=${kind}:${commit}`])
+    .then(
+      instant ? () => doInstantSquash(denops, `${commit}~`) : undefined,
+      (e) => console.error(`failed to execute git commit: ${e}`),
+    );
 }
