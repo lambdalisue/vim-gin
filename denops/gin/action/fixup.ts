@@ -63,6 +63,7 @@ async function doInstantSquash(denops: Denops, commit: string): Promise<void> {
     "--interactive",
     "--autostash",
     "--autosquash",
+    "--quiet",
     `${commit}~`,
   ]);
 
@@ -100,8 +101,12 @@ async function doFixupInteractive(
   const xs = await gatherCandidates(denops, bufnr, range);
   const commit = xs.map((v) => v.commit).join("\n");
   // Do not block Vim so that users can edit commit message
+  const args = ["commit", `--fixup=${kind}:${commit}`];
+  if (instant) {
+    args.push("--quiet");
+  }
   denops
-    .dispatch("gin", "command", "", ["commit", `--fixup=${kind}:${commit}`])
+    .dispatch("gin", "command", "", args)
     .then(
       instant ? () => doInstantSquash(denops, `${commit}~`) : undefined,
       (e) => console.error(`failed to execute git commit: ${e}`),
