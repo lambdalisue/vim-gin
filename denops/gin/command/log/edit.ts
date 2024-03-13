@@ -77,7 +77,10 @@ export async function exec(
   const args = [
     "log",
     "--color=always",
-    ...formatFlags(options.flags ?? {}),
+    ...formatFlags({
+      "decorate": "short",
+      ...(options.flags ?? {}),
+    }),
     ...(unnullish(options.commitish, (v) => [v]) ?? []),
     "--",
     ...(filenames ?? []),
