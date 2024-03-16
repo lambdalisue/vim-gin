@@ -26,10 +26,10 @@ export async function exec(
 ): Promise<void> {
   const [verbose, aliases] = await batch.collect(denops, (denops) => [
     option.verbose.get(denops),
-    vars.g.get(denops, "git_browse_aliases", {}),
+    vars.g.get(denops, "gin_browse_aliases", {}),
   ]);
   assert(aliases, is.RecordOf(is.String), {
-    name: "g:git_browse_aliases",
+    name: "g:gin_browse_aliases",
   });
 
   const worktree = await findWorktreeFromDenops(denops, {
