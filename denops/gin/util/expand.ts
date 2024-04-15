@@ -1,19 +1,22 @@
 import type { Denops } from "https://deno.land/x/denops_std@v6.0.1/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v6.0.1/function/mod.ts";
 import { parse as parseBufname } from "https://deno.land/x/denops_std@v6.0.1/bufname/mod.ts";
+import { join } from "https://deno.land/std@0.222.1/path/join.ts";
+import { ensure, is } from "https://deno.land/x/unknownutil@v3.18.0/mod.ts";
 import { GIN_FILE_BUFFER_PROTOCOLS } from "../global.ts";
 
 export async function expand(denops: Denops, expr: string): Promise<string> {
-  const bufname = await fn.expand(denops, expr) as string;
+  const bufname = ensure(await fn.expand(denops, expr), is.String);
   try {
-    const { scheme, fragment } = parseBufname(bufname);
+    const { scheme, expr, fragment } = parseBufname(bufname);
     if (fragment && GIN_FILE_BUFFER_PROTOCOLS.includes(scheme)) {
       try {
         // Return the first path if the buffer has multiple paths
         const paths = JSON.parse(fragment);
-        return paths.at(0) ?? bufname;
+        const path = paths.at(0);
+        return path ? join(expr, path) : bufname;
       } catch {
-        return fragment;
+        return join(expr, fragment);
       }
     }
   } catch {
