@@ -25,7 +25,7 @@ INTERFACE			|gin-interface|
 =============================================================================
 INTRODUCTION					*gin-introduction*
 
-Gin ( *gin.vim* ) is a plugin to handle git repository from Vim/Neovim.
+Gin ( *vim-gin* ) is a plugin to handle git repository from Vim/Neovim.
 
 
 =============================================================================

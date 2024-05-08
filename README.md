@@ -1,10 +1,10 @@
-# 🥃 gin.vim
+# 🥃 vim-gin
 
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![vim help](https://img.shields.io/badge/vim-%3Ah%20gin-orange.svg)](doc/gin.txt)
-[![test](https://github.com/lambdalisue/gin.vim/actions/workflows/test.yml/badge.svg)](https://github.com/lambdalisue/gin.vim/actions/workflows/test.yml)
+[![test](https://github.com/lambdalisue/vim-gin/actions/workflows/test.yml/badge.svg)](https://github.com/lambdalisue/vim-gin/actions/workflows/test.yml)
 
-Gin (_gin.vim_) is a plugin to handle git repository from Vim/Neovim.
+Gin (_vim-gin_) is a plugin to handle git repository from Vim/Neovim.
 
 **Alpha version. Any changes, including backward incompatible ones, are applied
 without announcements.**
@@ -26,7 +26,7 @@ without announcements.**
 - `GinPatch` to stage changes partially (like `git add -p`)
 - `GinStatus` to see `git status` of a repository
 
-See [Features](https://github.com/lambdalisue/gin.vim/wiki/Features) in Wiki for
+See [Features](https://github.com/lambdalisue/vim-gin/wiki/Features) in Wiki for
 detail about each features.
 
 ## Requirements
@@ -46,11 +46,11 @@ Install [Deno](https://deno.land) then use
 
 ```vim
 Plug 'vim-denops/denops.vim'
-Plug 'lambdalisue/gin.vim'
+Plug 'lambdalisue/vim-gin'
 ```
 
 Or see
-[How to install](https://github.com/lambdalisue/gin.vim/wiki#how-to-install)
+[How to install](https://github.com/lambdalisue/vim-gin/wiki#how-to-install)
 section in Wiki for other Vim plugin managers.
 
 ## Similar projects
