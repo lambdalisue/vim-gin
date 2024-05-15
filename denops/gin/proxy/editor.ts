@@ -1,5 +1,5 @@
 #!/usr/bin/env -S deno run --no-check --allow-env=GIN_PROXY_ADDRESS --allow-net=127.0.0.1
-import { pop, push } from "https://deno.land/x/streamtools@v0.5.0/mod.ts";
+import { pop, push } from "https://deno.land/x/streamtools@v1.0.0/mod.ts";
 import { ensure, is } from "https://deno.land/x/unknownutil@v3.14.1/mod.ts";
 
 const resultPattern = /^([^:]+):(.*)$/;
