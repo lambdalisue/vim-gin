@@ -1,15 +1,15 @@
-import type { Denops } from "https://deno.land/x/denops_std@v6.0.1/mod.ts";
-import { unnullish } from "https://deno.land/x/unnullish@v1.0.1/mod.ts";
-import { assert, is } from "https://deno.land/x/unknownutil@v3.14.1/mod.ts";
-import { systemopen } from "https://deno.land/x/systemopen@v0.2.0/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v6.5.0/mod.ts";
+import { unnullish } from "https://deno.land/x/unnullish@v1.0.2/mod.ts";
+import { assert, is } from "https://deno.land/x/unknownutil@v3.18.1/mod.ts";
+import { systemopen } from "https://deno.land/x/systemopen@v1.0.0/mod.ts";
 import {
   getURL,
   Options,
-} from "https://deno.land/x/git_browse@v1.0.1/bin/browse.ts";
-import * as batch from "https://deno.land/x/denops_std@v6.0.1/batch/mod.ts";
-import * as vars from "https://deno.land/x/denops_std@v6.0.1/variable/mod.ts";
-import * as path from "https://deno.land/std@0.214.0/path/mod.ts";
-import * as option from "https://deno.land/x/denops_std@v6.0.1/option/mod.ts";
+} from "https://deno.land/x/git_browse@v1.1.6/bin/browse.ts";
+import * as batch from "https://deno.land/x/denops_std@v6.5.0/batch/mod.ts";
+import * as vars from "https://deno.land/x/denops_std@v6.5.0/variable/mod.ts";
+import * as path from "https://deno.land/std@0.224.0/path/mod.ts";
+import * as option from "https://deno.land/x/denops_std@v6.5.0/option/mod.ts";
 import { findWorktreeFromDenops } from "../../git/worktree.ts";
 import { yank } from "../../util/yank.ts";
 
