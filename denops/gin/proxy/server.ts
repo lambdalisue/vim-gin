@@ -6,7 +6,7 @@ import * as fn from "https://deno.land/x/denops_std@v6.5.1/function/mod.ts";
 import * as vars from "https://deno.land/x/denops_std@v6.5.1/variable/mod.ts";
 import { ensure, is } from "https://deno.land/x/unknownutil@v3.14.1/mod.ts";
 import * as path from "https://deno.land/std@0.224.0/path/mod.ts";
-import { pop, push } from "https://deno.land/x/streamtools@v0.5.0/mod.ts";
+import { pop, push } from "https://deno.land/x/streamtools@v1.0.0/mod.ts";
 import { decodeUtf8, encodeUtf8 } from "../util/text.ts";
 
 const recordPattern = /^([^:]+?):(.*)$/;

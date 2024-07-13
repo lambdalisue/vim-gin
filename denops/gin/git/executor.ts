@@ -1,5 +1,5 @@
 import type { Denops } from "https://deno.land/x/denops_std@v6.5.1/mod.ts";
-import { readAll } from "https://deno.land/x/streamtools@v0.5.0/read_all.ts";
+import { readAll } from "https://deno.land/x/streamtools@v1.0.0/read_all.ts";
 import * as batch from "https://deno.land/x/denops_std@v6.5.1/batch/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v6.5.1/function/mod.ts";
 import * as option from "https://deno.land/x/denops_std@v6.5.1/option/mod.ts";
