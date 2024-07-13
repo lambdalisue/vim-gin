@@ -4,7 +4,7 @@ import {
   assert,
   ensure,
   is,
-} from "https://deno.land/x/unknownutil@v3.14.1/mod.ts";
+} from "https://deno.land/x/unknownutil@v3.18.1/mod.ts";
 import * as batch from "https://deno.land/x/denops_std@v6.5.1/batch/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v6.5.1/function/mod.ts";
 import * as helper from "https://deno.land/x/denops_std@v6.5.1/helper/mod.ts";
