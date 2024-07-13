@@ -1,6 +1,6 @@
-import type { Denops } from "https://deno.land/x/denops_std@v6.0.1/mod.ts";
-import * as batch from "https://deno.land/x/denops_std@v6.0.1/batch/mod.ts";
-import * as buffer from "https://deno.land/x/denops_std@v6.0.1/buffer/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v6.5.1/mod.ts";
+import * as batch from "https://deno.land/x/denops_std@v6.5.1/batch/mod.ts";
+import * as buffer from "https://deno.land/x/denops_std@v6.5.1/buffer/mod.ts";
 import { alias, define, GatherCandidates, Range } from "./core.ts";
 
 export type Candidate = { path: string };
