@@ -1,5 +1,5 @@
 import type { Denops } from "https://deno.land/x/denops_std@v6.5.1/mod.ts";
-import { unnullish } from "https://deno.land/x/unnullish@v1.0.1/mod.ts";
+import { unnullish } from "https://deno.land/x/unnullish@v1.0.2/mod.ts";
 import {
   assert,
   ensure,

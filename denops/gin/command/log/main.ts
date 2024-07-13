@@ -1,6 +1,6 @@
 import type { Denops } from "https://deno.land/x/denops_std@v6.5.1/mod.ts";
 import { assert, is } from "https://deno.land/x/unknownutil@v3.18.1/mod.ts";
-import { unnullish } from "https://deno.land/x/unnullish@v1.0.1/unnullish.ts";
+import { unnullish } from "https://deno.land/x/unnullish@v1.0.2/unnullish.ts";
 import * as helper from "https://deno.land/x/denops_std@v6.5.1/helper/mod.ts";
 import {
   builtinOpts,

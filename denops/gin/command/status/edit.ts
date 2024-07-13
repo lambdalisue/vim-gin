@@ -1,5 +1,5 @@
 import type { Denops } from "https://deno.land/x/denops_std@v6.5.1/mod.ts";
-import { unnullish } from "https://deno.land/x/unnullish@v1.0.1/mod.ts";
+import { unnullish } from "https://deno.land/x/unnullish@v1.0.2/mod.ts";
 import * as path from "https://deno.land/std@0.224.0/path/mod.ts";
 import * as autocmd from "https://deno.land/x/denops_std@v6.5.1/autocmd/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v6.5.1/function/mod.ts";

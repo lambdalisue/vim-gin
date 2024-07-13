@@ -1,6 +1,6 @@
 import type { Denops } from "https://deno.land/x/denops_std@v6.5.1/mod.ts";
 import * as path from "https://deno.land/std@0.224.0/path/mod.ts";
-import { unnullish } from "https://deno.land/x/unnullish@v1.0.1/mod.ts";
+import { unnullish } from "https://deno.land/x/unnullish@v1.0.2/mod.ts";
 import * as buffer from "https://deno.land/x/denops_std@v6.5.1/buffer/mod.ts";
 import * as option from "https://deno.land/x/denops_std@v6.5.1/option/mod.ts";
 import {
