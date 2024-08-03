@@ -1,5 +1,5 @@
-import type { Denops } from "https://deno.land/x/denops_std@v6.0.1/mod.ts";
-import * as batch from "https://deno.land/x/denops_std@v6.0.1/batch/mod.ts";
+import type { Denops } from "jsr:@denops/std@^7.0.0";
+import * as batch from "jsr:@denops/std@^7.0.0/batch";
 import { define, GatherCandidates, Range } from "./core.ts";
 
 export type Candidate = { commit: string };

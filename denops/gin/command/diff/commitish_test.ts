@@ -1,4 +1,4 @@
-import { assertEquals } from "https://deno.land/std@0.214.0/assert/mod.ts";
+import { assertEquals } from "jsr:@std/assert@^1.0.0";
 import { Commitish, INDEX, parseCommitish, WORKTREE } from "./commitish.ts";
 
 Deno.test("parseCommitish", () => {

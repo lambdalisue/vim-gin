@@ -1,10 +1,10 @@
-import type { Denops } from "https://deno.land/x/denops_std@v6.0.1/mod.ts";
-import { assert, is } from "https://deno.land/x/unknownutil@v3.14.1/mod.ts";
-import { unnullish } from "https://deno.land/x/unnullish@v1.0.1/mod.ts";
-import * as itertools from "https://deno.land/x/itertools@v1.1.1/mod.ts";
-import * as ansiEscapeCode from "https://deno.land/x/ansi_escape_code@v1.0.2/mod.ts";
-import * as batch from "https://deno.land/x/denops_std@v6.0.1/batch/mod.ts";
-import { Decoration } from "https://deno.land/x/denops_std@v6.0.1/buffer/mod.ts";
+import type { Denops } from "jsr:@denops/std@^7.0.0";
+import { assert, is } from "jsr:@core/unknownutil@^4.0.0";
+import { unnullish } from "jsr:@lambdalisue/unnullish@^1.0.0";
+import * as itertools from "jsr:@lambdalisue/itertools@^1.0.0";
+import * as ansiEscapeCode from "jsr:@lambdalisue/ansi-escape-code@^1.0.0";
+import * as batch from "jsr:@denops/std@^7.0.0/batch";
+import { Decoration } from "jsr:@denops/std@^7.0.0/buffer";
 import { countVimBytes } from "./text.ts";
 
 export function removeAnsiEscapeCode(

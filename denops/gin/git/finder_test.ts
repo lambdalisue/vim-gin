@@ -1,8 +1,5 @@
-import {
-  assertEquals,
-  assertRejects,
-} from "https://deno.land/std@0.214.0/assert/mod.ts";
-import * as path from "https://deno.land/std@0.214.0/path/mod.ts";
+import { assertEquals, assertRejects } from "jsr:@std/assert@^1.0.0";
+import * as path from "jsr:@std/path@^1.0.0";
 import { find } from "./finder.ts";
 import { ExecuteError } from "./process.ts";
 

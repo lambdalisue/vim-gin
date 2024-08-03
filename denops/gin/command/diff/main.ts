@@ -1,12 +1,12 @@
-import type { Denops } from "https://deno.land/x/denops_std@v6.0.1/mod.ts";
-import { assert, is } from "https://deno.land/x/unknownutil@v3.14.1/mod.ts";
-import * as helper from "https://deno.land/x/denops_std@v6.0.1/helper/mod.ts";
+import type { Denops } from "jsr:@denops/std@^7.0.0";
+import { as, assert, is } from "jsr:@core/unknownutil@^4.0.0";
+import * as helper from "jsr:@denops/std@^7.0.0/helper";
 import {
   builtinOpts,
   formatOpts,
   parse,
   validateOpts,
-} from "https://deno.land/x/denops_std@v6.0.1/argument/mod.ts";
+} from "jsr:@denops/std@^7.0.0/argument";
 import { fillCmdArgs, normCmdArgs, parseSilent } from "../../util/cmd.ts";
 import { exec } from "./command.ts";
 import { edit } from "./edit.ts";
@@ -39,15 +39,15 @@ export function main(denops: Denops): void {
       return helper.friendlyCall(denops, () => read(denops, bufnr, bufname));
     },
     "diff:jump:new": (mods) => {
-      assert(mods, is.OptionalOf(is.String), { name: "mods" });
+      assert(mods, as.Optional(is.String), { name: "mods" });
       return helper.friendlyCall(denops, () => jumpNew(denops, mods ?? ""));
     },
     "diff:jump:old": (mods) => {
-      assert(mods, is.OptionalOf(is.String), { name: "mods" });
+      assert(mods, as.Optional(is.String), { name: "mods" });
       return helper.friendlyCall(denops, () => jumpOld(denops, mods ?? ""));
     },
     "diff:jump:smart": (mods) => {
-      assert(mods, is.OptionalOf(is.String), { name: "mods" });
+      assert(mods, as.Optional(is.String), { name: "mods" });
       return helper.friendlyCall(denops, () => jumpSmart(denops, mods ?? ""));
     },
   };

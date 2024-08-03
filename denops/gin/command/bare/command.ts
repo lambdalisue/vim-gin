@@ -1,7 +1,7 @@
-import type { Denops } from "https://deno.land/x/denops_std@v6.0.1/mod.ts";
-import * as autocmd from "https://deno.land/x/denops_std@v6.0.1/autocmd/mod.ts";
-import * as helper from "https://deno.land/x/denops_std@v6.0.1/helper/mod.ts";
-import * as option from "https://deno.land/x/denops_std@v6.0.1/option/mod.ts";
+import type { Denops } from "jsr:@denops/std@^7.0.0";
+import * as autocmd from "jsr:@denops/std@^7.0.0/autocmd";
+import * as helper from "jsr:@denops/std@^7.0.0/helper";
+import * as option from "jsr:@denops/std@^7.0.0/option";
 import { removeAnsiEscapeCode } from "../../util/ansi_escape_code.ts";
 import { execute } from "../../git/executor.ts";
 

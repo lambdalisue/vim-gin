@@ -1,6 +1,6 @@
-import type { Denops } from "https://deno.land/x/denops_std@v6.0.1/mod.ts";
-import { assert, is } from "https://deno.land/x/unknownutil@v3.14.1/mod.ts";
-import * as buffer from "https://deno.land/x/denops_std@v6.0.1/buffer/mod.ts";
+import type { Denops } from "jsr:@denops/std@^7.0.0";
+import { as, assert, is } from "jsr:@core/unknownutil@^4.0.0";
+import * as buffer from "jsr:@denops/std@^7.0.0/buffer";
 import { expand } from "./expand.ts";
 import { findWorktreeFromDenops } from "../git/worktree.ts";
 
@@ -18,7 +18,7 @@ export function main(denops: Denops): void {
     },
 
     "util:worktree": (worktree) => {
-      assert(worktree, is.OptionalOf(is.String), {
+      assert(worktree, as.Optional(is.String), {
         name: "worktree",
       });
       return findWorktreeFromDenops(denops, { worktree });

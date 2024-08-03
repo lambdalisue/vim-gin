@@ -1,8 +1,8 @@
-import type { Denops } from "https://deno.land/x/denops_std@v6.0.1/mod.ts";
-import { assert, is } from "https://deno.land/x/unknownutil@v3.14.1/mod.ts";
-import * as batch from "https://deno.land/x/denops_std@v6.0.1/batch/mod.ts";
-import * as vars from "https://deno.land/x/denops_std@v6.0.1/variable/mod.ts";
-import { Silent } from "https://deno.land/x/denops_std@v6.0.1/helper/mod.ts";
+import type { Denops } from "jsr:@denops/std@^7.0.0";
+import { assert, is } from "jsr:@core/unknownutil@^4.0.0";
+import * as batch from "jsr:@denops/std@^7.0.0/batch";
+import * as vars from "jsr:@denops/std@^7.0.0/variable";
+import { Silent } from "jsr:@denops/std@^7.0.0/helper";
 import { expand } from "./expand.ts";
 
 export function parseSilent(mods: string): Silent {

@@ -1,17 +1,10 @@
-import type { Denops } from "https://deno.land/x/denops_std@v6.0.1/mod.ts";
-import { unnullish } from "https://deno.land/x/unnullish@v1.0.1/mod.ts";
-import {
-  assert,
-  ensure,
-  is,
-} from "https://deno.land/x/unknownutil@v3.14.1/mod.ts";
-import * as batch from "https://deno.land/x/denops_std@v6.0.1/batch/mod.ts";
-import * as fn from "https://deno.land/x/denops_std@v6.0.1/function/mod.ts";
-import * as helper from "https://deno.land/x/denops_std@v6.0.1/helper/mod.ts";
-import {
-  parse,
-  validateOpts,
-} from "https://deno.land/x/denops_std@v6.0.1/argument/mod.ts";
+import type { Denops } from "jsr:@denops/std@^7.0.0";
+import { unnullish } from "jsr:@lambdalisue/unnullish@^1.0.0";
+import { assert, ensure, is } from "jsr:@core/unknownutil@^4.0.0";
+import * as batch from "jsr:@denops/std@^7.0.0/batch";
+import * as fn from "jsr:@denops/std@^7.0.0/function";
+import * as helper from "jsr:@denops/std@^7.0.0/helper";
+import { parse, validateOpts } from "jsr:@denops/std@^7.0.0/argument";
 import { fillCmdArgs, normCmdArgs } from "../../util/cmd.ts";
 import { exec } from "./command.ts";
 
@@ -24,7 +17,7 @@ export function main(denops: Denops): void {
     ...denops.dispatcher,
     "browse:command": (args, range) => {
       assert(args, is.ArrayOf(is.String), { name: "args" });
-      assert(range, is.OneOf([is.Undefined, isRange]), { name: "range" });
+      assert(range, is.UnionOf([is.Undefined, isRange]), { name: "range" });
       return helper.friendlyCall(
         denops,
         () =>
@@ -63,7 +56,7 @@ async function command(
     worktree: opts.worktree,
     yank: opts.yank === "" ? true : (opts.yank ?? false),
     noBrowser: ("n" in flags || "no-browser" in flags),
-    remote: ensure(flags.remote, is.OneOf([is.Undefined, is.String]), {
+    remote: ensure(flags.remote, is.UnionOf([is.Undefined, is.String]), {
       "message": "REMOTE in --remote={REMOTE} must be string",
     }),
     path,

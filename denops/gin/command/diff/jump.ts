@@ -1,12 +1,10 @@
-import type { Denops } from "https://deno.land/x/denops_std@v6.0.1/mod.ts";
-import { ensure, is } from "https://deno.land/x/unknownutil@v3.14.1/mod.ts";
-import * as path from "https://deno.land/std@0.214.0/path/mod.ts";
-import * as batch from "https://deno.land/x/denops_std@v6.0.1/batch/mod.ts";
-import * as buffer from "https://deno.land/x/denops_std@v6.0.1/buffer/mod.ts";
-import * as fn from "https://deno.land/x/denops_std@v6.0.1/function/mod.ts";
-import {
-  parse as parseBufname,
-} from "https://deno.land/x/denops_std@v6.0.1/bufname/mod.ts";
+import type { Denops } from "jsr:@denops/std@^7.0.0";
+import { ensure, is } from "jsr:@core/unknownutil@^4.0.0";
+import * as path from "jsr:@std/path@^1.0.0";
+import * as batch from "jsr:@denops/std@^7.0.0/batch";
+import * as buffer from "jsr:@denops/std@^7.0.0/buffer";
+import * as fn from "jsr:@denops/std@^7.0.0/function";
+import { parse as parseBufname } from "jsr:@denops/std@^7.0.0/bufname";
 import { exec as execEdit } from "../edit/command.ts";
 import { Commitish, INDEX, parseCommitish, WORKTREE } from "./commitish.ts";
 
