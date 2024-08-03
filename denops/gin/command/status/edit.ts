@@ -1,18 +1,14 @@
-import type { Denops } from "https://deno.land/x/denops_std@v6.0.1/mod.ts";
-import { unnullish } from "https://deno.land/x/unnullish@v1.0.1/mod.ts";
-import * as path from "https://deno.land/std@0.214.0/path/mod.ts";
-import * as autocmd from "https://deno.land/x/denops_std@v6.0.1/autocmd/mod.ts";
-import * as fn from "https://deno.land/x/denops_std@v6.0.1/function/mod.ts";
-import * as batch from "https://deno.land/x/denops_std@v6.0.1/batch/mod.ts";
-import * as buffer from "https://deno.land/x/denops_std@v6.0.1/buffer/mod.ts";
-import * as option from "https://deno.land/x/denops_std@v6.0.1/option/mod.ts";
-import * as vars from "https://deno.land/x/denops_std@v6.0.1/variable/mod.ts";
-import { parse as parseBufname } from "https://deno.land/x/denops_std@v6.0.1/bufname/mod.ts";
-import {
-  Flags,
-  formatFlags,
-  parseOpts,
-} from "https://deno.land/x/denops_std@v6.0.1/argument/mod.ts";
+import type { Denops } from "jsr:@denops/std@^7.0.0";
+import { unnullish } from "jsr:@lambdalisue/unnullish@^1.0.0";
+import * as path from "jsr:@std/path@^1.0.0";
+import * as autocmd from "jsr:@denops/std@^7.0.0/autocmd";
+import * as fn from "jsr:@denops/std@^7.0.0/function";
+import * as batch from "jsr:@denops/std@^7.0.0/batch";
+import * as buffer from "jsr:@denops/std@^7.0.0/buffer";
+import * as option from "jsr:@denops/std@^7.0.0/option";
+import * as vars from "jsr:@denops/std@^7.0.0/variable";
+import { parse as parseBufname } from "jsr:@denops/std@^7.0.0/bufname";
+import { Flags, formatFlags, parseOpts } from "jsr:@denops/std@^7.0.0/argument";
 import { bind } from "../../command/bare/command.ts";
 import { exec as execBuffer } from "../../command/buffer/edit.ts";
 import { findWorktreeFromDenops } from "../../git/worktree.ts";

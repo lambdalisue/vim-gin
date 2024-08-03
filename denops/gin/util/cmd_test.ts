@@ -1,8 +1,8 @@
-import { assertEquals } from "https://deno.land/std@0.214.0/assert/mod.ts";
-import * as batch from "https://deno.land/x/denops_std@v6.0.1/batch/mod.ts";
-import * as fn from "https://deno.land/x/denops_std@v6.0.1/function/mod.ts";
-import * as path from "https://deno.land/std@0.214.0/path/mod.ts";
-import { deadline } from "https://deno.land/std@0.214.0/async/mod.ts";
+import { assertEquals } from "jsr:@std/assert@^1.0.0";
+import * as batch from "jsr:@denops/std@^7.0.0/batch";
+import * as fn from "jsr:@denops/std@^7.0.0/function";
+import * as path from "jsr:@std/path@^1.0.0";
+import { deadline } from "jsr:@std/async@^1.0.0";
 import { test } from "./testutil.ts";
 import { normCmdArgs } from "./cmd.ts";
 

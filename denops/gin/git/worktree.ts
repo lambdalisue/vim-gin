@@ -1,8 +1,8 @@
-import type { Denops } from "https://deno.land/x/denops_std@v6.0.1/mod.ts";
-import * as batch from "https://deno.land/x/denops_std@v6.0.1/batch/mod.ts";
-import { parse as parseBufname } from "https://deno.land/x/denops_std@v6.0.1/bufname/mod.ts";
-import * as fn from "https://deno.land/x/denops_std@v6.0.1/function/mod.ts";
-import * as path from "https://deno.land/std@0.214.0/path/mod.ts";
+import type { Denops } from "jsr:@denops/std@^7.0.0";
+import * as batch from "jsr:@denops/std@^7.0.0/batch";
+import { parse as parseBufname } from "jsr:@denops/std@^7.0.0/bufname";
+import * as fn from "jsr:@denops/std@^7.0.0/function";
+import * as path from "jsr:@std/path@^1.0.0";
 import { GIN_BUFFER_PROTOCOLS } from "../global.ts";
 import { expand } from "../util/expand.ts";
 import { find } from "./finder.ts";

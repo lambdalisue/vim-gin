@@ -1,5 +1,5 @@
-import * as path from "https://deno.land/std@0.214.0/path/mod.ts";
-import { Cache } from "https://deno.land/x/ttl_cache@v0.1.1/mod.ts";
+import { resolve, SEPARATOR } from "jsr:@std/path@^1.0.0";
+import { Cache } from "jsr:@lambdalisue/ttl-cache@^1.0.0";
 import { execute } from "./process.ts";
 import { decodeUtf8 } from "../util/text.ts";
 
@@ -24,12 +24,12 @@ export async function find(cwd: string): Promise<string> {
 }
 
 async function findInternal(cwd: string): Promise<string> {
-  const terms = cwd.split(path.SEP);
+  const terms = cwd.split(SEPARATOR);
   if (terms.includes(".git")) {
     // `git rev-parse` does not work in a ".git" directory
     // so use a parent directory of it instead.
     const index = terms.indexOf(".git");
-    cwd = terms.slice(0, index).join(path.SEP);
+    cwd = terms.slice(0, index).join(SEPARATOR);
   }
   const stdout = await execute(
     [
@@ -42,5 +42,5 @@ async function findInternal(cwd: string): Promise<string> {
     },
   );
   const output = decodeUtf8(stdout);
-  return path.resolve(output.split(/\n/, 2)[0]);
+  return resolve(output.split(/\n/, 2)[0]);
 }

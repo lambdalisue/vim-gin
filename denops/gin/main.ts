@@ -1,4 +1,4 @@
-import type { Denops } from "https://deno.land/x/denops_std@v6.0.1/mod.ts";
+import type { Denops } from "jsr:@denops/std@^7.0.0";
 
 import { main as mainBare } from "./command/bare/main.ts";
 import { main as mainBuffer } from "./command/buffer/main.ts";

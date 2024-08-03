@@ -1,9 +1,9 @@
-import type { Denops } from "https://deno.land/x/denops_std@v6.0.1/mod.ts";
-import { unnullish } from "https://deno.land/x/unnullish@v1.0.1/mod.ts";
-import * as buffer from "https://deno.land/x/denops_std@v6.0.1/buffer/mod.ts";
-import * as option from "https://deno.land/x/denops_std@v6.0.1/option/mod.ts";
-import { format as formatBufname } from "https://deno.land/x/denops_std@v6.0.1/bufname/mod.ts";
-import { Flags } from "https://deno.land/x/denops_std@v6.0.1/argument/mod.ts";
+import type { Denops } from "jsr:@denops/std@^7.0.0";
+import { unnullish } from "jsr:@lambdalisue/unnullish@^1.0.0";
+import * as buffer from "jsr:@denops/std@^7.0.0/buffer";
+import * as option from "jsr:@denops/std@^7.0.0/option";
+import { format as formatBufname } from "jsr:@denops/std@^7.0.0/bufname";
+import { Flags } from "jsr:@denops/std@^7.0.0/argument";
 import { findWorktreeFromDenops } from "../../git/worktree.ts";
 
 export type ExecOptions = {

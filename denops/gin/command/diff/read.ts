@@ -1,17 +1,15 @@
-import type { Denops } from "https://deno.land/x/denops_std@v6.0.1/mod.ts";
-import { unnullish } from "https://deno.land/x/unnullish@v1.0.1/mod.ts";
-import { ensure, is } from "https://deno.land/x/unknownutil@v3.14.1/mod.ts";
-import * as vars from "https://deno.land/x/denops_std@v6.0.1/variable/mod.ts";
-import {
-  parse as parseBufname,
-} from "https://deno.land/x/denops_std@v6.0.1/bufname/mod.ts";
+import type { Denops } from "jsr:@denops/std@^7.0.0";
+import { unnullish } from "jsr:@lambdalisue/unnullish@^1.0.0";
+import { ensure, is } from "jsr:@core/unknownutil@^4.0.0";
+import * as vars from "jsr:@denops/std@^7.0.0/variable";
+import { parse as parseBufname } from "jsr:@denops/std@^7.0.0/bufname";
 import {
   builtinOpts,
   Flags,
   formatFlags,
   parseOpts,
   validateOpts,
-} from "https://deno.land/x/denops_std@v6.0.1/argument/mod.ts";
+} from "jsr:@denops/std@^7.0.0/argument";
 import { exec as execBuffer } from "../../command/buffer/read.ts";
 
 export async function read(

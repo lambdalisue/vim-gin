@@ -1,6 +1,4 @@
-import {
-  assertSnapshot,
-} from "https://deno.land/std@0.214.0/testing/snapshot.ts";
+import { assertSnapshot } from "jsr:@std/testing@^1.0.0/snapshot";
 import { test } from "./testutil.ts";
 import { buildDecorationsFromAnsiEscapeCode } from "./ansi_escape_code.ts";
 

@@ -1,8 +1,5 @@
-import * as path from "https://deno.land/std@0.214.0/path/mod.ts";
-import {
-  test as testOri,
-  TestDefinition,
-} from "https://deno.land/x/denops_test@v1.6.1/mod.ts";
+import * as path from "jsr:@std/path@^1.0.0";
+import { test as testOri, TestDefinition } from "jsr:@denops/test@^3.0.0";
 
 const runtimepath = path.resolve(
   path.fromFileUrl(new URL("../../..", import.meta.url)),

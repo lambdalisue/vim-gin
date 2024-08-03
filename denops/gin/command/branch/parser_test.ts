@@ -1,4 +1,4 @@
-import { assertSnapshot } from "https://deno.land/std@0.214.0/testing/snapshot.ts";
+import { assertSnapshot } from "jsr:@std/testing@^1.0.0/snapshot";
 import { parse } from "./parser.ts";
 
 Deno.test("parse", async function (t): Promise<void> {
