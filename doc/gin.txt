@@ -217,9 +217,10 @@ COMMANDS					*gin-commands*
 	directory. Commands call |cd|, |lcd|, and |tcd| respectively.
 	
 							*:GinChaperon*
-:GinChaperon[!] [++{option}...] {path}
+:GinChaperon[!] [++{option}...] [{path}]
 	Open three main buffers (THEIRS, WORKTREE, and OURS) and three
-	supplemental buffers to solve conflicts on {path}.
+	supplemental buffers to solve conflicts on {path}. If no {path} is
+	specified, the default value is the current buffer.
 
 	The following options are valid as {++option}:
 
@@ -343,9 +344,10 @@ COMMANDS					*gin-commands*
 	Use a bang (!) to forcibly open a buffer.
 
 							*:GinPatch*
-:GinPatch[!] [{++option}...] {path}
+:GinPatch[!] [{++option}...] [{path}]
 	Open three buffers (HEAD, INDEX, and WORKTREE) to patch changes of
-	{path}.
+	{path}. If no {path} is specified, the default value is the current
+	buffer.
 
 	The following options are valid as {++option}:
 

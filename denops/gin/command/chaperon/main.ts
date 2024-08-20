@@ -8,6 +8,7 @@ import {
   validateOpts,
 } from "jsr:@denops/std@^7.0.0/argument";
 import { fillCmdArgs, normCmdArgs, parseSilent } from "../../util/cmd.ts";
+import { ensurePath } from "../../util/ensure_path.ts";
 import { exec } from "./command.ts";
 
 export function main(denops: Denops): void {
@@ -46,8 +47,8 @@ async function command(
     ...builtinOpts,
   ]);
 
-  const [abspath] = parseResidue(residue);
-  await exec(denops, abspath, {
+  const [rawpath] = parseResidue(residue);
+  await exec(denops, await ensurePath(denops, rawpath), {
     worktree: opts.worktree,
     opener: opts.opener,
     noOurs: "no-ours" in opts,
@@ -60,9 +61,12 @@ async function command(
 
 function parseResidue(
   residue: string[],
-): [string] {
-  // GinChaperon [{options}] {path}
+): [string | undefined] {
   switch (residue.length) {
+    // GinChaperon [{options}]
+    case 0:
+      return [undefined];
+    // GinChaperon [{options}] {path}
     case 1:
       return [residue[0]];
     default:
