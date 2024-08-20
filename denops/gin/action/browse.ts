@@ -122,8 +122,9 @@ async function doBrowse(
   for (const x of xs) {
     await denops.dispatch("gin", "browse:command", [
       ...extraArgs,
-      ...(x.path ? [`--path=${x.path}`] : []),
+      ...(x.path ? [] : ["++repository"]),
       x.commit,
+      ...(x.path ? [x.path] : []),
     ]);
   }
 }
