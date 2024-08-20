@@ -171,11 +171,17 @@ COMMANDS					*gin-commands*
 	Use a bang (!) to forcibly open a buffer.
 
 							*:GinBrowse*
-:GinBrowse [{++option}...] [{flags}] [{commitish}]
+:[range]GinBrowse [{++option}...] [{flags}] [{commitish}] [{path}]
 	Open a system browser to visit the hosting service webpage of the
-	repository. If no {commitish} is given, it defaults to HEAD.
+	repository. If no {commitish} is given, it defaults to HEAD. If no
+	{path} is given, it defaults to the current buffer or the current
+	working directory if the current buffer is not a file.
 
 	The following options are valid as {++option}:
+
+	++repository
+		Open the repository page instead of the blob or commit page.
+		If this option is given, {path} is ignored.
 
 	++yank={regname}
 		Yank the URL to the clipboard.
@@ -190,7 +196,6 @@ COMMANDS					*gin-commands*
 	--commit
 	--home
 	-n, --no-browser
-	--path={PATH}
 	--permalink
 	--pr
 	--remote={REMOTE}
@@ -198,7 +203,7 @@ COMMANDS					*gin-commands*
 	It uses "git-browse" command as a module internally so see usage of
 	that for detail about each {flags}.
 	
-	https://deno.land/x/git_browse
+	https://jsr.io/@lambdalisue/git-browse
 
 	See |g:gin_browse_aliases| to define aliases of REMOTE to support
 	arbitrary domain (e.g. GitHub Enterprise).

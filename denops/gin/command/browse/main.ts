@@ -1,5 +1,4 @@
 import type { Denops } from "jsr:@denops/std@^7.0.0";
-import { unnullish } from "jsr:@lambdalisue/unnullish@^1.0.0";
 import { assert, ensure, is } from "jsr:@core/unknownutil@^4.0.0";
 import * as batch from "jsr:@denops/std@^7.0.0/batch";
 import * as fn from "jsr:@denops/std@^7.0.0/function";
@@ -44,14 +43,12 @@ async function command(
   const [opts, flags, residue] = parse(args);
   validateOpts(opts, [
     "worktree",
+    "repository",
     "yank",
   ]);
 
-  const commitish = parseResidue(residue);
-  const path = unnullish(
-    await ensurePath(denops, flags["path"]),
-    (p) => formatPath(p, options.range),
-  );
+  const [commitish, rawpath] = parseResidue(residue);
+  const path = formatPath(await ensurePath(denops, rawpath), options.range);
   await exec(denops, commitish ?? "HEAD", {
     worktree: opts.worktree,
     yank: opts.yank === "" ? true : (opts.yank ?? false),
@@ -59,7 +56,7 @@ async function command(
     remote: ensure(flags.remote, is.UnionOf([is.Undefined, is.String]), {
       "message": "REMOTE in --remote={REMOTE} must be string",
     }),
-    path,
+    path: "repository" in opts ? undefined : path,
     home: "home" in flags,
     commit: "commit" in flags,
     pr: "pr" in flags,
@@ -69,13 +66,17 @@ async function command(
 
 function parseResidue(
   residue: string[],
-): string | undefined {
-  // GinBrowse [{options}] {commitish}
+): [string | undefined, string | undefined] {
   switch (residue.length) {
+    // GinBrowse [{options}]
     case 0:
-      return undefined;
+      return [undefined, undefined];
+    // GinBrowse [{options}] {commitish}
     case 1:
-      return residue[0];
+      return [residue[0], undefined];
+    // GinBrowse [{options}] {commitish} {path}
+    case 2:
+      return [residue[0], residue[1]];
     default:
       throw new Error("Invalid number of arguments");
   }
@@ -83,19 +84,18 @@ function parseResidue(
 
 async function ensurePath(
   denops: Denops,
-  path?: unknown,
-): Promise<string | undefined> {
+  path?: string,
+): Promise<string> {
+  const bufname = await fn.expand(denops, path ?? "%") as string;
+  const abspath = await fn.fnamemodify(denops, bufname, ":p");
   if (path) {
-    return ensure(path, is.String, {
-      message: "PATH in --path={PATH} must be string",
-    });
+    return abspath;
   }
-  const [bufname, buftype, cwd] = await batch.collect(denops, (denops) => [
-    fn.expand(denops, "%:p") as Promise<string>,
+  const [buftype, cwd] = await batch.collect(denops, (denops) => [
     fn.getbufvar(denops, "%", "&buftype") as Promise<string>,
     fn.getcwd(denops),
   ]);
-  return buftype ? cwd : bufname;
+  return buftype ? cwd : abspath;
 }
 
 function formatPath(path: string, range?: Range): string {
