@@ -13,17 +13,18 @@ const cacheWorktree = new Cache<string, string | Error>(ttl);
  * @returns A root path of a git working directory.
  */
 export async function findWorktree(cwd: string): Promise<string> {
-  const result = cacheWorktree.get(cwd) ?? await (async () => {
+  const path = await Deno.realPath(cwd);
+  const result = cacheWorktree.get(path) ?? await (async () => {
     let result: string | Error;
     try {
-      result = await revParse(cwd, [
+      result = await revParse(path, [
         "--show-toplevel",
         "--show-superproject-working-tree",
       ]);
     } catch (e) {
       result = e;
     }
-    cacheWorktree.set(cwd, result);
+    cacheWorktree.set(path, result);
     return result;
   })();
   if (result instanceof Error) {
