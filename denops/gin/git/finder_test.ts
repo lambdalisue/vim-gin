@@ -1,25 +1,26 @@
 import { assertEquals, assertRejects } from "jsr:@std/assert@^1.0.0";
-import * as path from "jsr:@std/path@^1.0.0";
+import { sandbox } from "jsr:@lambdalisue/sandbox@^2.0.0";
+import $ from "jsr:@david/dax@^0.42.0";
+import { join } from "jsr:@std/path@^1.0.0";
 import { findWorktree } from "./finder.ts";
 import { ExecuteError } from "./process.ts";
 
 Deno.test({
-  name: "find() returns a root path of a git working directory",
+  name: "findWorktree() returns a root path of a git working directory",
   fn: async () => {
-    const exp = path.resolve(
-      path.fromFileUrl(import.meta.url),
-      "../../../../",
-    );
-    assertEquals(await findWorktree("."), exp);
+    await using sbox = await prepare();
+    Deno.chdir(join("a", "b", "c"));
+    assertEquals(await findWorktree("."), sbox.path);
     // An internal cache will be used for the following call
-    assertEquals(await findWorktree("."), exp);
+    assertEquals(await findWorktree("."), sbox.path);
   },
   sanitizeResources: false,
   sanitizeOps: false,
 });
 
 Deno.test({
-  name: "find() throws an error if the path is not in a git working directory",
+  name:
+    "findWorktree() throws an error if the path is not in a git working directory",
   fn: async () => {
     await assertRejects(async () => {
       await findWorktree("/");
@@ -32,3 +33,12 @@ Deno.test({
   sanitizeResources: false,
   sanitizeOps: false,
 });
+
+async function prepare(): ReturnType<typeof sandbox> {
+  const sbox = await sandbox();
+  await $`git init`;
+  await $`git commit --allow-empty -m 'Initial commit' --no-gpg-sign`;
+  await $`git switch -c main`;
+  await Deno.mkdir(join("a", "b", "c"), { recursive: true });
+  return sbox;
+}
