@@ -2,7 +2,7 @@ import type { Denops } from "jsr:@denops/std@^7.0.0";
 import { Cache } from "jsr:@lambdalisue/ttl-cache@^1.0.0";
 import * as path from "jsr:@std/path@^1.0.0";
 import { findWorktreeFromDenops } from "../git/worktree.ts";
-import { find } from "../git/finder.ts";
+import { findWorktree } from "../git/finder.ts";
 
 type Data = string;
 
@@ -13,7 +13,7 @@ async function getData(
 ): Promise<Data> {
   return cache.get("data") ?? await (async () => {
     const worktree = await findWorktreeFromDenops(denops);
-    const result = await find(worktree);
+    const result = await findWorktree(worktree);
     cache.set("data", result);
     return result;
   })();

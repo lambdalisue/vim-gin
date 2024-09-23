@@ -4,17 +4,26 @@ import { execute } from "./process.ts";
 import { decodeUtf8 } from "../util/text.ts";
 
 const ttl = 30000; // seconds
-const cache = new Cache<string, string | Error>(ttl);
+const cacheWorktree = new Cache<string, string | Error>(ttl);
 
-export async function find(cwd: string): Promise<string> {
-  const result = cache.get(cwd) ?? await (async () => {
+/**
+ * Find a root path of a git working directory.
+ *
+ * @param cwd - A current working directory.
+ * @returns A root path of a git working directory.
+ */
+export async function findWorktree(cwd: string): Promise<string> {
+  const result = cacheWorktree.get(cwd) ?? await (async () => {
     let result: string | Error;
     try {
-      result = await findInternal(cwd);
+      result = await revParse(cwd, [
+        "--show-toplevel",
+        "--show-superproject-working-tree",
+      ]);
     } catch (e) {
       result = e;
     }
-    cache.set(cwd, result);
+    cacheWorktree.set(cwd, result);
     return result;
   })();
   if (result instanceof Error) {
@@ -23,7 +32,7 @@ export async function find(cwd: string): Promise<string> {
   return result;
 }
 
-async function findInternal(cwd: string): Promise<string> {
+async function revParse(cwd: string, args: string[]): Promise<string> {
   const terms = cwd.split(SEPARATOR);
   if (terms.includes(".git")) {
     // `git rev-parse` does not work in a ".git" directory
@@ -31,16 +40,7 @@ async function findInternal(cwd: string): Promise<string> {
     const index = terms.indexOf(".git");
     cwd = terms.slice(0, index).join(SEPARATOR);
   }
-  const stdout = await execute(
-    [
-      "rev-parse",
-      "--show-toplevel",
-      "--show-superproject-working-tree",
-    ],
-    {
-      cwd,
-    },
-  );
+  const stdout = await execute(["rev-parse", ...args], { cwd });
   const output = decodeUtf8(stdout);
   return resolve(output.split(/\n/, 2)[0]);
 }
