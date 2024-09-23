@@ -5,6 +5,7 @@ import { decodeUtf8 } from "../util/text.ts";
 
 const ttl = 30000; // seconds
 const cacheWorktree = new Cache<string, string | Error>(ttl);
+const cacheGitdir = new Cache<string, string | Error>(ttl);
 
 /**
  * Find a root path of a git working directory.
@@ -25,6 +26,30 @@ export async function findWorktree(cwd: string): Promise<string> {
       result = e;
     }
     cacheWorktree.set(path, result);
+    return result;
+  })();
+  if (result instanceof Error) {
+    throw result;
+  }
+  return result;
+}
+
+/**
+ * Find a .git directory of a git working directory.
+ *
+ * @param cwd - A current working directory.
+ * @returns A root path of a git working directory.
+ */
+export async function findGitdir(cwd: string): Promise<string> {
+  const path = await Deno.realPath(cwd);
+  const result = cacheGitdir.get(path) ?? await (async () => {
+    let result: string | Error;
+    try {
+      result = await revParse(path, ["--git-dir"]);
+    } catch (e) {
+      result = e;
+    }
+    cacheGitdir.set(path, result);
     return result;
   })();
   if (result instanceof Error) {
