@@ -1,4 +1,5 @@
 {
+  "lock": false,
   "exclude": [
     "docs/**",
     ".coverage/**"
