@@ -5,7 +5,7 @@ import * as fn from "jsr:@denops/std@^7.0.0/function";
 import * as path from "jsr:@std/path@^1.0.0";
 import { GIN_BUFFER_PROTOCOLS } from "../global.ts";
 import { expand } from "../util/expand.ts";
-import { find } from "./finder.ts";
+import { findWorktree } from "./finder.ts";
 
 /**
  * Find a git worktree from a suspected directory
@@ -32,7 +32,7 @@ async function findWorktreeFromSuspect(
         console.debug(`Trying to find a git repository from '${c}'`);
       }
       try {
-        return await find(c);
+        return await findWorktree(c);
       } catch {
         // Fail silently
       }

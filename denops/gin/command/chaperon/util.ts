@@ -1,5 +1,6 @@
 import * as fs from "jsr:@std/fs@^1.0.0";
 import * as path from "jsr:@std/path@^1.0.0";
+import { findGitdir } from "../../git/finder.ts";
 
 const beginMarker = `${"<".repeat(7)} `;
 const endMarker = `${">".repeat(7)} `;
@@ -29,8 +30,9 @@ export type AliasHead = typeof validAliasHeads[number];
 export async function getInProgressAliasHead(
   worktree: string,
 ): Promise<AliasHead | undefined> {
+  const gitdir = await findGitdir(worktree);
   for (const head of validAliasHeads) {
-    if (await fs.exists(path.join(worktree, ".git", head))) {
+    if (await fs.exists(path.join(gitdir, head))) {
       return head;
     }
   }
