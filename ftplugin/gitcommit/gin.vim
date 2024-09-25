@@ -3,8 +3,8 @@ if get(g:, 'gin_proxy_disable_accept_and_cancel_aliases', 0)
 endif
 
 if !exists(':Accept')
-  command! Accept wq
+  command! -buffer Accept wq
 endif
 if !exists(':Cancel')
-  command! Cancel cq
+  command! -buffer Cancel cq
 endif
