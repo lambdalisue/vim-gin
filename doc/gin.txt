@@ -84,6 +84,11 @@ It asks if users want to apply or cancel changes when |:quit| command is
 invoked. Answer "yes" to apply changes and others to cancel changes. Or use
 :Accept or :Cancel buffer local command to directly apply or cancel changes.
 
+Note that this :Accept and :Cancel command are aliased to |:wq| and |:cq| 
+respectively for "gitcommit" and "gitrebase" filetype buffers so that users
+can use the same keybindings even they invoke "git commit" or "git rebase -i"
+outside of Vim.
+
 Use |g:gin_proxy_apply_without_confirm| to apply changes without asking.
 
 Use |g:gin_proxy_editor_opener| to specify the opener command to open the
@@ -91,6 +96,9 @@ buffer.
 
 Use |g:gin_proxy_disable_askpass| and/or |g:gin_proxy_disable_editor| to
 disable this proxy feature.
+
+Use |g:gin_proxy_disable_accept_and_cancel_aliases| to disable the accept and
+cancel aliases in "gitcommit" and "gitrebase" filetype buffers.
 
 
 =============================================================================
@@ -638,6 +646,12 @@ VARIABLES					*gin-variables*
 
 *g:gin_proxy_disable_editor*
 	Disable overriding "GIT_EDITOR" to proxy editors.
+
+	Default: 0
+
+*g:gin_proxy_disable_accept_and_cancel_aliases*
+	Disable :Accept and :Cancel aliases in "gitcommit" and "gitrebase"
+	filetype buffers.
 
 	Default: 0
 
