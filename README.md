@@ -1,4 +1,4 @@
-# 🥃 vim-gin
+# 🥃 Gin
 
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![vim help](https://img.shields.io/badge/vim-%3Ah%20gin-orange.svg)](doc/gin.txt)
@@ -59,7 +59,7 @@ section in Wiki for other Vim plugin managers.
   lead me to the development of gita.vim
 - [lambdalisue/vim-gita](https://github.com/lambdalisue/vim-gita)<br>First git
   manipulation plugin that I made, works on Vim 7.4
-- [lambdalisue/gina.vim](https://github.com/lambdalisue/gina.vim)<br>Second git
+- [lambdalisue/vim-gina](https://github.com/lambdalisue/vim-gina)<br>Second git
   manipulation plugin that I made, works asynchronously on Vim 8.1
 
 ## License
