@@ -19,7 +19,7 @@ INTERFACE			|gin-interface|
   COMPONENTS			  |gin-components|
   MAPPINGS			  |gin-mappings|
   ACTIONS			  |gin-actions|
-  AUTOCMDS			  |git-autocmds|
+  AUTOCMDS			  |gin-autocmds|
 
 
 =============================================================================
