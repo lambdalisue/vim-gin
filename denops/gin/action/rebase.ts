@@ -25,6 +25,13 @@ export async function init(
       (denops, bufnr, range) =>
         doRebaseInteractive(denops, bufnr, range, gatherCandidates),
     );
+    await define(
+      denops,
+      bufnr,
+      "rebase:instant-drop",
+      (denops, bufnr, range) =>
+        doRebaseInstantDrop(denops, bufnr, range, gatherCandidates),
+    );
   });
 }
 
@@ -73,4 +80,27 @@ async function doRebaseInteractive(
     // NOTE: must be done on resolve because the rebase is not awaited
     () => denops.cmd("silent checktime"),
   );
+}
+
+async function doRebaseInstantDrop(
+  denops: Denops,
+  bufnr: number,
+  range: Range,
+  gatherCandidates: GatherCandidates<Candidate>,
+): Promise<void> {
+  const xs = await gatherCandidates(denops, bufnr, range);
+  const x = xs.at(0);
+  if (!x) {
+    return;
+  }
+  await denops.dispatch("gin", "command", "", [
+    "rebase",
+    "--onto",
+    `${x.commit}~`,
+    x.commit,
+    "HEAD",
+  ]);
+
+  // suppress false-positive detection of file changes
+  await denops.cmd("silent checktime");
 }
