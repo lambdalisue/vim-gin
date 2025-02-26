@@ -7,6 +7,7 @@ setlocal nobuflisted
 setlocal nolist nospell
 setlocal nowrap nofoldenable
 setlocal cursorline
+setlocal nomodeline
 
 if !get(g:, 'gin_log_disable_default_mappings')
   map <buffer><nowait> a <Plug>(gin-action-choice)
