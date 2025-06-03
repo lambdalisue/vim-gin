@@ -18,6 +18,21 @@ export async function findWorktree(cwd: string): Promise<string> {
   const result = cacheWorktree.get(path) ?? await (async () => {
     let result: string | Error;
     try {
+      // Search upward from current directory to find worktree root
+      let currentPath = path;
+      while (
+        currentPath && currentPath !== "/" &&
+        currentPath !== resolve(currentPath, "..")
+      ) {
+        if (await isWorktreeRoot(currentPath)) {
+          result = currentPath;
+          cacheWorktree.set(path, result);
+          return result;
+        }
+        currentPath = resolve(currentPath, "..");
+      }
+
+      // If no worktree found, use normal detection for regular repositories
       result = await revParse(path, [
         "--show-toplevel",
         "--show-superproject-working-tree",
@@ -58,15 +73,38 @@ export async function findGitdir(cwd: string): Promise<string> {
   return result;
 }
 
-async function revParse(cwd: string, args: string[]): Promise<string> {
-  const terms = cwd.split(SEPARATOR);
-  if (terms.includes(".git")) {
-    // `git rev-parse` does not work in a ".git" directory
-    // so use a parent directory of it instead.
-    const index = terms.indexOf(".git");
-    cwd = terms.slice(0, index).join(SEPARATOR);
+async function isWorktreeRoot(currentPath: string): Promise<boolean> {
+  try {
+    const gitPath = resolve(currentPath, ".git");
+    const stat = await Deno.stat(gitPath);
+    if (stat.isFile) {
+      // Found a .git file, verify it's a valid git worktree
+      await revParse(currentPath, ["--git-dir"]);
+      return true;
+    }
+  } catch {
+    // Either .git doesn't exist or it's not a valid worktree
   }
-  const stdout = await execute(["rev-parse", ...args], { cwd });
-  const output = decodeUtf8(stdout);
-  return resolve(output.split(/\n/, 2)[0]);
+  return false;
+}
+
+async function revParse(cwd: string, args: string[]): Promise<string> {
+  // First, try to execute git rev-parse from the current directory
+  // This will work correctly even if we're in a worktree inside .git
+  try {
+    const stdout = await execute(["rev-parse", ...args], { cwd });
+    const output = decodeUtf8(stdout);
+    return resolve(output.split(/\n/, 2)[0]);
+  } catch (e) {
+    // If it fails and we're in a .git directory, try from parent
+    const terms = cwd.split(SEPARATOR);
+    if (terms.includes(".git")) {
+      const index = terms.indexOf(".git");
+      const parentCwd = terms.slice(0, index).join(SEPARATOR);
+      const stdout = await execute(["rev-parse", ...args], { cwd: parentCwd });
+      const output = decodeUtf8(stdout);
+      return resolve(output.split(/\n/, 2)[0]);
+    }
+    throw e;
+  }
 }
