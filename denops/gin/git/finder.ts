@@ -1,4 +1,4 @@
-import { resolve, SEPARATOR } from "jsr:@std/path@^1.0.0";
+import { resolve } from "jsr:@std/path@^1.0.0";
 import { Cache } from "jsr:@lambdalisue/ttl-cache@^1.0.0";
 import { execute } from "./process.ts";
 import { decodeUtf8 } from "../util/text.ts";
@@ -6,6 +6,17 @@ import { decodeUtf8 } from "../util/text.ts";
 const ttl = 30000; // seconds
 const cacheWorktree = new Cache<string, string | Error>(ttl);
 const cacheGitdir = new Cache<string, string | Error>(ttl);
+
+/**
+ * Check if we've reached the filesystem root by comparing a path with its parent.
+ * This works cross-platform (Windows, Linux, Mac).
+ *
+ * @param currentPath - The path to check
+ * @returns true if the path is the filesystem root, false otherwise
+ */
+function isFilesystemRoot(currentPath: string): boolean {
+  return currentPath === resolve(currentPath, "..");
+}
 
 /**
  * Find a root path of a git working directory.
@@ -20,10 +31,7 @@ export async function findWorktree(cwd: string): Promise<string> {
     try {
       // Search upward from current directory to find worktree root
       let currentPath = path;
-      while (
-        currentPath && currentPath !== "/" &&
-        currentPath !== resolve(currentPath, "..")
-      ) {
+      while (!isFilesystemRoot(currentPath)) {
         if (await isWorktreeRoot(currentPath)) {
           result = currentPath;
           cacheWorktree.set(path, result);
@@ -38,7 +46,7 @@ export async function findWorktree(cwd: string): Promise<string> {
         "--show-superproject-working-tree",
       ]);
     } catch (e) {
-      result = e;
+      result = e as Error;
     }
     cacheWorktree.set(path, result);
     return result;
@@ -62,7 +70,7 @@ export async function findGitdir(cwd: string): Promise<string> {
     try {
       result = await revParse(path, ["--git-dir"]);
     } catch (e) {
-      result = e;
+      result = e as Error;
     }
     cacheGitdir.set(path, result);
     return result;
