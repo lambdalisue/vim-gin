@@ -97,22 +97,7 @@ async function isWorktreeRoot(currentPath: string): Promise<boolean> {
 }
 
 async function revParse(cwd: string, args: string[]): Promise<string> {
-  // First, try to execute git rev-parse from the current directory
-  // This will work correctly even if we're in a worktree inside .git
-  try {
-    const stdout = await execute(["rev-parse", ...args], { cwd });
-    const output = decodeUtf8(stdout);
-    return resolve(output.split(/\n/, 2)[0]);
-  } catch (e) {
-    // If it fails and we're in a .git directory, try from parent
-    const terms = cwd.split(SEPARATOR);
-    if (terms.includes(".git")) {
-      const index = terms.indexOf(".git");
-      const parentCwd = terms.slice(0, index).join(SEPARATOR);
-      const stdout = await execute(["rev-parse", ...args], { cwd: parentCwd });
-      const output = decodeUtf8(stdout);
-      return resolve(output.split(/\n/, 2)[0]);
-    }
-    throw e;
-  }
+  const stdout = await execute(["rev-parse", ...args], { cwd });
+  const output = decodeUtf8(stdout);
+  return resolve(output.split(/\n/, 2)[0]);
 }
