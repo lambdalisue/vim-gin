@@ -68,6 +68,61 @@ Deno.test({
 });
 
 Deno.test({
+  name: "findWorktree() returns a root path for worktree inside .git directory",
+  fn: async () => {
+    await using sbox = await prepare();
+    // Create a worktree inside .git/workspaces/ directory
+    await Deno.mkdir(join(".git", "workspaces"), { recursive: true });
+    await $`git worktree add -b workspace-test .git/workspaces/test main`;
+
+    // Change to a subdirectory within the worktree
+    await Deno.mkdir(join(".git", "workspaces", "test", "subdir"), {
+      recursive: true,
+    });
+    Deno.chdir(join(".git", "workspaces", "test", "subdir"));
+
+    // findWorktree should return the worktree root, not the main repository root
+    assertEquals(
+      await findWorktree("."),
+      join(sbox.path, ".git", "workspaces", "test"),
+    );
+    // An internal cache will be used for the following call
+    assertEquals(
+      await findWorktree("."),
+      join(sbox.path, ".git", "workspaces", "test"),
+    );
+  },
+  sanitizeResources: false,
+  sanitizeOps: false,
+});
+
+Deno.test({
+  name: "findGitdir() returns a gitdir path for worktree inside .git directory",
+  fn: async () => {
+    await using sbox = await prepare();
+    // Create a worktree inside .git/workspaces/ directory
+    await Deno.mkdir(join(".git", "workspaces"), { recursive: true });
+    await $`git worktree add -b workspace-test2 .git/workspaces/test2 main`;
+
+    // Change to the worktree
+    Deno.chdir(join(".git", "workspaces", "test2"));
+
+    // findGitdir should return the correct gitdir for this worktree
+    assertEquals(
+      await findGitdir("."),
+      join(sbox.path, ".git", "worktrees", "test2"),
+    );
+    // An internal cache will be used for the following call
+    assertEquals(
+      await findGitdir("."),
+      join(sbox.path, ".git", "worktrees", "test2"),
+    );
+  },
+  sanitizeResources: false,
+  sanitizeOps: false,
+});
+
+Deno.test({
   name:
     "findGitdir() throws an error if the path is not in a git working directory",
   fn: async () => {
