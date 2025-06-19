@@ -46,7 +46,11 @@ export async function findWorktree(cwd: string): Promise<string> {
         "--show-superproject-working-tree",
       ]);
     } catch (e) {
-      result = e as Error;
+      if (e instanceof Error) {
+        result = e;
+      } else {
+        throw e;
+      }
     }
     cacheWorktree.set(path, result);
     return result;
@@ -70,7 +74,11 @@ export async function findGitdir(cwd: string): Promise<string> {
     try {
       result = await revParse(path, ["--git-dir"]);
     } catch (e) {
-      result = e as Error;
+      if (e instanceof Error) {
+        result = e;
+      } else {
+        throw e;
+      }
     }
     cacheGitdir.set(path, result);
     return result;
@@ -99,5 +107,5 @@ async function isWorktreeRoot(currentPath: string): Promise<boolean> {
 async function revParse(cwd: string, args: string[]): Promise<string> {
   const stdout = await execute(["rev-parse", ...args], { cwd });
   const output = decodeUtf8(stdout);
-  return resolve(output.split(/\n/, 2)[0]);
+  return resolve(cwd, output.split(/\n/, 2)[0]);
 }
