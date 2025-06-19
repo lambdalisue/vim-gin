@@ -47,6 +47,7 @@ async function doNew(
   const from = x?.target ?? "HEAD";
   const name = await helper.input(denops, {
     prompt: `New branch (from ${from}): `,
+    text: from,
   });
   await denops.cmd('redraw | echo ""');
   if (!name) {
