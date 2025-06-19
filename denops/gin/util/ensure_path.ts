@@ -15,7 +15,7 @@ export async function ensurePath(
   denops: Denops,
   path?: string,
 ): Promise<string> {
-  const bufname = await fn.expand(denops, path ?? "%") as string;
-  const abspath = await fn.fnamemodify(denops, bufname, ":p");
+  const expr = path ?? await fn.bufname(denops);
+  const abspath = await fn.fnamemodify(denops, expr, ":p");
   return abspath;
 }
