@@ -67,6 +67,8 @@ async function doNew(
     worktreePath,
     target,
   ]);
+  // Change the current working directory to the new worktree
+  await fn.chdir(denops, worktreePath);
 }
 
 async function doNewOrphan(
@@ -92,6 +94,8 @@ async function doNewOrphan(
     "--orphan",
     worktreePath,
   ]);
+  // Change the current working directory to the new worktree
+  await fn.chdir(denops, worktreePath);
 }
 
 async function findRoot(
