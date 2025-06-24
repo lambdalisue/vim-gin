@@ -1,7 +1,11 @@
 import type { Denops } from "jsr:@denops/std@^7.0.0";
+import * as fn from "jsr:@denops/std@^7.0.0/function";
 import * as batch from "jsr:@denops/std@^7.0.0/batch";
 import * as helper from "jsr:@denops/std@^7.0.0/helper";
+import { join } from "jsr:@std/path@^1.0.0/join";
+import { dirname } from "jsr:@std/path@^1.0.0/dirname";
 import { define, GatherCandidates, Range } from "./core.ts";
+import { revParse } from "../git/finder.ts";
 
 export type Candidate = { target?: string };
 
@@ -42,12 +46,14 @@ async function doNew(
   force: boolean,
   gatherCandidates: GatherCandidates<Candidate>,
 ): Promise<void> {
+  const cwd = await fn.getcwd(denops);
+  const root = await findRoot(cwd);
   const xs = await gatherCandidates(denops, bufnr, range);
   const x = xs.at(0);
   const target = x?.target ?? "HEAD";
   const worktreePath = await helper.input(denops, {
     prompt: `Worktree path (for ${target}): `,
-    text: `.worktrees/${target}`,
+    text: join(root, `.worktrees/${target}`),
   });
   await denops.cmd('redraw | echo ""');
   if (!worktreePath) {
@@ -69,9 +75,11 @@ async function doNewOrphan(
   _range: Range,
   _gatherCandidates: GatherCandidates<unknown>,
 ): Promise<void> {
+  const cwd = await fn.getcwd(denops);
+  const root = await findRoot(cwd);
   const worktreePath = await helper.input(denops, {
     prompt: "Worktree path (orphan): ",
-    text: `.worktrees/orphan`,
+    text: join(root, `.worktrees/orphan`),
   });
   await denops.cmd('redraw | echo ""');
   if (!worktreePath) {
@@ -84,4 +92,15 @@ async function doNewOrphan(
     "--orphan",
     worktreePath,
   ]);
+}
+
+async function findRoot(
+  cwd: string,
+): Promise<string> {
+  try {
+    const gitdir = await revParse(cwd, ["--git-common-dir"]);
+    return dirname(gitdir);
+  } catch {
+    return "";
+  }
 }

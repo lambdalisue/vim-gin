@@ -104,7 +104,7 @@ async function isWorktreeRoot(currentPath: string): Promise<boolean> {
   return false;
 }
 
-async function revParse(cwd: string, args: string[]): Promise<string> {
+export async function revParse(cwd: string, args: string[]): Promise<string> {
   const stdout = await execute(["rev-parse", ...args], { cwd });
   const output = decodeUtf8(stdout);
   return resolve(cwd, output.split(/\n/, 2)[0]);
