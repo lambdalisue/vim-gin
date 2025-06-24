@@ -19,6 +19,7 @@ import { init as initActionMerge } from "../../action/merge.ts";
 import { init as initActionRebase } from "../../action/rebase.ts";
 import { init as initActionSwitch } from "../../action/switch.ts";
 import { init as initActionYank } from "../../action/yank.ts";
+import { init as initActionWorktreeNew } from "../../action/worktree_new.ts";
 import { Branch, parse as parseBranch } from "./parser.ts";
 
 export async function edit(
@@ -71,6 +72,7 @@ export async function exec(
       await initActionBranchDelete(denops, bufnr, gatherCandidates);
       await initActionBranchMove(denops, bufnr, gatherCandidates);
       await initActionBranchNew(denops, bufnr, gatherCandidates);
+      await initActionWorktreeNew(denops, bufnr, gatherCandidates);
       await initActionBrowse(denops, bufnr, async (denops, bufnr, range) => {
         const xs = await gatherCandidates(denops, bufnr, range);
         return xs.map((b) => ({ commit: b.target, ...b }));

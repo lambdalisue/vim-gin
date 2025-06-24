@@ -3,7 +3,7 @@ import * as batch from "jsr:@denops/std@^7.0.0/batch";
 import * as helper from "jsr:@denops/std@^7.0.0/helper";
 import { define, GatherCandidates, Range } from "./core.ts";
 
-export type Candidate = { branch: string };
+export type Candidate = { branch: string; worktree?: string };
 
 export async function init(
   denops: Denops,
@@ -40,21 +40,41 @@ async function doMove(
   if (!x) {
     return;
   }
-  const from = x.branch;
-  const name = await helper.input(denops, {
-    prompt: `Rename (from ${from}): `,
-    text: from,
-  });
-  await denops.cmd('redraw | echo ""');
-  if (!name) {
-    await helper.echoerr(denops, "Cancelled");
-    return;
+  if (x.worktree) {
+    const from = x.worktree;
+    const newPath = await helper.input(denops, {
+      prompt: `New path (from ${from}): `,
+      text: from,
+    });
+    await denops.cmd('redraw | echo ""');
+    if (!newPath) {
+      await helper.echoerr(denops, "Cancelled");
+      return;
+    }
+    await denops.dispatch("gin", "command", "", [
+      "worktree",
+      "move",
+      ...(force ? ["--force"] : []),
+      from,
+      newPath,
+    ]);
+  } else {
+    const from = x.branch;
+    const newName = await helper.input(denops, {
+      prompt: `Rename (from ${from}): `,
+      text: from,
+    });
+    await denops.cmd('redraw | echo ""');
+    if (!newName) {
+      await helper.echoerr(denops, "Cancelled");
+      return;
+    }
+    await denops.dispatch("gin", "command", "", [
+      "branch",
+      ...(force ? ["--force"] : []),
+      "--move",
+      from,
+      newName,
+    ]);
   }
-  await denops.dispatch("gin", "command", "", [
-    "branch",
-    ...(force ? ["--force"] : []),
-    "--move",
-    from,
-    name,
-  ]);
 }

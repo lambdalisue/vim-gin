@@ -14,21 +14,21 @@ export async function init(
     await define(
       denops,
       bufnr,
-      "new",
+      "worktree",
       (denops, bufnr, range) =>
         doNew(denops, bufnr, range, false, gatherCandidates),
     );
     await define(
       denops,
       bufnr,
-      "new:force",
+      "worktree:force",
       (denops, bufnr, range) =>
         doNew(denops, bufnr, range, true, gatherCandidates),
     );
     await define(
       denops,
       bufnr,
-      "new:orphan",
+      "worktree:orphan",
       (denops, bufnr, range) =>
         doNewOrphan(denops, bufnr, range, gatherCandidates),
     );
@@ -44,21 +44,22 @@ async function doNew(
 ): Promise<void> {
   const xs = await gatherCandidates(denops, bufnr, range);
   const x = xs.at(0);
-  const from = x?.target ?? "HEAD";
-  const branchName = await helper.input(denops, {
-    prompt: `New branch (from ${from}): `,
-    text: from,
+  const target = x?.target ?? "HEAD";
+  const worktreePath = await helper.input(denops, {
+    prompt: `Worktree path (for ${target}): `,
+    text: `.worktrees/${target}`,
   });
   await denops.cmd('redraw | echo ""');
-  if (!branchName) {
+  if (!worktreePath) {
     await helper.echoerr(denops, "Cancelled");
     return;
   }
   await denops.dispatch("gin", "command", "", [
-    "switch",
-    force ? "-C" : "-c",
-    branchName,
-    from,
+    "worktree",
+    "add",
+    ...(force ? ["-f"] : []),
+    worktreePath,
+    target,
   ]);
 }
 
@@ -68,17 +69,19 @@ async function doNewOrphan(
   _range: Range,
   _gatherCandidates: GatherCandidates<unknown>,
 ): Promise<void> {
-  const branchName = await helper.input(denops, {
-    prompt: "New branch (orphan): ",
+  const worktreePath = await helper.input(denops, {
+    prompt: "Worktree path (orphan): ",
+    text: `.worktrees/orphan`,
   });
   await denops.cmd('redraw | echo ""');
-  if (!branchName) {
+  if (!worktreePath) {
     await helper.echoerr(denops, "Cancelled");
     return;
   }
   await denops.dispatch("gin", "command", "", [
-    "switch",
+    "worktree",
+    "add",
     "--orphan",
-    branchName,
+    worktreePath,
   ]);
 }
