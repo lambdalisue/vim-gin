@@ -21,9 +21,23 @@ export async function init(
     await define(
       denops,
       bufnr,
+      "rebase:x",
+      (denops, bufnr, range) =>
+        doRebase(denops, bufnr, range, gatherCandidates, true),
+    );
+    await define(
+      denops,
+      bufnr,
       "rebase:i",
       (denops, bufnr, range) =>
         doRebaseInteractive(denops, bufnr, range, gatherCandidates),
+    );
+    await define(
+      denops,
+      bufnr,
+      "rebase:i:x",
+      (denops, bufnr, range) =>
+        doRebaseInteractive(denops, bufnr, range, gatherCandidates, true),
     );
     await define(
       denops,
@@ -40,16 +54,26 @@ async function doRebase(
   bufnr: number,
   range: Range,
   gatherCandidates: GatherCandidates<Candidate>,
+  execute?: boolean,
 ): Promise<void> {
   const xs = await gatherCandidates(denops, bufnr, range);
   const x = xs.at(0);
   if (!x) {
     return;
   }
-  await denops.dispatch("gin", "command", "", [
-    "rebase",
-    x.commit,
-  ]);
+  const args = ["rebase", x.commit];
+  if (execute) {
+    const cmd = await helper.input(denops, {
+      prompt: "Execute command after rebase: ",
+    }) ?? "";
+    await denops.cmd('redraw | echo ""');
+    if (!cmd) {
+      await helper.echoerr(denops, "Cancelled");
+      return;
+    }
+    args.push("-x", cmd);
+  }
+  await denops.dispatch("gin", "command", "", args);
 
   // suppress false-positive detection of file changes
   await denops.cmd("silent checktime");
@@ -60,20 +84,33 @@ async function doRebaseInteractive(
   bufnr: number,
   range: Range,
   gatherCandidates: GatherCandidates<Candidate>,
+  execute?: boolean,
 ): Promise<void> {
   const xs = await gatherCandidates(denops, bufnr, range);
   const x = xs.at(0);
   if (!x) {
     return;
   }
-  // NOTE:
-  // We must NOT await the command otherwise Vim would freeze
-  // because command proxy could not work if we await here.
-  denops.dispatch("gin", "command", "", [
+  const args = [
     "rebase",
     "--interactive",
     x.commit,
-  ]).catch(async (e) => {
+  ];
+  if (execute) {
+    const cmd = await helper.input(denops, {
+      prompt: "Execute command after rebase: ",
+    }) ?? "";
+    await denops.cmd('redraw | echo ""');
+    if (!cmd) {
+      await helper.echoerr(denops, "Cancelled");
+      return;
+    }
+    args.push("-x", cmd);
+  }
+  // NOTE:
+  // We must NOT await the command otherwise Vim would freeze
+  // because command proxy could not work if we await here.
+  denops.dispatch("gin", "command", "", args).catch(async (e) => {
     await helper.echoerr(denops, e.toString());
   }).then(
     // suppress false-positive detection of file changes
