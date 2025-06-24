@@ -4,7 +4,7 @@ import { define, GatherCandidates, Range } from "./core.ts";
 
 export type Candidate =
   | { kind: "remote"; branch: string; remote: string }
-  | { kind?: "alias" | "local"; branch: string };
+  | { kind?: "alias" | "local"; branch: string; worktree?: string };
 
 export async function init(
   denops: Denops,
@@ -50,11 +50,19 @@ async function doDelete(
         ]);
         break;
       default:
-        await denops.dispatch("gin", "command", "", [
-          "branch",
-          force ? "-D" : "-d",
-          x.branch,
-        ]);
+        if (x.worktree) {
+          await denops.dispatch("gin", "command", "", [
+            "worktree",
+            "remove",
+            x.worktree,
+          ]);
+        } else {
+          await denops.dispatch("gin", "command", "", [
+            "branch",
+            force ? "-D" : "-d",
+            x.branch,
+          ]);
+        }
         break;
     }
   }
