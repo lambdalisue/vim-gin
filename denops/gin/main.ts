@@ -13,6 +13,7 @@ import { main as mainEdit } from "./command/edit/main.ts";
 import { main as mainLog } from "./command/log/main.ts";
 import { main as mainPatch } from "./command/patch/main.ts";
 import { main as mainStatus } from "./command/status/main.ts";
+import { main as mainTree } from "./command/tree/main.ts";
 
 import { main as mainComponentBranch } from "./component/branch.ts";
 import { main as mainComponentTraffic } from "./component/traffic.ts";
@@ -32,6 +33,7 @@ export function main(denops: Denops): void {
   mainLog(denops);
   mainPatch(denops);
   mainStatus(denops);
+  mainTree(denops);
 
   mainComponentBranch(denops);
   mainComponentTraffic(denops);
