@@ -10,6 +10,7 @@ import {
 import { fillCmdArgs, normCmdArgs, parseSilent } from "../../util/cmd.ts";
 import { exec } from "./command.ts";
 import { edit } from "./edit.ts";
+import * as action from "./action.ts";
 
 export function main(denops: Denops): void {
   denops.dispatcher = {
@@ -30,6 +31,21 @@ export function main(denops: Denops): void {
       assert(bufnr, is.Number, { name: "bufnr" });
       assert(bufname, is.String, { name: "bufname" });
       return helper.friendlyCall(denops, () => edit(denops, bufnr, bufname));
+    },
+    "tree:action:expand": (bufnr, range) => {
+      assert(bufnr, is.Number, { name: "bufnr" });
+      assert(range, is.TupleOf([is.Number, is.Number]), { name: "range" });
+      return helper.friendlyCall(denops, () => action.expand(denops, bufnr, range));
+    },
+    "tree:action:collapse": (bufnr, range) => {
+      assert(bufnr, is.Number, { name: "bufnr" });
+      assert(range, is.TupleOf([is.Number, is.Number]), { name: "range" });
+      return helper.friendlyCall(denops, () => action.collapse(denops, bufnr, range));
+    },
+    "tree:action:expandOrEdit": (bufnr, range) => {
+      assert(bufnr, is.Number, { name: "bufnr" });
+      assert(range, is.TupleOf([is.Number, is.Number]), { name: "range" });
+      return helper.friendlyCall(denops, () => action.expandOrEdit(denops, bufnr, range));
     },
   };
 }

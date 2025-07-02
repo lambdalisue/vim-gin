@@ -13,9 +13,16 @@ import {
   parseOpts,
   validateOpts,
 } from "jsr:@denops/std@^7.0.0/argument";
-import { DefaultRenderer, getVisibleItems } from "jsr:@lambdalisue/ui-treeutil@^0.1.2";
+import {
+  DefaultRenderer,
+  getVisibleItems,
+} from "jsr:@lambdalisue/ui-treeutil@^0.1.2";
 import { execute } from "../../git/executor.ts";
 import { parseLsTreeToTree } from "./parser.ts";
+import { setTreeState } from "./state.ts";
+import { bind } from "../../command/bare/command.ts";
+import { init as initActionCore } from "../../action/core.ts";
+import * as action from "./action.ts";
 
 export async function edit(
   denops: Denops,
@@ -66,6 +73,7 @@ export async function exec(
   const { stdout } = await execute(denops, args, {
     worktree: options.worktree,
     throwOnError: true,
+    stdoutIndicator: "null",
   });
 
   // Decode the stdout from Uint8Array to string
@@ -77,7 +85,7 @@ export async function exec(
 
   // Parse the git ls-tree output into a tree structure
   const tree = parseLsTreeToTree(output, options.commitish ?? "HEAD");
-  
+
   // Get visible items and render them
   const items = getVisibleItems(tree);
   const renderer = new DefaultRenderer();
@@ -85,12 +93,17 @@ export async function exec(
 
   await buffer.ensure(denops, bufnr, async () => {
     await batch.batch(denops, async (denops) => {
+      // Store tree state in buffer variable
+      await setTreeState(denops, bufnr, {
+        tree,
+        commitish: options.commitish ?? "HEAD",
+        worktree: options.worktree ?? "",
+      });
+
       await buffer.replace(denops, bufnr, lines);
       await option.bufhidden.setLocal(denops, "hide");
       await option.buftype.setLocal(denops, "nofile");
       await option.swapfile.setLocal(denops, false);
-      await option.modifiable.setLocal(denops, false);
-      await option.readonly.setLocal(denops, true);
       await option.filetype.setLocal(denops, "gin-tree");
       if (options.fileformat) {
         await option.fileformat.setLocal(denops, options.fileformat);
@@ -98,6 +111,11 @@ export async function exec(
       if (options.encoding) {
         await option.fileencoding.setLocal(denops, options.encoding);
       }
+
+      // Initialize actions
+      await bind(denops, bufnr);
+      await initActionCore(denops, bufnr);
     });
   });
 }
+
