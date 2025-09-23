@@ -5,6 +5,7 @@ import * as batch from "jsr:@denops/std@^7.0.0/batch";
 import * as fn from "jsr:@denops/std@^7.0.0/function";
 import * as option from "jsr:@denops/std@^7.0.0/option";
 import { parse as parseBufname } from "jsr:@denops/std@^7.0.0/bufname";
+import Encoding from "npm:encoding-japanese";
 import { findWorktreeFromDenops } from "../../git/worktree.ts";
 import { exec as execBare } from "../../command/bare/command.ts";
 
@@ -64,7 +65,8 @@ export async function exec(
   }
   try {
     await fs.copy(f, original);
-    await Deno.writeTextFile(original, `${content.join("\n")}\n`);
+    const data = encode(`${content.join("\n")}\n`, fileencoding);
+    await Deno.writeFile(original, data);
     await fn.setbufvar(denops, bufnr, "&modified", 0);
     await execBare(denops, [
       "add",
@@ -79,4 +81,13 @@ export async function exec(
   } finally {
     await restore();
   }
+}
+
+function encode(str: string, encoding: string): Uint8Array {
+  const utf8Encoder = new TextEncoder();
+  const utf8Bytes = utf8Encoder.encode(str);
+  return Uint8Array.from(Encoding.convert(utf8Bytes, {
+    to: encoding,
+    from: "UTF8",
+  }));
 }
