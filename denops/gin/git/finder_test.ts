@@ -142,7 +142,11 @@ async function prepare(): ReturnType<typeof sandbox> {
   const sbox = await sandbox();
   await $`git init`;
   await $`git commit --allow-empty -m 'Initial commit' --no-gpg-sign`;
-  await $`git switch -c main`;
+  // Check if we're already on main branch, if not switch to it
+  const currentBranch = await $`git branch --show-current`.text();
+  if (currentBranch.trim() !== "main") {
+    await $`git switch -c main`;
+  }
   await Deno.mkdir(join("a", "b", "c"), { recursive: true });
   return sbox;
 }
