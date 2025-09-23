@@ -7,6 +7,7 @@ import * as option from "jsr:@denops/std@^7.0.0/option";
 import { parse as parseBufname } from "jsr:@denops/std@^7.0.0/bufname";
 import Encoding from "npm:encoding-japanese";
 import { findWorktreeFromDenops } from "../../git/worktree.ts";
+import { addBom } from "../../util/bom.ts";
 import { exec as execBare } from "../../command/bare/command.ts";
 
 export async function write(
@@ -33,15 +34,17 @@ export async function exec(
   relpath: string,
   options: ExecOptions,
 ): Promise<void> {
-  const [verbose, fileencoding, fileformat, content] = await batch.collect(
-    denops,
-    (denops) => [
-      option.verbose.get(denops),
-      option.fileencoding.getBuffer(denops, bufnr),
-      option.fileformat.getBuffer(denops, bufnr),
-      fn.getbufline(denops, bufnr, 1, "$"),
-    ],
-  );
+  const [verbose, fileencoding, fileformat, bomb, content] = await batch
+    .collect(
+      denops,
+      (denops) => [
+        option.verbose.get(denops),
+        option.fileencoding.getBuffer(denops, bufnr),
+        option.fileformat.getBuffer(denops, bufnr),
+        option.bomb.getBuffer(denops, bufnr),
+        fn.getbufline(denops, bufnr, 1, "$"),
+      ],
+    );
 
   const worktree = await findWorktreeFromDenops(denops, {
     worktree: options.worktree,
@@ -66,7 +69,7 @@ export async function exec(
   try {
     await fs.copy(f, original);
     const data = encode(`${content.join("\n")}\n`, fileencoding);
-    await Deno.writeFile(original, data);
+    await Deno.writeFile(original, bomb ? addBom(data) : data);
     await fn.setbufvar(denops, bufnr, "&modified", 0);
     await execBare(denops, [
       "add",
