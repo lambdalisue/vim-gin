@@ -5,7 +5,7 @@ import * as batch from "jsr:@denops/std@^7.0.0/batch";
 import * as fn from "jsr:@denops/std@^7.0.0/function";
 import * as option from "jsr:@denops/std@^7.0.0/option";
 import { parse as parseBufname } from "jsr:@denops/std@^7.0.0/bufname";
-import Encoding from "npm:encoding-japanese";
+import Encoding from "npm:encoding-japanese@2.2.0";
 import { findWorktreeFromDenops } from "../../git/worktree.ts";
 import { addBom } from "../../util/bom.ts";
 import { exec as execBare } from "../../command/bare/command.ts";
