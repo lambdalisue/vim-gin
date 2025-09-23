@@ -141,6 +141,9 @@ Deno.test({
 async function prepare(): ReturnType<typeof sandbox> {
   const sbox = await sandbox();
   await $`git init`;
+  // Configure git user for tests to avoid commit failures
+  await $`git config user.email "test@example.com"`;
+  await $`git config user.name "Test User"`;
   await $`git commit --allow-empty -m 'Initial commit' --no-gpg-sign`;
   // Check if we're already on main branch, if not switch to it
   const currentBranch = await $`git branch --show-current`.text();
