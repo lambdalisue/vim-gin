@@ -11,7 +11,7 @@ export function encodeUtf8(input: string): Uint8Array {
 /**
  * Decode an UTF8 Uint8Array into a string
  */
-export function decodeUtf8(input: BufferSource): string {
+export function decodeUtf8(input: AllowSharedBufferSource): string {
   return textDecoder.decode(input);
 }
 

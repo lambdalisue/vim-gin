@@ -124,7 +124,10 @@ async function postProcessor(
     env,
   });
   const proc = command.spawn();
-  const reader = new Blob([stdout]);
+  // Deno's Type definition doesn't allow ArrayBufferLike so we need to copy
+  // stdout (Uint8Array<ArrayBufferLike>) to safeStdout (Uint8Array<ArrayBuffer>)
+  const safeStdout = new Uint8Array(stdout);
+  const reader = new Blob([safeStdout.buffer]);
   const [_, result] = await Promise.all([
     reader.stream().pipeTo(proc.stdin),
     proc.output(),

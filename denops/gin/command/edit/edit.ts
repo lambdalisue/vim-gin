@@ -9,6 +9,7 @@ import * as vars from "jsr:@denops/std@^7.0.0/variable";
 import { parseOpts, validateOpts } from "jsr:@denops/std@^7.0.0/argument";
 import { parse as parseBufname } from "jsr:@denops/std@^7.0.0/bufname";
 import { execute } from "../../git/executor.ts";
+import { hasBom } from "../../util/bom.ts";
 import { formatTreeish } from "./util.ts";
 
 export async function edit(
@@ -73,6 +74,7 @@ export async function exec(
       await denops.cmd("filetype detect");
       await option.swapfile.setLocal(denops, false);
       await option.bufhidden.setLocal(denops, "unload");
+      await option.bomb.setLocal(denops, hasBom(stdout));
       if (options.commitish) {
         await option.buftype.setLocal(denops, "nowrite");
         await option.modifiable.setLocal(denops, false);
