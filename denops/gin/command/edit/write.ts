@@ -69,7 +69,7 @@ export async function exec(
   try {
     await fs.copy(f, original);
     const data = encode(
-      `${content.map(line => line + getEOL(fileformat)).join("")}`,
+      `${content.map((line) => line + getEOL(fileformat)).join("")}`,
       fileencoding,
     );
     await Deno.writeFile(original, bomb ? addBom(data) : data);
