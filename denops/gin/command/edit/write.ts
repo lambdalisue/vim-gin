@@ -69,7 +69,7 @@ export async function exec(
   try {
     await fs.copy(f, original);
     const data = encode(
-      `${content.map((line) => line + getEOL(fileformat)).join("")}`,
+      `${content.map((line) => line + getEol(fileformat)).join("")}`,
       fileencoding,
     );
     await Deno.writeFile(original, bomb ? addBom(data) : data);
@@ -89,7 +89,7 @@ export async function exec(
   }
 }
 
-function getEOL(fileformat: string): string {
+function getEol(fileformat: string): string {
   switch (fileformat) {
     case "dos":
       return "\r\n";
