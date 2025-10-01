@@ -68,10 +68,8 @@ export async function exec(
   }
   try {
     await fs.copy(f, original);
-    const data = encode(
-      `${content.map((line) => line + getEol(fileformat)).join("")}`,
-      fileencoding,
-    );
+    const eol = getEol(fileformat);
+    const data = encode(`${content.join(eol)}${eol}`, fileencoding);
     await Deno.writeFile(original, bomb ? addBom(data) : data);
     await fn.setbufvar(denops, bufnr, "&modified", 0);
     await execBare(denops, [
