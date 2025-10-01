@@ -68,7 +68,8 @@ export async function exec(
   }
   try {
     await fs.copy(f, original);
-    const data = encode(`${content.join("\n")}\n`, fileencoding);
+    const eol = getEol(fileformat);
+    const data = encode(`${content.join(eol)}${eol}`, fileencoding);
     await Deno.writeFile(original, bomb ? addBom(data) : data);
     await fn.setbufvar(denops, bufnr, "&modified", 0);
     await execBare(denops, [
@@ -83,6 +84,19 @@ export async function exec(
     });
   } finally {
     await restore();
+  }
+}
+
+function getEol(fileformat: string): string {
+  switch (fileformat) {
+    case "dos":
+      return "\r\n";
+    case "unix":
+      return "\n";
+    case "mac":
+      return "\r";
+    default:
+      return "\n";
   }
 }
 
