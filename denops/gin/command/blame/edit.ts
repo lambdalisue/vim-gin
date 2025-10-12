@@ -20,9 +20,8 @@ import {
   parseGitBlamePorcelain,
 } from "./parser.ts";
 import { relativeTime } from "../../util/relative_time.ts";
-import type { ExecOptions, HistoryEntry } from "./types.ts";
+import type { ExecOptions } from "./types.ts";
 import * as History from "./history.ts";
-import { updateDetail } from "./detail.ts";
 import { getBlameContext, getBlameLine } from "./buffer_utils.ts";
 
 /**
@@ -67,7 +66,7 @@ export async function editNav(
   const { expr, params } = parseBufname(bufname);
 
   // Try to get the file fragment from the nav buffer variable
-  let fileFragment = await vars.b.get(denops, "gin_blame_file_fragment") as string | undefined;
+  const fileFragment = await vars.b.get(denops, "gin_blame_file_fragment") as string | undefined;
 
   if (!fileFragment) {
     // This shouldn't happen in normal usage, but handle it gracefully
@@ -93,8 +92,6 @@ export async function editNav(
   if (bufnrBlame === -1) {
     // Open the ginblame buffer in the appropriate window
     const winidNav = await fn.bufwinid(denops, bufnr);
-    // Save the current window
-    const currentWin = await fn.winnr(denops);
 
     // Temporarily disable winfixbuf for the nav window to switch windows
     if (winidNav !== -1) {
@@ -304,7 +301,6 @@ export async function exec(
     await buffer.open(denops, bufnameDetail, {
       opener: "topleft 10split",
     });
-    const bufnrDetail = await fn.bufnr(denops, bufnameDetail);
 
     // Then create bottom nav window
     await denops.cmd("wincmd j");
