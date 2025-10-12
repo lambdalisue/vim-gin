@@ -43,12 +43,12 @@ Good example (JSDoc):
  */
 ```
 
-Bad example (vague comments):
+Bad example (non-English comments):
 
 ```
 /**
- * Parse blame output
- * @param content - Blame output
- * @returns Parsed result
+ * Git blame の porcelain 出力を解析する
+ * @param content - git blame --porcelain の出力
+ * @returns パースされた blame 結果
  */
 ```

@@ -89,17 +89,15 @@ Deno.test("relativeTime", async (t) => {
   });
 
   await t.step("returns months for times less than a year ago", () => {
-    const now = new Date();
-    const oneMonthAgo = new Date(now);
-    oneMonthAgo.setMonth(now.getMonth() - 1);
+    // Use a fixed base date (mid-month) to avoid EOM/DST issues
+    const now = new Date("2024-06-15T12:00:00Z");
+    const oneMonthAgo = new Date("2024-05-15T12:00:00Z");
     assertEquals(relativeTime(oneMonthAgo, now), "1 month ago");
 
-    const twoMonthsAgo = new Date(now);
-    twoMonthsAgo.setMonth(now.getMonth() - 2);
+    const twoMonthsAgo = new Date("2024-04-15T12:00:00Z");
     assertEquals(relativeTime(twoMonthsAgo, now), "2 months ago");
 
-    const elevenMonthsAgo = new Date(now);
-    elevenMonthsAgo.setMonth(now.getMonth() - 11);
+    const elevenMonthsAgo = new Date("2023-07-15T12:00:00Z");
     assertEquals(relativeTime(elevenMonthsAgo, now), "11 months ago");
   });
 
