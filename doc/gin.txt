@@ -419,6 +419,61 @@ COMMANDS					*gin-commands*
 
 	Use a bang (!) to forcibly open a buffer.
 
+							*:GinBlame*
+:GinBlame[!] [{++option}...] [{commitish}] {path}
+	Open a 3-window blame view showing:
+	- Top (10 lines): Commit details for the line under cursor
+	- Bottom-left (60 cols): Line numbers and commit info (ginblamenav)
+	- Bottom-right: File content with commit dividers (ginblame)
+
+	The three windows are synchronized with scrollbind and cursorbind.
+	Moving the cursor in any window updates all windows and the commit
+	detail view.
+
+	The following options are valid as {++option}:
+
+	++emojify
+		Convert :emoji-name: in commit messages to emoji characters.
+>
+		:GinBlame ++emojify HEAD README.md
+<
+	See |gin-commands-options| for common {++option}.
+
+	If {commitish} is specified, shows blame for that commit (e.g., HEAD~3).
+	Otherwise, shows blame for HEAD.
+
+	Several default mappings are defined in both ginblame and ginblamenav
+	buffers:
+
+	<CR>		Jump to the commit under cursor. If already viewing that
+			commit, jump to its parent commit. Tracks file renames
+			automatically using git blame's "previous" information.
+
+	<C-O>		Navigate to older commit in history. Restores exact
+			cursor position from when you were last at that commit.
+
+	<C-I>		Navigate to newer commit in history.
+
+	Users can disable default mappings with:
+>
+	let g:gin_blame_disable_default_mappings = 1
+<
+	And use Plug mappings instead:
+
+	<Plug>(gin-blame-switch-commit)		Switch to commit under cursor
+	<Plug>(gin-blame-navigate-older)	Navigate to older commit
+	<Plug>(gin-blame-navigate-newer)	Navigate to newer commit
+
+	The blame view uses a compound filetype (e.g., "typescript.gin-blame")
+	so syntax highlighting works while gin-blame specific features are
+	available.
+
+	Users can specify default and/or persistent arguments of the command.
+	See |gin-commands-default-args| and/or |gin-commands-persistent-args|
+	for detail.
+
+	Use a bang (!) to forcibly open a buffer.
+
 							*gin-commands-options*
 Gin supports several options starts with double plus signs (++) as:
 
