@@ -10,8 +10,12 @@ import type { HistoryEntry } from "./types.ts";
 export async function getHistory(
   denops: Denops,
 ): Promise<{ history: HistoryEntry[]; historyIndex: number }> {
-  const history = (await vars.b.get(denops, "gin_blame_history") as HistoryEntry[] | undefined) || [];
-  const historyIndex = (await vars.b.get(denops, "gin_blame_history_index") as number | undefined) ?? -1;
+  const history = (await vars.b.get(denops, "gin_blame_history") as
+    | HistoryEntry[]
+    | undefined) || [];
+  const historyIndex = (await vars.b.get(denops, "gin_blame_history_index") as
+    | number
+    | undefined) ?? -1;
   return { history, historyIndex };
 }
 
@@ -27,9 +31,19 @@ export async function saveHistory(
 ): Promise<void> {
   await batch.batch(denops, async (denops) => {
     await fn.setbufvar(denops, bufnrNav, "gin_blame_history", history);
-    await fn.setbufvar(denops, bufnrNav, "gin_blame_history_index", historyIndex);
+    await fn.setbufvar(
+      denops,
+      bufnrNav,
+      "gin_blame_history_index",
+      historyIndex,
+    );
     await fn.setbufvar(denops, bufnrBlame, "gin_blame_history", history);
-    await fn.setbufvar(denops, bufnrBlame, "gin_blame_history_index", historyIndex);
+    await fn.setbufvar(
+      denops,
+      bufnrBlame,
+      "gin_blame_history_index",
+      historyIndex,
+    );
   });
 }
 

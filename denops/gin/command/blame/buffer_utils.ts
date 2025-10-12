@@ -2,10 +2,10 @@ import type { Denops } from "jsr:@denops/std@^7.0.0";
 import * as fn from "jsr:@denops/std@^7.0.0/function";
 import * as vars from "jsr:@denops/std@^7.0.0/variable";
 import {
-  parse as parseBufname,
   type BufnameParams,
+  parse as parseBufname,
 } from "jsr:@denops/std@^7.0.0/bufname";
-import type { GitBlameResult, GitBlameLine } from "./parser.ts";
+import type { GitBlameLine, GitBlameResult } from "./parser.ts";
 
 /**
  * Information about the current blame buffer context
@@ -24,7 +24,9 @@ export type BlameBufferContext = {
 /**
  * Get blame buffer context from current buffer
  */
-export async function getBlameContext(denops: Denops): Promise<BlameBufferContext> {
+export async function getBlameContext(
+  denops: Denops,
+): Promise<BlameBufferContext> {
   const bufnrCurrent = await fn.bufnr(denops);
   const bufnameCurrent = await fn.bufname(denops, bufnrCurrent);
   const { scheme, expr, params } = parseBufname(bufnameCurrent);
@@ -35,28 +37,38 @@ export async function getBlameContext(denops: Denops): Promise<BlameBufferContex
 
   if (scheme === "ginblamenav") {
     bufnrNav = bufnrCurrent;
-    const bufnameBlame = await vars.b.get(denops, "gin_blame_file_bufname") as string | undefined;
+    const bufnameBlame = await vars.b.get(denops, "gin_blame_file_bufname") as
+      | string
+      | undefined;
     if (!bufnameBlame) {
       throw new Error("Cannot find associated ginblame buffer");
     }
     bufnrBlame = await fn.bufnr(denops, bufnameBlame);
   } else if (scheme === "ginblame") {
     bufnrBlame = bufnrCurrent;
-    const bufnameNav = await vars.b.get(denops, "gin_blame_nav_bufname") as string | undefined;
+    const bufnameNav = await vars.b.get(denops, "gin_blame_nav_bufname") as
+      | string
+      | undefined;
     if (!bufnameNav) {
       throw new Error("Cannot find associated ginblamenav buffer");
     }
     bufnrNav = await fn.bufnr(denops, bufnameNav);
   } else {
-    throw new Error("This command can only be called from ginblame or ginblamenav buffer");
+    throw new Error(
+      "This command can only be called from ginblame or ginblamenav buffer",
+    );
   }
 
-  const fileFragment = await vars.b.get(denops, "gin_blame_file_fragment") as string | undefined;
+  const fileFragment = await vars.b.get(denops, "gin_blame_file_fragment") as
+    | string
+    | undefined;
   if (!fileFragment) {
     throw new Error("File fragment not found");
   }
 
-  const blameResult = await vars.b.get(denops, "gin_blame_result") as GitBlameResult | undefined;
+  const blameResult = await vars.b.get(denops, "gin_blame_result") as
+    | GitBlameResult
+    | undefined;
   if (!blameResult) {
     throw new Error("Blame result not found");
   }
@@ -88,7 +100,9 @@ export async function getBlameLine(
   _blameResult: GitBlameResult,
 ): Promise<{ blameLine: GitBlameLine; relativeOffset: number } | null> {
   // Get the line map (physical line -> GitBlameLine)
-  const lineMap = await vars.b.get(denops, "gin_blame_line_map") as Record<number, GitBlameLine> | undefined;
+  const lineMap = await vars.b.get(denops, "gin_blame_line_map") as
+    | Record<number, GitBlameLine>
+    | undefined;
   if (!lineMap) {
     return null;
   }

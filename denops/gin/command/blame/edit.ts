@@ -66,7 +66,9 @@ export async function editNav(
   const { expr, params } = parseBufname(bufname);
 
   // Try to get the file fragment from the nav buffer variable
-  const fileFragment = await vars.b.get(denops, "gin_blame_file_fragment") as string | undefined;
+  const fileFragment = await vars.b.get(denops, "gin_blame_file_fragment") as
+    | string
+    | undefined;
 
   if (!fileFragment) {
     // This shouldn't happen in normal usage, but handle it gracefully
@@ -74,9 +76,13 @@ export async function editNav(
   }
 
   // Get the associated ginblame buffer name
-  const bufnameBlame = await vars.b.get(denops, "gin_blame_file_bufname") as string | undefined;
+  const bufnameBlame = await vars.b.get(denops, "gin_blame_file_bufname") as
+    | string
+    | undefined;
   if (!bufnameBlame) {
-    throw new Error("Cannot reload ginblamenav: associated ginblame buffer not found");
+    throw new Error(
+      "Cannot reload ginblamenav: associated ginblame buffer not found",
+    );
   }
 
   // Get cmdarg for encoding/fileformat options
@@ -198,10 +204,11 @@ export async function exec(
     },
   );
   const blameResult = parseGitBlamePorcelain(content);
-  const { fileContent, navContent, dividers, lineMap, fileLineToPhysical } = formatGitBlameResult(
-    blameResult,
-    options.emojify,
-  );
+  const { fileContent, navContent, dividers, lineMap, fileLineToPhysical } =
+    formatGitBlameResult(
+      blameResult,
+      options.emojify,
+    );
 
   // Prepare buffer names for paired buffers
   const bufnameNav = formatBufname({
@@ -262,7 +269,11 @@ export async function exec(
       await option.modifiable.setLocal(denops, false);
       await vars.b.set(denops, "gin_blame_result", blameResult);
       await vars.b.set(denops, "gin_blame_line_map", lineMap);
-      await vars.b.set(denops, "gin_blame_file_line_to_physical", fileLineToPhysical);
+      await vars.b.set(
+        denops,
+        "gin_blame_file_line_to_physical",
+        fileLineToPhysical,
+      );
       await vars.b.set(denops, "gin_blame_nav_bufname", bufnameNav);
       await vars.b.set(denops, "gin_blame_detail_bufname", bufnameDetail);
       await vars.b.set(denops, "gin_blame_file_fragment", relpath);
@@ -281,7 +292,10 @@ export async function exec(
         })),
       );
       // Store buffer names for cleanup
-      await vars.b.set(denops, "gin_blame_paired_buffers", [bufnameNav, bufnameDetail]);
+      await vars.b.set(denops, "gin_blame_paired_buffers", [
+        bufnameNav,
+        bufnameDetail,
+      ]);
       // Close all paired buffers when this buffer is unloaded
       await denops.cmd(
         `autocmd BufUnload <buffer> ++once call timer_start(0, { -> execute('silent! bwipeout ' . bufnr('${
@@ -333,7 +347,11 @@ export async function exec(
       await option.modifiable.setLocal(denops, false);
       await vars.b.set(denops, "gin_blame_result", blameResult);
       await vars.b.set(denops, "gin_blame_line_map", lineMap);
-      await vars.b.set(denops, "gin_blame_file_line_to_physical", fileLineToPhysical);
+      await vars.b.set(
+        denops,
+        "gin_blame_file_line_to_physical",
+        fileLineToPhysical,
+      );
       await vars.b.set(denops, "gin_blame_file_bufname", bufnameFile);
       await vars.b.set(denops, "gin_blame_file_fragment", relpath);
       await vars.b.set(denops, "gin_blame_detail_bufname", bufnameDetail);
@@ -530,10 +548,11 @@ async function updateBlameBuffers(
     {},
   );
   const newBlameResult = parseGitBlamePorcelain(content);
-  const { fileContent, navContent, dividers, lineMap, fileLineToPhysical } = formatGitBlameResult(
-    newBlameResult,
-    emojify,
-  );
+  const { fileContent, navContent, dividers, lineMap, fileLineToPhysical } =
+    formatGitBlameResult(
+      newBlameResult,
+      emojify,
+    );
 
   // Prepare new buffer names with commitish
   const newBufnameBlame = formatBufname({
@@ -585,18 +604,51 @@ async function updateBlameBuffers(
     bufnrBlame = actualBufnrBlame;
 
     // Get detail bufname before batch (to avoid issues with vars.b.get in batch)
-    const detailBufname = await vars.b.get(denops, "gin_blame_detail_bufname") as string | undefined;
+    const detailBufname = await vars.b.get(
+      denops,
+      "gin_blame_detail_bufname",
+    ) as string | undefined;
 
     // Update ginblame buffer variables and signs (use the actual buffer number)
     await batch.batch(denops, async (denops) => {
-      await fn.setbufvar(denops, bufnrBlame, "gin_blame_result", newBlameResult);
+      await fn.setbufvar(
+        denops,
+        bufnrBlame,
+        "gin_blame_result",
+        newBlameResult,
+      );
       await fn.setbufvar(denops, bufnrBlame, "gin_blame_line_map", lineMap);
-      await fn.setbufvar(denops, bufnrBlame, "gin_blame_file_line_to_physical", fileLineToPhysical);
-      await fn.setbufvar(denops, bufnrBlame, "gin_blame_file_fragment", fileFragment);
-      await fn.setbufvar(denops, bufnrBlame, "gin_blame_file_bufname", newBufnameBlame);
-      await fn.setbufvar(denops, bufnrBlame, "gin_blame_nav_bufname", newBufnameNav);
+      await fn.setbufvar(
+        denops,
+        bufnrBlame,
+        "gin_blame_file_line_to_physical",
+        fileLineToPhysical,
+      );
+      await fn.setbufvar(
+        denops,
+        bufnrBlame,
+        "gin_blame_file_fragment",
+        fileFragment,
+      );
+      await fn.setbufvar(
+        denops,
+        bufnrBlame,
+        "gin_blame_file_bufname",
+        newBufnameBlame,
+      );
+      await fn.setbufvar(
+        denops,
+        bufnrBlame,
+        "gin_blame_nav_bufname",
+        newBufnameNav,
+      );
       if (detailBufname) {
-        await fn.setbufvar(denops, bufnrBlame, "gin_blame_detail_bufname", detailBufname);
+        await fn.setbufvar(
+          denops,
+          bufnrBlame,
+          "gin_blame_detail_bufname",
+          detailBufname,
+        );
       }
       await fn.sign_unplace(denops, "*", { buffer: bufnrBlame });
       await fn.sign_placelist(
@@ -634,8 +686,18 @@ async function updateBlameBuffers(
     await batch.batch(denops, async (denops) => {
       await fn.setbufvar(denops, bufnrNav, "gin_blame_result", newBlameResult);
       await fn.setbufvar(denops, bufnrNav, "gin_blame_line_map", lineMap);
-      await fn.setbufvar(denops, bufnrNav, "gin_blame_file_line_to_physical", fileLineToPhysical);
-      await fn.setbufvar(denops, bufnrNav, "gin_blame_file_bufname", newBufnameBlame);
+      await fn.setbufvar(
+        denops,
+        bufnrNav,
+        "gin_blame_file_line_to_physical",
+        fileLineToPhysical,
+      );
+      await fn.setbufvar(
+        denops,
+        bufnrNav,
+        "gin_blame_file_bufname",
+        newBufnameBlame,
+      );
       await fn.sign_unplace(denops, "*", { buffer: bufnrNav });
       await fn.sign_placelist(
         denops,
@@ -793,11 +855,22 @@ export async function switchToCommit(denops: Denops): Promise<void> {
 
     // Update the file fragment in nav buffer variable if filename changed
     if (newFilename !== fileFragment) {
-      await fn.setbufvar(denops, actualBufnrNav, "gin_blame_file_fragment", newFilename);
+      await fn.setbufvar(
+        denops,
+        actualBufnrNav,
+        "gin_blame_file_fragment",
+        newFilename,
+      );
     }
 
     // Update history with actual buffer numbers
-    await History.saveHistory(denops, actualBufnrNav, actualBufnrBlame, newHistory, newIndex);
+    await History.saveHistory(
+      denops,
+      actualBufnrNav,
+      actualBufnrBlame,
+      newHistory,
+      newIndex,
+    );
 
     // Use actual buffer numbers for the rest of the function
     bufnrNav = actualBufnrNav;
@@ -805,9 +878,17 @@ export async function switchToCommit(denops: Denops): Promise<void> {
   } catch (error) {
     // If the file doesn't exist in this commit, we've reached the beginning
     if (error instanceof Error && error.message.includes("no such path")) {
-      await denops.cmd('echohl WarningMsg | echo "File does not exist in this commit (reached the beginning)" | echohl None');
+      await denops.cmd(
+        'echohl WarningMsg | echo "File does not exist in this commit (reached the beginning)" | echohl None',
+      );
       // Restore history to previous state
-      await History.saveHistory(denops, bufnrNav, bufnrBlame, history, historyIndex);
+      await History.saveHistory(
+        denops,
+        bufnrNav,
+        bufnrBlame,
+        history,
+        historyIndex,
+      );
       return;
     }
     throw error;
@@ -816,14 +897,18 @@ export async function switchToCommit(denops: Denops): Promise<void> {
   // Move cursor to the corresponding line in the NEW buffer
   // The new buffer shows the selected commit, so we need to find the original line number
   // Get the updated blame result from the new buffer
-  const newBlameResult = await vars.b.get(denops, "gin_blame_result") as GitBlameResult | undefined;
+  const newBlameResult = await vars.b.get(denops, "gin_blame_result") as
+    | GitBlameResult
+    | undefined;
   if (!newBlameResult) {
     throw new Error("Updated blame result not found");
   }
 
   // Find the line in the new commit where originalLineNumber matches
   // In the new commit, this originalLineNumber becomes the current lineNumber
-  const newBlameLine = newBlameResult.lines.find((line) => line.lineNumber === originalLineNum);
+  const newBlameLine = newBlameResult.lines.find((line) =>
+    line.lineNumber === originalLineNum
+  );
 
   if (newBlameLine) {
     // Move to nav buffer to search and update cursor
@@ -833,7 +918,10 @@ export async function switchToCommit(denops: Denops): Promise<void> {
     }
 
     // Get the new fileLineToPhysical map from the updated buffer
-    const newFileLineToPhysical = await vars.b.get(denops, "gin_blame_file_line_to_physical") as Record<number, number> | undefined;
+    const newFileLineToPhysical = await vars.b.get(
+      denops,
+      "gin_blame_file_line_to_physical",
+    ) as Record<number, number> | undefined;
 
     // Direct lookup: file line number -> physical line
     let foundLine = 0;
@@ -849,12 +937,22 @@ export async function switchToCommit(denops: Denops): Promise<void> {
       // We must use win_execute to set cursor without changing current window.
       const winidBlame = await fn.bufwinid(denops, bufnrBlame);
       if (winidBlame !== -1) {
-        await fn.win_execute(denops, winidBlame, `call cursor(${foundLine}, 0)`);
+        await fn.win_execute(
+          denops,
+          winidBlame,
+          `call cursor(${foundLine}, 0)`,
+        );
       }
 
       // Update history with actual physical line after cursor move
       newHistory[newIndex].physicalLine = foundLine;
-      await History.saveHistory(denops, bufnrNav, bufnrBlame, newHistory, newIndex);
+      await History.saveHistory(
+        denops,
+        bufnrNav,
+        bufnrBlame,
+        newHistory,
+        newIndex,
+      );
     }
 
     // Return to original window (ginblame if called from there)
@@ -882,7 +980,10 @@ export async function switchToCommit(denops: Denops): Promise<void> {
  *
  * Note: Works from both ginblame and ginblamenav buffers
  */
-export async function navigateHistory(denops: Denops, direction: "older" | "newer"): Promise<void> {
+export async function navigateHistory(
+  denops: Denops,
+  direction: "older" | "newer",
+): Promise<void> {
   const winidCurrent = await fn.win_getid(denops);
 
   // Get blame buffer context
@@ -893,15 +994,21 @@ export async function navigateHistory(denops: Denops, direction: "older" | "newe
   const { history, historyIndex } = await History.getHistory(denops);
 
   // Calculate new index
-  const newHistoryIndex = direction === "older" ? historyIndex - 1 : historyIndex + 1;
+  const newHistoryIndex = direction === "older"
+    ? historyIndex - 1
+    : historyIndex + 1;
 
   // Check bounds
   if (newHistoryIndex < 0) {
-    await denops.cmd('echohl WarningMsg | echo "Already at oldest commit" | echohl None');
+    await denops.cmd(
+      'echohl WarningMsg | echo "Already at oldest commit" | echohl None',
+    );
     return;
   }
   if (newHistoryIndex >= history.length) {
-    await denops.cmd('echohl WarningMsg | echo "Already at newest commit" | echohl None');
+    await denops.cmd(
+      'echohl WarningMsg | echo "Already at newest commit" | echohl None',
+    );
     return;
   }
 
@@ -937,7 +1044,12 @@ export async function navigateHistory(denops: Denops, direction: "older" | "newe
 
   // Update the file fragment in nav buffer variable if filename changed
   if (newFilename !== fileFragment) {
-    await fn.setbufvar(denops, actualBufnrNav, "gin_blame_file_fragment", newFilename);
+    await fn.setbufvar(
+      denops,
+      actualBufnrNav,
+      "gin_blame_file_fragment",
+      newFilename,
+    );
   }
 
   // Save new history index (use actual buffer numbers)
@@ -952,7 +1064,13 @@ export async function navigateHistory(denops: Denops, direction: "older" | "newe
   });
   const actualBufnrBlame = await fn.bufnr(denops, newBufnameBlame);
 
-  await History.saveHistory(denops, actualBufnrNav, actualBufnrBlame, history, newHistoryIndex);
+  await History.saveHistory(
+    denops,
+    actualBufnrNav,
+    actualBufnrBlame,
+    history,
+    newHistoryIndex,
+  );
 
   // Restore cursor position from history (simple physical line number)
   // Move to nav buffer to restore cursor (cursorbind will sync to blame buffer)
@@ -968,7 +1086,11 @@ export async function navigateHistory(denops: Denops, direction: "older" | "newe
     // Also set cursor in ginblame buffer explicitly (cursorbind is not reliable)
     const winidBlame = await fn.bufwinid(denops, bufnrBlame);
     if (winidBlame !== -1) {
-      await fn.win_execute(denops, winidBlame, `call cursor(${historyEntry.physicalLine}, 0)`);
+      await fn.win_execute(
+        denops,
+        winidBlame,
+        `call cursor(${historyEntry.physicalLine}, 0)`,
+      );
     }
   }
 

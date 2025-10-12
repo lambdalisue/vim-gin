@@ -18,12 +18,16 @@ export async function updateDetail(denops: Denops): Promise<void> {
   const bufnameCurrent = await fn.bufname(denops, bufnrCurrent);
   const { scheme, expr, params } = parseBufname(bufnameCurrent);
 
-  const blameResult = await vars.b.get(denops, "gin_blame_result") as GitBlameResult | undefined;
+  const blameResult = await vars.b.get(denops, "gin_blame_result") as
+    | GitBlameResult
+    | undefined;
   if (!blameResult) {
     return;
   }
 
-  const bufnameDetail = await vars.b.get(denops, "gin_blame_detail_bufname") as string | undefined;
+  const bufnameDetail = await vars.b.get(denops, "gin_blame_detail_bufname") as
+    | string
+    | undefined;
   if (!bufnameDetail) {
     return;
   }
@@ -35,7 +39,10 @@ export async function updateDetail(denops: Denops): Promise<void> {
   let commitSha: string;
 
   // Check if on first divider line (line 1, empty)
-  if (lnum === 1 && (!currentLine || typeof currentLine === "string" && !currentLine.trim())) {
+  if (
+    lnum === 1 &&
+    (!currentLine || typeof currentLine === "string" && !currentLine.trim())
+  ) {
     // Show the blame target commit
     const currentCommitish = Array.isArray(params?.commitish)
       ? params.commitish[0]
@@ -53,13 +60,21 @@ export async function updateDetail(denops: Denops): Promise<void> {
   }
 
   // Check if already displaying this commit
-  const lastCommitSha = await vars.b.get(denops, "gin_blame_detail_last_commit") as string | undefined;
+  const lastCommitSha = await vars.b.get(
+    denops,
+    "gin_blame_detail_last_commit",
+  ) as string | undefined;
   if (lastCommitSha === commitSha) {
     return;
   }
 
   // Execute git show to get full commit details
-  const { stdout } = await execute(denops, ["show", "--no-patch", "--format=fuller", commitSha], {
+  const { stdout } = await execute(denops, [
+    "show",
+    "--no-patch",
+    "--format=fuller",
+    commitSha,
+  ], {
     worktree: expr,
     throwOnError: false,
     stdoutIndicator: "null",
@@ -81,7 +96,10 @@ export async function updateDetail(denops: Denops): Promise<void> {
  * Reformat git show output: Metadata -> Summary -> Body
  * Apply emojify only to summary line
  */
-function reformatCommitDetail(gitShowOutput: string[], shouldEmojify: boolean): string[] {
+function reformatCommitDetail(
+  gitShowOutput: string[],
+  shouldEmojify: boolean,
+): string[] {
   const result: string[] = [];
   let i = 0;
 

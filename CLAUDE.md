@@ -5,6 +5,7 @@
 **All code comments MUST be written in English.**
 
 This applies to:
+
 - Function/class documentation comments
 - Inline comments explaining logic
 - TODO/FIXME/NOTE comments
@@ -19,18 +20,21 @@ This applies to:
 ### Examples
 
 Good example:
+
 ```
 // Disable visual features that affect line number display
 await disableVisualLineModifications(denops, bufnr);
 ```
 
 Bad example (using non-English comments):
+
 ```
 // Disable visual line modifications
 await disableVisualLineModifications(denops, bufnr);
 ```
 
 Good example (JSDoc):
+
 ```
 /**
  * Parse git blame porcelain output
@@ -40,6 +44,7 @@ Good example (JSDoc):
 ```
 
 Bad example (vague comments):
+
 ```
 /**
  * Parse blame output

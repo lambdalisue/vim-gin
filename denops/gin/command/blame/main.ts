@@ -51,7 +51,10 @@ export function main(denops: Denops): void {
       if (direction !== "older" && direction !== "newer") {
         throw new Error(`Invalid direction: ${direction}`);
       }
-      return helper.friendlyCall(denops, () => navigateHistory(denops, direction as "older" | "newer"));
+      return helper.friendlyCall(
+        denops,
+        () => navigateHistory(denops, direction as "older" | "newer"),
+      );
     },
     "blame:update_detail": () => {
       return updateDetail(denops);
