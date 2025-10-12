@@ -18,26 +18,30 @@ This applies to:
 
 ### Examples
 
-```typescript
-// ✅ Good
+Good example:
+```
 // Disable visual features that affect line number display
 await disableVisualLineModifications(denops, bufnr);
+```
 
-// ❌ Bad (using non-English comments)
+Bad example (using non-English comments):
+```
 // Disable visual line modifications
 await disableVisualLineModifications(denops, bufnr);
 ```
 
-```typescript
+Good example (JSDoc):
+```
 /**
- * ✅ Good
  * Parse git blame porcelain output
  * @param content - Raw output from git blame --porcelain
  * @returns Parsed blame result with commits and lines
  */
+```
 
+Bad example (vague comments):
+```
 /**
- * ❌ Bad (using non-English comments)
  * Parse blame output
  * @param content - Blame output
  * @returns Parsed result
