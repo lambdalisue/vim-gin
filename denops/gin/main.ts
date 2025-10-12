@@ -5,6 +5,7 @@ import { main as mainBuffer } from "./command/buffer/main.ts";
 import { main as mainProxy } from "./proxy/main.ts";
 import { main as mainUtil } from "./util/main.ts";
 
+import { main as mainBlame } from "./command/blame/main.ts";
 import { main as mainBranch } from "./command/branch/main.ts";
 import { main as mainBrowse } from "./command/browse/main.ts";
 import { main as mainChaperon } from "./command/chaperon/main.ts";
@@ -24,6 +25,7 @@ export function main(denops: Denops): void {
   mainProxy(denops);
   mainUtil(denops);
 
+  mainBlame(denops);
   mainBranch(denops);
   mainBrowse(denops);
   mainChaperon(denops);
