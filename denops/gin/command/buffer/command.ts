@@ -12,6 +12,7 @@ export type ExecOptions = {
   opener?: string;
   emojify?: boolean;
   diffjump?: string;
+  difffold?: boolean;
   filetype?: string;
   cmdarg?: string;
   mods?: string;
@@ -36,6 +37,7 @@ export async function exec(
       monochrome: unnullish(options.monochrome, (v) => v ? "" : undefined),
       emojify: unnullish(options.emojify, (v) => v ? "" : undefined),
       diffjump: options.diffjump,
+      difffold: unnullish(options.difffold, (v) => v ? "" : undefined),
       filetype: options.filetype ?? "gin-buffer",
     },
     fragment: `${args.join(" ")}$`,

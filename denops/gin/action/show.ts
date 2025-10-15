@@ -61,6 +61,7 @@ async function doShow(
       `++opener=${opener}`,
       ...(emojify ? [`++emojify`] : []),
       `++diffjump=${x.commit}`,
+      `++difffold`,
       "show",
       x.commit,
     ]);

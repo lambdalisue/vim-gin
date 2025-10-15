@@ -17,6 +17,7 @@ import {
 } from "../../util/ansi_escape_code.ts";
 import { execute } from "../../git/executor.ts";
 import { init as initDiffJump } from "../../feat/diffjump/jump.ts";
+import { init as initDiffFold } from "../../feat/difffold/fold.ts";
 
 export async function edit(
   denops: Denops,
@@ -50,10 +51,15 @@ export async function edit(
     emojify: "emojify" in (params ?? {}),
   });
 
-  // Initialize diff jump functionality if ++jump option is present
+  // Initialize diff jump functionality if ++diffjump option is present
   const jumpCommitish = params?.diffjump;
   if (jumpCommitish !== undefined) {
     await initDiffJump(denops, bufnr, "buffer");
+  }
+
+  // Initialize diff fold functionality if ++difffold option is present
+  if ("difffold" in (params ?? {})) {
+    await initDiffFold(denops, bufnr);
   }
 }
 

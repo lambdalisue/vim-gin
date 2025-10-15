@@ -98,6 +98,7 @@ async function command(
     "opener",
     "emojify",
     "diffjump",
+    "difffold",
     "filetype",
     ...builtinOpts,
   ]);
@@ -108,6 +109,7 @@ async function command(
     opener: opts.opener,
     emojify: unnullish(opts.emojify, () => true),
     diffjump: opts.diffjump,
+    difffold: unnullish(opts.difffold, () => true),
     filetype: opts.filetype,
     cmdarg: formatOpts(opts, builtinOpts).join(" "),
     mods,

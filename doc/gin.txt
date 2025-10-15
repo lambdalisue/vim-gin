@@ -152,6 +152,15 @@ COMMANDS					*gin-commands*
 		:GinBuffer ++diffjump=abc123 show abc123
 		:GinBuffer ++diffjump log -p -1
 <
+	++difffold
+		Enable automatic folding for file sections in unified diff
+		output. Each file in the diff will be folded separately,
+		making it easier to navigate large diffs with multiple files.
+		For example:
+>
+		:GinBuffer ++difffold show HEAD
+		:GinBuffer ++diffjump ++difffold log -p -1
+<
 	++filetype={filetype}
 		Specifies the filetype to set for the buffer. Defaults to
 		"gin-buffer". This is useful when you want specific ftplugin
