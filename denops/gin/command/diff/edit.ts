@@ -15,6 +15,7 @@ import {
 import * as buffer from "jsr:@denops/std@^7.0.0/buffer";
 import { exec as execBuffer } from "../../command/buffer/edit.ts";
 import { init as initDiffJump } from "../../feat/diffjump/jump.ts";
+import { init as initDiffFold } from "../../feat/difffold/fold.ts";
 
 export async function edit(
   denops: Denops,
@@ -90,4 +91,7 @@ export async function exec(
 
   // Initialize diff jump functionality
   await initDiffJump(denops, bufnr, "diff");
+
+  // Initialize diff fold functionality
+  await initDiffFold(denops, bufnr);
 }
