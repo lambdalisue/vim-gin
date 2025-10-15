@@ -1,5 +1,6 @@
 import { assertEquals } from "jsr:@std/assert@^1.0.0";
-import { Commitish, INDEX, parseCommitish, WORKTREE } from "./commitish.ts";
+import { type Commitish, INDEX, WORKTREE } from "../../feat/diffjump/jump.ts";
+import { parseCommitish } from "./commitish.ts";
 
 Deno.test("parseCommitish", () => {
   const testcases: [[string, boolean], [Commitish, Commitish]][] = [

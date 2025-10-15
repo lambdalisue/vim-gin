@@ -16,6 +16,7 @@ import {
   buildDecorationsFromAnsiEscapeCode,
 } from "../../util/ansi_escape_code.ts";
 import { execute } from "../../git/executor.ts";
+import { init as initDiffJump } from "../../feat/diffjump/jump.ts";
 
 export async function edit(
   denops: Denops,
@@ -42,8 +43,18 @@ export async function edit(
     monochrome: "monochrome" in (params ?? {}),
     encoding: opts.enc ?? opts.encoding,
     fileformat: opts.ff ?? opts.fileformat,
+    filetype: unnullish(
+      params?.filetype,
+      (v) => ensure(v, is.String, { message: "filetype must be string" }),
+    ),
     emojify: "emojify" in (params ?? {}),
   });
+
+  // Initialize diff jump functionality if ++jump option is present
+  const jumpCommitish = params?.diffjump;
+  if (jumpCommitish !== undefined) {
+    await initDiffJump(denops, bufnr, "buffer");
+  }
 }
 
 export type ExecOptions = {
@@ -52,6 +63,7 @@ export type ExecOptions = {
   monochrome?: boolean;
   encoding?: string;
   fileformat?: string;
+  filetype?: string;
   emojify?: boolean;
   stdoutIndicator?: string;
   stderrIndicator?: string;
@@ -110,7 +122,9 @@ export async function exec(
   await buffer.concrete(denops, bufnr);
   await buffer.ensure(denops, bufnr, async () => {
     await batch.batch(denops, async (denops) => {
-      await option.filetype.setLocal(denops, "gin");
+      if (options.filetype !== undefined) {
+        await option.filetype.setLocal(denops, options.filetype);
+      }
       await option.bufhidden.setLocal(denops, "unload");
       await option.buftype.setLocal(denops, "nofile");
       await option.swapfile.setLocal(denops, false);

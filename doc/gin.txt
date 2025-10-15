@@ -139,6 +139,24 @@ COMMANDS					*gin-commands*
 	++emojify
 		Replace all ":emoji:" with emoji characters.
 
+	++diffjump[={commitish}]
+		Enable diff jump functionality for buffers that contain git
+		diff output (e.g., "git show", "git log -p"). When enabled,
+		diff jump mappings become available in the buffer.
+		If {commitish} is specified, it will be used as the target
+		commit. If omitted, defaults to "HEAD".
+		See |<Plug>(gin-diffjump-smart)| for available mappings.
+		For example:
+>
+		:GinBuffer ++diffjump show HEAD
+		:GinBuffer ++diffjump=abc123 show abc123
+		:GinBuffer ++diffjump log -p -1
+<
+	++filetype={filetype}
+		Specifies the filetype to set for the buffer. Defaults to
+		"gin-buffer". This is useful when you want specific ftplugin
+		behavior for certain commands.
+
 	++processor={processor}
 		Specifies the processor program that will process the result.
 		The result is passed to the processor via stdin and the
@@ -649,6 +667,12 @@ VARIABLES					*gin-variables*
 
 	Default: 0
 
+*g:gin_buffer_disable_default_mappings*
+	Disable default mappings on buffers shown by |:GinBuffer| with
+	|++diffjump| option (filetype "gin-buffer").
+
+	Default: 0
+
 *g:gin_edit_default_args*
 	Specify default arguments of |:GinEdit|.
 
@@ -807,12 +831,16 @@ MAPPINGS					*gin-mappings*
 
 *<Plug>(gin-diffjump-smart)*
 	Jump to the corresponding line of the comparison or comparison source.
+	Available in buffers with diff jump enabled (|:GinDiff|, |:GinBuffer|
+	with |++diffjump| option).
 
 *<Plug>(gin-diffjump-old)*
 	Jump to the corresponding line of the comparison source.
+	Available in buffers with diff jump enabled.
 
 *<Plug>(gin-diffjump-new)*
 	Jump to the corresponding line of the comparison.
+	Available in buffers with diff jump enabled.
 
 -----------------------------------------------------------------------------
 ACTIONS						*gin-actions*

@@ -1,6 +1,8 @@
 import type { Denops } from "jsr:@denops/std@^7.0.0";
-import { as, assert, is } from "jsr:@core/unknownutil@^4.0.0";
+import { assert, ensure, is } from "jsr:@core/unknownutil@^4.0.0";
 import * as helper from "jsr:@denops/std@^7.0.0/helper";
+import * as fn from "jsr:@denops/std@^7.0.0/function";
+import { parse as parseBufname } from "jsr:@denops/std@^7.0.0/bufname";
 import {
   builtinOpts,
   formatOpts,
@@ -11,7 +13,8 @@ import { fillCmdArgs, normCmdArgs, parseSilent } from "../../util/cmd.ts";
 import { exec } from "./command.ts";
 import { edit } from "./edit.ts";
 import { read } from "./read.ts";
-import { jumpNew, jumpOld, jumpSmart } from "./jump.ts";
+import { main as mainDiffJump } from "../../feat/diffjump/main.ts";
+import { parseCommitish } from "./commitish.ts";
 
 export function main(denops: Denops): void {
   denops.dispatcher = {
@@ -38,19 +41,35 @@ export function main(denops: Denops): void {
       assert(bufname, is.String, { name: "bufname" });
       return helper.friendlyCall(denops, () => read(denops, bufnr, bufname));
     },
-    "diff:jump:new": (mods) => {
-      assert(mods, as.Optional(is.String), { name: "mods" });
-      return helper.friendlyCall(denops, () => jumpNew(denops, mods ?? ""));
-    },
-    "diff:jump:old": (mods) => {
-      assert(mods, as.Optional(is.String), { name: "mods" });
-      return helper.friendlyCall(denops, () => jumpOld(denops, mods ?? ""));
-    },
-    "diff:jump:smart": (mods) => {
-      assert(mods, as.Optional(is.String), { name: "mods" });
-      return helper.friendlyCall(denops, () => jumpSmart(denops, mods ?? ""));
-    },
   };
+  mainDiffJump(denops, "diff", {
+    commitishMap: {
+      old: async ({ bufnr }) => {
+        const bufname = await fn.bufname(denops, bufnr);
+        const { params } = parseBufname(bufname);
+        const cached = "cached" in (params ?? {});
+        const commitish = ensure(
+          params?.commitish ?? "",
+          is.String,
+          { message: "commitish must be string" },
+        );
+        const [oldCommitish, _] = parseCommitish(commitish, cached);
+        return oldCommitish;
+      },
+      new: async ({ bufnr }) => {
+        const bufname = await fn.bufname(denops, bufnr);
+        const { params } = parseBufname(bufname);
+        const cached = "cached" in (params ?? {});
+        const commitish = ensure(
+          params?.commitish ?? "",
+          is.String,
+          { message: "commitish must be string" },
+        );
+        const [_, newCommitish] = parseCommitish(commitish, cached);
+        return newCommitish;
+      },
+    },
+  });
 }
 
 async function command(

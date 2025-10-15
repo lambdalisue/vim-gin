@@ -60,6 +60,7 @@ async function doShow(
     await denops.dispatch("gin", "buffer:command", "", "", [
       `++opener=${opener}`,
       ...(emojify ? [`++emojify`] : []),
+      `++diffjump=${x.commit}`,
       "show",
       x.commit,
     ]);

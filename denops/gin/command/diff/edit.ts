@@ -2,7 +2,6 @@ import type { Denops } from "jsr:@denops/std@^7.0.0";
 import { unnullish } from "jsr:@lambdalisue/unnullish@^1.0.0";
 import { ensure, is } from "jsr:@core/unknownutil@^4.0.0";
 import * as batch from "jsr:@denops/std@^7.0.0/batch";
-import * as mapping from "jsr:@denops/std@^7.0.0/mapping";
 import * as option from "jsr:@denops/std@^7.0.0/option";
 import * as vars from "jsr:@denops/std@^7.0.0/variable";
 import { parse as parseBufname } from "jsr:@denops/std@^7.0.0/bufname";
@@ -15,6 +14,7 @@ import {
 } from "jsr:@denops/std@^7.0.0/argument";
 import * as buffer from "jsr:@denops/std@^7.0.0/buffer";
 import { exec as execBuffer } from "../../command/buffer/edit.ts";
+import { init as initDiffJump } from "../../feat/diffjump/jump.ts";
 
 export async function edit(
   denops: Denops,
@@ -85,33 +85,9 @@ export async function exec(
       await option.buftype.setLocal(denops, "nofile");
       await option.swapfile.setLocal(denops, false);
       await option.modifiable.setLocal(denops, false);
-      await mapping.map(
-        denops,
-        "<Plug>(gin-diffjump-old)",
-        `<Cmd>call denops#request('gin', 'diff:jump:old', [])<CR>`,
-        {
-          buffer: true,
-          noremap: true,
-        },
-      );
-      await mapping.map(
-        denops,
-        "<Plug>(gin-diffjump-new)",
-        `<Cmd>call denops#request('gin', 'diff:jump:new', [])<CR>`,
-        {
-          buffer: true,
-          noremap: true,
-        },
-      );
-      await mapping.map(
-        denops,
-        "<Plug>(gin-diffjump-smart)",
-        `<Cmd>call denops#request('gin', 'diff:jump:smart', [])<CR>`,
-        {
-          buffer: true,
-          noremap: true,
-        },
-      );
     });
   });
+
+  // Initialize diff jump functionality
+  await initDiffJump(denops, bufnr, "diff");
 }
