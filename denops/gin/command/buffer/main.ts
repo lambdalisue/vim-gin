@@ -1,8 +1,10 @@
 import type { Denops } from "jsr:@denops/std@^7.0.0";
 import { unnullish } from "jsr:@lambdalisue/unnullish@^1.0.0";
-import { assert, is } from "jsr:@core/unknownutil@^4.0.0";
+import { assert, ensure, is } from "jsr:@core/unknownutil@^4.0.0";
 import * as helper from "jsr:@denops/std@^7.0.0/helper";
 import * as buffer from "jsr:@denops/std@^7.0.0/buffer";
+import * as fn from "jsr:@denops/std@^7.0.0/function";
+import { parse as parseBufname } from "jsr:@denops/std@^7.0.0/bufname";
 import {
   builtinOpts,
   formatOpts,
@@ -14,6 +16,7 @@ import { normCmdArgs, parseSilent } from "../../util/cmd.ts";
 import { exec } from "./command.ts";
 import { edit } from "./edit.ts";
 import { read } from "./read.ts";
+import { main as mainDiffJump } from "../../feat/diffjump/main.ts";
 
 export function main(denops: Denops): void {
   denops.dispatcher = {
@@ -47,6 +50,38 @@ export function main(denops: Denops): void {
       );
     },
   };
+  mainDiffJump(denops, "buffer", {
+    commitishMap: {
+      old: async ({ bufnr }) => {
+        const bufname = await fn.bufname(denops, bufnr);
+        const { params } = parseBufname(bufname);
+        const jumpCommitish = params?.diffjump;
+        if (jumpCommitish === undefined) {
+          return "HEAD^";
+        }
+        const commitish = ensure(
+          jumpCommitish || "HEAD",
+          is.String,
+          { message: "jump must be string" },
+        );
+        return `${commitish}^`;
+      },
+      new: async ({ bufnr }) => {
+        const bufname = await fn.bufname(denops, bufnr);
+        const { params } = parseBufname(bufname);
+        const jumpCommitish = params?.diffjump;
+        if (jumpCommitish === undefined) {
+          return "HEAD";
+        }
+        const commitish = ensure(
+          jumpCommitish || "HEAD",
+          is.String,
+          { message: "jump must be string" },
+        );
+        return commitish;
+      },
+    },
+  });
 }
 
 async function command(
@@ -62,6 +97,9 @@ async function command(
     "monochrome",
     "opener",
     "emojify",
+    "diffjump",
+    "difffold",
+    "filetype",
     ...builtinOpts,
   ]);
   return exec(denops, residue, {
@@ -70,6 +108,9 @@ async function command(
     monochrome: unnullish(opts.monochrome, () => true),
     opener: opts.opener,
     emojify: unnullish(opts.emojify, () => true),
+    diffjump: opts.diffjump,
+    difffold: unnullish(opts.difffold, () => true),
+    filetype: opts.filetype,
     cmdarg: formatOpts(opts, builtinOpts).join(" "),
     mods,
     bang: bang === "!",

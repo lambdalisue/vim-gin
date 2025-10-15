@@ -11,6 +11,9 @@ export type ExecOptions = {
   monochrome?: boolean;
   opener?: string;
   emojify?: boolean;
+  diffjump?: string;
+  difffold?: boolean;
+  filetype?: string;
   cmdarg?: string;
   mods?: string;
   bang?: boolean;
@@ -33,6 +36,9 @@ export async function exec(
       processor: unnullish(options.processor, (v) => v.join(" ")),
       monochrome: unnullish(options.monochrome, (v) => v ? "" : undefined),
       emojify: unnullish(options.emojify, (v) => v ? "" : undefined),
+      diffjump: options.diffjump,
+      difffold: unnullish(options.difffold, (v) => v ? "" : undefined),
+      filetype: options.filetype ?? "gin-buffer",
     },
     fragment: `${args.join(" ")}$`,
   });

@@ -1,7 +1,4 @@
-export const INDEX = Symbol("INDEX");
-export const WORKTREE = Symbol("WORKTREE");
-
-export type Commitish = string | typeof INDEX | typeof WORKTREE;
+import { type Commitish, INDEX, WORKTREE } from "../../feat/diffjump/jump.ts";
 
 // git diff
 //  INDEX -> WORKTREE
