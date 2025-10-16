@@ -3,7 +3,8 @@ if exists('b:did_ftplugin')
 endif
 runtime ftplugin/diff.vim
 
-setlocal foldlevel=1
+let s:winid = win_getid()
+call timer_start(0, { -> win_execute(s:winid, 'setlocal foldlevel=1') })
 
 if !get(g:, 'gin_diff_disable_default_mappings')
   nmap <buffer> <CR> <Plug>(gin-diffjump-smart)zv
