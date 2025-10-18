@@ -939,6 +939,9 @@ export async function switchToCommit(denops: Denops): Promise<void> {
       await fn.win_gotoid(denops, winidCurrent);
     }
   }
+
+  // Redraw to ensure display is updated after buffer/cursor changes
+  await denops.cmd("redraw");
 }
 
 /**
@@ -1077,4 +1080,7 @@ export async function navigateHistory(
   if (scheme === "ginblame") {
     await fn.win_gotoid(denops, winidCurrent);
   }
+
+  // Redraw to ensure display is updated after buffer/cursor changes
+  await denops.cmd("redraw");
 }
