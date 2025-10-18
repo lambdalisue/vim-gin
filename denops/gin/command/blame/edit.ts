@@ -291,18 +291,9 @@ export async function exec(
           lnum: divider,
         })),
       );
-      // Store buffer names for cleanup
-      await vars.b.set(denops, "gin_blame_paired_buffers", [
-        bufnameNav,
-        bufnameDetail,
-      ]);
       // Close all paired buffers when this buffer is unloaded
       await denops.cmd(
-        `autocmd BufUnload <buffer> ++once call timer_start(0, { -> execute('silent! bwipeout ' . bufnr('${
-          bufnameNav.replaceAll("'", "''")
-        }') . ' | silent! bwipeout ' . bufnr('${
-          bufnameDetail.replaceAll("'", "''")
-        }')) })`,
+        `autocmd BufUnload <buffer> ++once call timer_start(0, { -> execute('silent! bwipeout ' . getbufvar(str2nr(expand('<abuf>')), 'gin_blame_paired_bufnr_nav') . ' | silent! bwipeout ' . getbufvar(str2nr(expand('<abuf>')), 'gin_blame_paired_bufnr_detail')) })`,
       );
     });
   });
@@ -325,6 +316,17 @@ export async function exec(
     await fn.win_gotoid(denops, winidNav);
   }
   const bufnrNav = await fn.bufnr(denops, bufnameNav);
+  const bufnrDetail = await fn.bufnr(denops, bufnameDetail);
+
+  // Store buffer numbers in ginblame buffer for cleanup autocmd
+  await fn.setbufvar(denops, bufnr, "gin_blame_paired_bufnr_nav", bufnrNav);
+  await fn.setbufvar(
+    denops,
+    bufnr,
+    "gin_blame_paired_bufnr_detail",
+    bufnrDetail,
+  );
+
   await buffer.replace(denops, bufnrNav, navContent, {
     fileformat,
     fileencoding,
@@ -355,6 +357,9 @@ export async function exec(
       await vars.b.set(denops, "gin_blame_file_bufname", bufnameFile);
       await vars.b.set(denops, "gin_blame_file_fragment", relpath);
       await vars.b.set(denops, "gin_blame_detail_bufname", bufnameDetail);
+      // Store buffer numbers for cleanup
+      await vars.b.set(denops, "gin_blame_paired_bufnr_file", bufnr);
+      await vars.b.set(denops, "gin_blame_paired_bufnr_detail", bufnrDetail);
       // Initialize history as empty - will be populated on first Enter
       await vars.b.set(denops, "gin_blame_history", []);
       await vars.b.set(denops, "gin_blame_history_index", -1);
@@ -374,17 +379,12 @@ export async function exec(
       );
       // Close all paired buffers when this navigation buffer is unloaded
       await denops.cmd(
-        `autocmd BufUnload <buffer> ++once call timer_start(0, { -> execute('silent! bwipeout ' . bufnr('${
-          bufnameFile.replaceAll("'", "''")
-        }') . ' | silent! bwipeout ' . bufnr('${
-          bufnameDetail.replaceAll("'", "''")
-        }')) })`,
+        `autocmd BufUnload <buffer> ++once call timer_start(0, { -> execute('silent! bwipeout ' . getbufvar(str2nr(expand('<abuf>')), 'gin_blame_paired_bufnr_file') . ' | silent! bwipeout ' . getbufvar(str2nr(expand('<abuf>')), 'gin_blame_paired_bufnr_detail')) })`,
       );
     });
   });
 
   // Setup commit detail buffer
-  const bufnrDetail = await fn.bufnr(denops, bufnameDetail);
   // Initial commit detail will be set by the first CursorMoved event
   await buffer.ensure(denops, bufnrDetail, async () => {
     await batch.batch(denops, async (denops) => {
@@ -398,13 +398,12 @@ export async function exec(
       await option.bufhidden.setLocal(denops, "unload");
       await option.buftype.setLocal(denops, "nowrite");
       await option.modifiable.setLocal(denops, false);
+      // Store buffer numbers for cleanup
+      await vars.b.set(denops, "gin_blame_paired_bufnr_file", bufnr);
+      await vars.b.set(denops, "gin_blame_paired_bufnr_nav", bufnrNav);
       // Close all paired buffers when detail buffer is unloaded
       await denops.cmd(
-        `autocmd BufUnload <buffer> ++once call timer_start(0, { -> execute('silent! bwipeout ' . bufnr('${
-          bufnameFile.replaceAll("'", "''")
-        }') . ' | silent! bwipeout ' . bufnr('${
-          bufnameNav.replaceAll("'", "''")
-        }')) })`,
+        `autocmd BufUnload <buffer> ++once call timer_start(0, { -> execute('silent! bwipeout ' . getbufvar(str2nr(expand('<abuf>')), 'gin_blame_paired_bufnr_file') . ' | silent! bwipeout ' . getbufvar(str2nr(expand('<abuf>')), 'gin_blame_paired_bufnr_nav')) })`,
       );
     });
   });
@@ -595,13 +594,9 @@ async function updateBlameBuffers(
       fileencoding,
     });
 
-    // Rename ginblame buffer using nvim_buf_set_name
-    const oldBufnrBlame = bufnrBlame;
-    await denops.call("nvim_buf_set_name", bufnrBlame, newBufnameBlame);
-
-    // Get the new buffer number after rename (nvim_buf_set_name may create a new buffer)
-    const actualBufnrBlame = await fn.bufnr(denops, newBufnameBlame);
-    bufnrBlame = actualBufnrBlame;
+    // Rename ginblame buffer using :file command (Vim/Neovim compatible)
+    const escapedBlame = await fn.fnameescape(denops, newBufnameBlame);
+    await fn.win_execute(denops, winidBlame, `noautocmd file ${escapedBlame}`);
 
     // Get detail bufname before batch (to avoid issues with vars.b.get in batch)
     const detailBufname = await vars.b.get(
@@ -662,27 +657,17 @@ async function updateBlameBuffers(
       );
     });
 
-    // If buffer number changed, switch the window to the new buffer and delete old one
-    if (actualBufnrBlame !== oldBufnrBlame && winidBlame !== -1) {
-      await fn.win_execute(denops, winidBlame, `buffer ${actualBufnrBlame}`);
-      await denops.cmd(`silent! bwipeout ${oldBufnrBlame}`);
-    }
-
     // Update ginblamenav buffer content
     await buffer.replace(denops, bufnrNav, navContent, {
       fileformat,
       fileencoding,
     });
 
-    // Rename ginblamenav buffer using nvim_buf_set_name
-    const oldBufnrNav = bufnrNav;
-    await denops.call("nvim_buf_set_name", bufnrNav, newBufnameNav);
+    // Rename ginblamenav buffer using :file command (Vim/Neovim compatible)
+    const escapedNav = await fn.fnameescape(denops, newBufnameNav);
+    await fn.win_execute(denops, winidNav, `noautocmd file ${escapedNav}`);
 
-    // Get the new buffer number after rename (nvim_buf_set_name may create a new buffer)
-    const actualBufnrNav = await fn.bufnr(denops, newBufnameNav);
-    bufnrNav = actualBufnrNav;
-
-    // Update ginblamenav buffer variables and signs (use the actual buffer number)
+    // Update ginblamenav buffer variables and signs
     await batch.batch(denops, async (denops) => {
       await fn.setbufvar(denops, bufnrNav, "gin_blame_result", newBlameResult);
       await fn.setbufvar(denops, bufnrNav, "gin_blame_line_map", lineMap);
@@ -709,12 +694,6 @@ async function updateBlameBuffers(
         })),
       );
     });
-
-    // If buffer number changed, switch the window to the new buffer and delete old one
-    if (actualBufnrNav !== oldBufnrNav && winidNav !== -1) {
-      await fn.win_execute(denops, winidNav, `buffer ${actualBufnrNav}`);
-      await denops.cmd(`silent! bwipeout ${oldBufnrNav}`);
-    }
 
     return { newBufnrNav: bufnrNav, newBufnrBlame: bufnrBlame };
   } finally {
