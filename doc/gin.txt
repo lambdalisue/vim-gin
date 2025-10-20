@@ -676,6 +676,46 @@ VARIABLES					*gin-variables*
 
 	Default: 0
 
+*g:gin_difffold_prefixes*			*gin-difffold*
+	Customize prefixes shown in diff buffer foldtext. The foldtext
+	displays file status (added/deleted/modified/renamed) and diff
+	statistics (+added -deleted lines).
+
+	The value is a |Dictionary| with the following keys:
+	  - added:    Prefix for newly added files
+	  - deleted:  Prefix for deleted files
+	  - modified: Prefix for modified files
+	  - renamed:  Prefix for renamed files
+
+	Two preset constants are provided:
+	  - |g:gin#difffold#prefixes_ascii|    ASCII symbols (default)
+	  - |g:gin#difffold#prefixes_nerdfont| Nerd Font icons
+
+	Example (using Nerd Font icons):
+>
+	let g:gin_difffold_prefixes = g:gin#difffold#prefixes_nerdfont
+<
+	Example (custom prefixes):
+>
+	let g:gin_difffold_prefixes = {
+	      \ 'added': '[NEW]',
+	      \ 'deleted': '[DEL]',
+	      \ }
+<
+	Partial configuration is supported. Unspecified keys will use the
+	default ASCII values.
+
+	Default: |g:gin#difffold#prefixes_ascii|
+
+*g:gin#difffold#prefixes_ascii*
+	ASCII prefix set for diff foldtext (constant).
+	Values: {'added': '[+]', 'deleted': '[-]', 'modified': '[.]',
+	         'renamed': '[/]'}
+
+*g:gin#difffold#prefixes_nerdfont*
+	Nerd Font icon prefix set for diff foldtext (constant).
+	Uses Codicons nf-cod-diff_* icons.
+
 *g:gin_buffer_disable_default_mappings*
 	Disable default mappings on buffers shown by |:GinBuffer| with
 	|++diffjump| option (filetype "gin-buffer").
