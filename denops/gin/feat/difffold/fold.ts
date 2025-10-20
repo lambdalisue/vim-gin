@@ -1,7 +1,6 @@
 import type { Denops } from "jsr:@denops/std@^7.0.0";
 import * as batch from "jsr:@denops/std@^7.0.0/batch";
 import * as fn from "jsr:@denops/std@^7.0.0/function";
-import * as option from "jsr:@denops/std@^7.0.0/option";
 import { parse } from "./parser.ts";
 
 /**
@@ -29,7 +28,15 @@ export async function init(denops: Denops, bufnr: number): Promise<void> {
 
   await batch.batch(denops, async (denops) => {
     // Set fold method to manual
-    await option.foldmethod.setLocal(denops, "manual");
+    await fn.setbufvar(denops, bufnr, "&foldmethod", "manual");
+
+    // Set custom foldtext function
+    await fn.setbufvar(
+      denops,
+      bufnr,
+      "&foldtext",
+      "gin#difffold#foldtext()",
+    );
 
     // Create folds for each file section
     for (const section of sections) {
