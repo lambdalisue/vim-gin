@@ -292,8 +292,9 @@ export async function exec(
         })),
       );
       // Close all paired buffers when this buffer is unloaded
-      await denops.cmd(
-        `autocmd BufUnload <buffer> ++once call timer_start(0, { -> execute('silent! bwipeout ' . getbufvar(str2nr(expand('<abuf>')), 'gin_blame_paired_bufnr_nav') . ' | silent! bwipeout ' . getbufvar(str2nr(expand('<abuf>')), 'gin_blame_paired_bufnr_detail')) })`,
+      await denops.call(
+        "gin#internal#command#blame#setup_cleanup_autocmd",
+        ["gin_blame_paired_bufnr_nav", "gin_blame_paired_bufnr_detail"],
       );
     });
   });
@@ -378,8 +379,9 @@ export async function exec(
         })),
       );
       // Close all paired buffers when this navigation buffer is unloaded
-      await denops.cmd(
-        `autocmd BufUnload <buffer> ++once call timer_start(0, { -> execute('silent! bwipeout ' . getbufvar(str2nr(expand('<abuf>')), 'gin_blame_paired_bufnr_file') . ' | silent! bwipeout ' . getbufvar(str2nr(expand('<abuf>')), 'gin_blame_paired_bufnr_detail')) })`,
+      await denops.call(
+        "gin#internal#command#blame#setup_cleanup_autocmd",
+        ["gin_blame_paired_bufnr_file", "gin_blame_paired_bufnr_detail"],
       );
     });
   });
@@ -402,8 +404,9 @@ export async function exec(
       await vars.b.set(denops, "gin_blame_paired_bufnr_file", bufnr);
       await vars.b.set(denops, "gin_blame_paired_bufnr_nav", bufnrNav);
       // Close all paired buffers when detail buffer is unloaded
-      await denops.cmd(
-        `autocmd BufUnload <buffer> ++once call timer_start(0, { -> execute('silent! bwipeout ' . getbufvar(str2nr(expand('<abuf>')), 'gin_blame_paired_bufnr_file') . ' | silent! bwipeout ' . getbufvar(str2nr(expand('<abuf>')), 'gin_blame_paired_bufnr_nav')) })`,
+      await denops.call(
+        "gin#internal#command#blame#setup_cleanup_autocmd",
+        ["gin_blame_paired_bufnr_file", "gin_blame_paired_bufnr_nav"],
       );
     });
   });
