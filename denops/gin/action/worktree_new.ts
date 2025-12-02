@@ -50,10 +50,14 @@ async function doNew(
   const root = await findRoot(cwd);
   const xs = await gatherCandidates(denops, bufnr, range);
   const x = xs.at(0);
-  const target = x?.target ?? "HEAD";
+  const from = x?.target ?? "HEAD";
+  const branchName = await helper.input(denops, {
+    prompt: `New branch (from ${from}): `,
+    text: from,
+  });
   const worktreePath = await helper.input(denops, {
-    prompt: `Worktree path (for ${target}): `,
-    text: join(root, `.worktrees/${target}`),
+    prompt: `Worktree path (for ${branchName}): `,
+    text: join(root, `.worktrees/${branchName}`),
   });
   await denops.cmd('redraw | echo ""');
   if (!worktreePath) {
@@ -64,8 +68,10 @@ async function doNew(
     "worktree",
     "add",
     ...(force ? ["-f"] : []),
+    "-b",
+    branchName,
     worktreePath,
-    target,
+    from,
   ]);
   // Change the current working directory to the new worktree
   await fn.chdir(denops, worktreePath);
@@ -79,9 +85,12 @@ async function doNewOrphan(
 ): Promise<void> {
   const cwd = await fn.getcwd(denops);
   const root = await findRoot(cwd);
+  const branchName = await helper.input(denops, {
+    prompt: "New branch (orphan): ",
+  });
   const worktreePath = await helper.input(denops, {
-    prompt: "Worktree path (orphan): ",
-    text: join(root, `.worktrees/orphan`),
+    prompt: `Worktree path (for ${branchName}): `,
+    text: join(root, `.worktrees/${branchName}`),
   });
   await denops.cmd('redraw | echo ""');
   if (!worktreePath) {
@@ -92,6 +101,8 @@ async function doNewOrphan(
     "worktree",
     "add",
     "--orphan",
+    "-b",
+    branchName,
     worktreePath,
   ]);
   // Change the current working directory to the new worktree
