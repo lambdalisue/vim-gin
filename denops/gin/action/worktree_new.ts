@@ -55,11 +55,15 @@ async function doNew(
     prompt: `New branch (from ${from}): `,
     text: from,
   });
+  if (!branchName) {
+    await helper.echoerr(denops, "Cancelled");
+    return;
+  }
+  const branchPath = branchName.replace(/[/\\]/g, "_");
   const worktreePath = await helper.input(denops, {
     prompt: `Worktree path (for ${branchName}): `,
-    text: join(root, `.worktrees/${branchName}`),
+    text: join(root, `.worktrees/${branchPath}`),
   });
-  await denops.cmd('redraw | echo ""');
   if (!worktreePath) {
     await helper.echoerr(denops, "Cancelled");
     return;
@@ -68,8 +72,7 @@ async function doNew(
     "worktree",
     "add",
     ...(force ? ["-f"] : []),
-    "-b",
-    branchName,
+    ...(branchName === from ? [] : [branchName]),
     worktreePath,
     from,
   ]);
@@ -88,11 +91,14 @@ async function doNewOrphan(
   const branchName = await helper.input(denops, {
     prompt: "New branch (orphan): ",
   });
+  if (!branchName) {
+    await helper.echoerr(denops, "Cancelled");
+    return;
+  }
   const worktreePath = await helper.input(denops, {
     prompt: `Worktree path (for ${branchName}): `,
     text: join(root, `.worktrees/${branchName}`),
   });
-  await denops.cmd('redraw | echo ""');
   if (!worktreePath) {
     await helper.echoerr(denops, "Cancelled");
     return;
