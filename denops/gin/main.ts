@@ -19,6 +19,7 @@ import { main as mainStatus } from "./command/status/main.ts";
 import { main as mainTag } from "./command/tag/main.ts";
 
 import { main as mainComponentBranch } from "./component/branch.ts";
+import { main as mainComponentRebase } from "./component/rebase.ts";
 import { main as mainComponentTraffic } from "./component/traffic.ts";
 import { main as mainComponentWorktree } from "./component/worktree.ts";
 
@@ -42,6 +43,7 @@ export function main(denops: Denops): void {
   mainTag(denops);
 
   mainComponentBranch(denops);
+  mainComponentRebase(denops);
   mainComponentTraffic(denops);
   mainComponentWorktree(denops);
 }
