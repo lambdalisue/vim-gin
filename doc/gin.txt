@@ -383,6 +383,31 @@ COMMANDS					*gin-commands*
 
 	Use a bang (!) to forcibly open a buffer.
 
+							*:GinReflog*
+:GinReflog[!] [{++option}...] [{flags}] [{ref}]
+	Open a "gin-reflog" buffer to show a git reflog.
+
+	The following options are valid as {++option}:
+
+	++emojify
+		Replace all ":emoji:" with emoji characters.
+
+	See |gin-commands-options| for common {++option}.
+
+	See ":man git-reflog(1)" for detail about each {flags}.
+
+	The optional {ref} argument specifies which ref to show the reflog
+	for. If omitted, HEAD is used by default.
+
+	Several default mappings are defined in the buffer. Use "help" action
+	to see mappings or disable by |g:gin_reflog_disable_default_mappings|.
+
+	Users can specify default and/or persistent arguments of the command.
+	See |gin-commands-default-args| and/or |gin-commands-persistent-args|
+	for detail.
+
+	Use a bang (!) to forcibly open a buffer.
+
 							*:GinStash*
 :GinStash[!] [{++option}...] [{flags}]
 	Open a "gin-stash" buffer to show a stash list.
@@ -766,6 +791,21 @@ VARIABLES					*gin-variables*
 
 *g:gin_log_disable_default_mappings*
 	Disable default mappings on buffers shown by |:GinLog|.
+
+	Default: 0
+
+*g:gin_reflog_default_args*
+	Specify default arguments of |:GinReflog|.
+
+	Default: []
+
+*g:gin_reflog_persistent_args*
+	Specify persistent arguments of |:GinReflog|.
+
+	Default: []
+
+*g:gin_reflog_disable_default_mappings*
+	Disable default mappings on buffers shown by |:GinReflog|.
 
 	Default: 0
 
