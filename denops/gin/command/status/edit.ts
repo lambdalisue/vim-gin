@@ -13,6 +13,7 @@ import { bind } from "../../command/bare/command.ts";
 import { exec as execBuffer } from "../../command/buffer/edit.ts";
 import { findWorktreeFromDenops } from "../../git/worktree.ts";
 import { getRebaseState } from "../../git/rebase.ts";
+import { tryCleanupSplitTemplate } from "../../action/commit_split.ts";
 import { init as initActionAdd } from "../../action/add.ts";
 import { init as initActionBrowse } from "../../action/browse.ts";
 import { init as initActionChaperon } from "../../action/chaperon.ts";
@@ -91,6 +92,8 @@ export async function exec(
       }
       await fn.winrestview(denops, saved);
     });
+    // Clean up commit.template override if rebase has completed
+    await tryCleanupSplitTemplate(worktree);
     await batch.batch(denops, async (denops) => {
       await bind(denops, bufnr);
       await initActionCore(denops, bufnr);
