@@ -506,7 +506,7 @@ COMMANDS					*gin-commands*
 	--ignored[=traditional/no/matching]
 	--renames/--no-renames
 	--find-renames[={n}]
-		
+
 	See ":man git-status(1)" for detail about each {flags}.
 
 	Several default mappings are defined in the buffer. Use "help" action
@@ -861,6 +861,21 @@ VARIABLES					*gin-variables*
 
 *g:gin_stash_disable_default_mappings*
 	Disable default mappings on buffers shown by |:GinStash|.
+
+	Default: 0
+
+*g:gin_tag_default_args*
+	Specify default arguments of |:GinTag|.
+
+	Default: []
+
+*g:gin_tag_persistent_args*
+	Specify persistent arguments of |:GinTag|.
+
+	Default: []
+
+*g:gin_tag_disable_default_mappings*
+	Disable default mappings on buffers shown by |:GinTag|.
 
 	Default: 0
 
