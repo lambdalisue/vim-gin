@@ -1029,6 +1029,23 @@ NOTE that we won't list all actions available here because there are too many
 of them and we cannot maintain correct documentation of that.
 Use the "help" action to check what actions are available on each gin buffer.
 
+							*gin-action-commit:split*
+commit:split
+commit:split:{opener}
+	Split a commit into multiple commits via interactive rebase. This
+	action is available in |:GinLog|, |:GinReflog|, and |:GinStatus|
+	buffers. When invoked on a commit, it:
+
+	1. Starts an interactive rebase at the target commit
+	2. Resets the commit (keeping changes in working tree)
+	3. Opens |:GinStatus| to let you stage and commit changes
+
+	After completing your new commits, continue the rebase with
+	"git rebase --continue" (or use the continue:rebase action).
+
+	Available openers: edit, split, vsplit, tabedit
+	The default opener is "edit".
+
 *<Plug>(gin-action-echo)*
 	Echo active action candidates for debugging.
 
