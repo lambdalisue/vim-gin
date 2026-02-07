@@ -497,6 +497,11 @@ COMMANDS					*gin-commands*
 :GinStatus[!] [{++option}...] [{flags}] [-- {pathspec}...]
 	Open a "gin-status" buffer to show a status.
 
+	When a rebase is in progress (either interactive or non-interactive),
+	a rebase progress header is automatically displayed at the top of the
+	buffer showing the current commit being processed and the total number
+	of commits (e.g., "REBASE 3/10" or "REBASE-i 3/10").
+
 	See |gin-commands-options| for common {++option}.
 
 	The following flags are valid as {flags}:
@@ -506,7 +511,7 @@ COMMANDS					*gin-commands*
 	--ignored[=traditional/no/matching]
 	--renames/--no-renames
 	--find-renames[={n}]
-		
+
 	See ":man git-status(1)" for detail about each {flags}.
 
 	Several default mappings are defined in the buffer. Use "help" action
@@ -864,6 +869,21 @@ VARIABLES					*gin-variables*
 
 	Default: 0
 
+*g:gin_tag_default_args*
+	Specify default arguments of |:GinTag|.
+
+	Default: []
+
+*g:gin_tag_persistent_args*
+	Specify persistent arguments of |:GinTag|.
+
+	Default: []
+
+*g:gin_tag_disable_default_mappings*
+	Disable default mappings on buffers shown by |:GinTag|.
+
+	Default: 0
+
 *g:gin_proxy_apply_without_confirm*
 	Apply changes without confirmation on proxy editors.
 
@@ -959,6 +979,15 @@ gin#component#traffic#ascii()
 gin#component#traffic#unicode()
 	Return an indicator string of the number of ahead and behind commits.
 
+					*gin#component#rebase#ascii()*
+					*gin#component#rebase#unicode()*
+gin#component#rebase#ascii()
+gin#component#rebase#unicode()
+	Return an indicator string of the rebase progress when a rebase is
+	in progress. Returns empty string when no rebase is in progress.
+	The format is "REBASE N/M" or "REBASE-i N/M" where N is the current
+	commit being processed and M is the total number of commits.
+
 					*gin#component#worktree#name()*
 					*gin#component#worktree#full()*
 gin#component#worktree#name()
@@ -999,6 +1028,23 @@ ACTIONS						*gin-actions*
 NOTE that we won't list all actions available here because there are too many
 of them and we cannot maintain correct documentation of that.
 Use the "help" action to check what actions are available on each gin buffer.
+
+							*gin-action-commit:split*
+commit:split
+commit:split:{opener}
+	Split a commit into multiple commits via interactive rebase. This
+	action is available in |:GinLog|, |:GinReflog|, and |:GinStatus|
+	buffers. When invoked on a commit, it:
+
+	1. Starts an interactive rebase at the target commit
+	2. Resets the commit (keeping changes in working tree)
+	3. Opens |:GinStatus| to let you stage and commit changes
+
+	After completing your new commits, continue the rebase with
+	"git rebase --continue" (or use the continue:rebase action).
+
+	Available openers: edit, split, vsplit, tabedit
+	The default opener is "edit".
 
 *<Plug>(gin-action-echo)*
 	Echo active action candidates for debugging.
