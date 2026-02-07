@@ -24,6 +24,7 @@ without announcements.**
 - `GinEdit` to see `git show` of a file
 - `GinLog` to see `git log` of a repository/file
 - `GinPatch` to stage changes partially (like `git add -p`)
+- `GinStash` to see `git stash list` of a repository
 - `GinStatus` to see `git status` of a repository
 
 See [Features](https://github.com/lambdalisue/vim-gin/wiki/Features) in Wiki for
