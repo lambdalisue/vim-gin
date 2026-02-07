@@ -430,6 +430,31 @@ COMMANDS					*gin-commands*
 
 	Use a bang (!) to forcibly open a buffer.
 
+							*:GinTag*
+:GinTag[!] [{++option}...] [{flags}] [{pattern}...]
+	Open a "gin-tag" buffer to show a tag list.
+
+	The following options are valid as {++option}:
+
+	++emojify
+		Replace all ":emoji:" with emoji characters.
+
+	See |gin-commands-options| for common {++option}.
+
+	See ":man git-tag(1)" for detail about each {flags}.
+
+	The optional {pattern} arguments are shell wildcard patterns. If
+	given, only tags matching the patterns are shown.
+
+	Several default mappings are defined in the buffer. Use "help" action
+	to see mappings or disable by |g:gin_tag_disable_default_mappings|.
+
+	Users can specify default and/or persistent arguments of the command.
+	See |gin-commands-default-args| and/or |gin-commands-persistent-args|
+	for detail.
+
+	Use a bang (!) to forcibly open a buffer.
+
 							*:GinPatch*
 :GinPatch[!] [{++option}...] [{path}]
 	Open three buffers (HEAD, INDEX, and WORKTREE) to patch changes of
