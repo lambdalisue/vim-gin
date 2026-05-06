@@ -19,5 +19,3 @@ if !get(g:, 'gin_log_disable_default_mappings')
   nmap <buffer><nowait> yy <Plug>(gin-action-yank:commit)
   vmap <buffer><nowait> y <Plug>(gin-action-yank:commit)<Esc>
 endif
-
-call gin#internal#util#cursor_restore#enable()

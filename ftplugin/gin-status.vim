@@ -28,5 +28,3 @@ if !get(g:, 'gin_status_disable_default_mappings')
   nmap <buffer><nowait> yy <Plug>(gin-action-yank:path)
   vmap <buffer><nowait> y <Plug>(gin-action-yank:path)<Esc>
 endif
-
-call gin#internal#util#cursor_restore#enable()
