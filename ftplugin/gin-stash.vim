@@ -19,3 +19,5 @@ if !get(g:, 'gin_stash_disable_default_mappings')
   nmap <buffer><nowait> yy <Plug>(gin-action-yank:stash)
   vmap <buffer><nowait> y <Plug>(gin-action-yank:stash)<Esc>
 endif
+
+call gin#internal#util#cursor_restore#enable()

@@ -17,3 +17,5 @@ if !get(g:, 'gin_branch_disable_default_mappings')
   nmap <buffer><nowait> yy <Plug>(gin-action-yank:branch)
   vmap <buffer><nowait> y <Plug>(gin-action-yank:branch)<Esc>
 endif
+
+call gin#internal#util#cursor_restore#enable()
