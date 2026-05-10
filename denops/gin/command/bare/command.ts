@@ -35,6 +35,8 @@ export async function exec(
     denops,
     removeAnsiEscapeCode(content.join("\n")),
   );
+  // Reload files that may have been changed by the git command
+  await denops.cmd("silent checktime");
   if (!eventignore.includes("all")) {
     await denops.call(
       "gin#internal#util#debounce",
