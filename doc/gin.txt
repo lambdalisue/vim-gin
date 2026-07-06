@@ -664,8 +664,8 @@ as paths or raw git arguments.
 
 These names are primarily an internal representation, but users may match the
 scheme part in autocmds or inspect the name when integrating with gin buffers.
-Use |gin#util#expand()| instead of parsing buffer names when you need the file
-path represented by a gin file-like buffer.
+Use |gin#util#expand()| instead of parsing buffer names when you need the first
+file path represented by a gin file-like buffer.
 
 The following schemes are used:
 
@@ -717,7 +717,8 @@ ginstash://{worktree};{flags};emojify=
 ginstatus://{worktree};{flags}#{pathspecs}$
 	Used by |:GinStatus|. Parameters are git-status flags. The
 	"untracked-files" parameter is added by default. The fragment is a JSON
-	array of pathspecs terminated with "$".
+	array of pathspecs followed by the "$" terminator. The terminator is
+	not part of the JSON array.
 
 						*gin-buffer-name-gintag*
 gintag://{worktree};{flags};emojify=#{patterns}$
