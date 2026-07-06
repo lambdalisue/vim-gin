@@ -651,6 +651,88 @@ Users can define "GinLocal" buffer local command on those buffers like
 	  autocmd BufReadCmd ginlog://* call s:define_gin_local()
 	augroup END
 <
+							*gin-buffer-names*
+Gin buffers use special buffer names. They are generated internally with
+denops' bufname formatter and generally look like:
+>
+	{scheme}://{worktree};{param}={value};{flag}=#{fragment}
+<
+{worktree} is an absolute path to a git working tree. Parameters are separated
+with ";" and URL-escaped by the formatter. Boolean-like parameters are stored
+as empty values. The fragment part after "#" stores command-specific data such
+as paths or raw git arguments.
+
+These names are primarily an internal representation, but users may match the
+scheme part in autocmds or inspect the name when integrating with gin buffers.
+Use |gin#util#expand()| instead of parsing buffer names when you need the first
+file path represented by a gin file-like buffer.
+
+The following schemes are used:
+
+						*gin-buffer-name-gin*
+gin://{worktree};{params}#{args}$
+	Used by |:GinBuffer|. The fragment is the raw git command arguments
+	joined with spaces and terminated with "$". Parameters include:
+	"processor", "monochrome", "emojify", "diffjump", "difffold", and
+	"filetype".
+
+						*gin-buffer-name-ginbranch*
+ginbranch://{worktree};{flags}#{patterns}$
+	Used by |:GinBranch|. Parameters are git-branch flags. The fragment is
+	the space-joined branch patterns terminated with "$".
+
+						*gin-buffer-name-gindiff*
+gindiff://{worktree};{flags};commitish={commitish};processor={processor}#{paths}
+	Used by |:GinDiff|. Parameters are git-diff flags plus "commitish" and
+	"processor". The fragment is a JSON array of paths relative to
+	{worktree}.
+
+						*gin-buffer-name-ginedit*
+ginedit://{worktree};commitish={commitish}#{path}
+	Used by |:GinEdit| and by commands that need a file-like view of a git
+	object. The fragment is a path relative to {worktree}. With
+	"commitish", the buffer shows the file content at that revision.
+	Without "commitish", the buffer represents the index entry for the
+	path, that is, the staged version. For example, |:GinPatch| uses this
+	form as the center INDEX pane, while the WORKTREE pane is a normal file
+	buffer.
+
+						*gin-buffer-name-ginlog*
+ginlog://{worktree};{flags};commitish={commitish};emojify=#{paths}
+	Used by |:GinLog|. Parameters are git-log flags plus "commitish" and
+	"emojify". The fragment is a JSON array of paths relative to
+	{worktree}.
+
+						*gin-buffer-name-ginreflog*
+ginreflog://{worktree};{flags};ref={ref};emojify=
+	Used by |:GinReflog|. Parameters are git-reflog flags plus "ref" and
+	"emojify".
+
+						*gin-buffer-name-ginstash*
+ginstash://{worktree};{flags};emojify=
+	Used by |:GinStash|. Parameters are git-stash-list flags plus
+	"emojify".
+
+						*gin-buffer-name-ginstatus*
+ginstatus://{worktree};{flags}#{pathspecs}$
+	Used by |:GinStatus|. Parameters are git-status flags. The
+	"untracked-files" parameter is added by default. The fragment is a JSON
+	array of pathspecs followed by the "$" terminator. The terminator is
+	not part of the JSON array.
+
+						*gin-buffer-name-gintag*
+gintag://{worktree};{flags};emojify=#{patterns}$
+	Used by |:GinTag|. Parameters are git-tag flags plus "emojify". The
+	fragment is the space-joined tag patterns terminated with "$".
+
+						*gin-buffer-name-ginblame*
+ginblame://{worktree};commitish={commitish};emojify=#{path}
+ginblamenav://{worktree};commitish={commitish};emojify=#{path}
+ginblamedetail://{worktree};commitish={commitish};emojify=#{path}
+	Used by |:GinBlame|. The fragment is a path relative to {worktree}.
+	"ginblame" is the file-content buffer, "ginblamenav" is the navigation
+	buffer, and "ginblamedetail" is the internal commit-detail buffer.
+
 						*gin-commands-default-args*
 Users can specify default arguments that is used when no arguments are given
 for each Gin commands by variable like "g:gin_{command}_default_args".
