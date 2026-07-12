@@ -51,18 +51,20 @@ async function doDelete(
         break;
       default:
         if (x.worktree) {
+          // The branch is checked out in another worktree, so the worktree
+          // must be removed first before the branch itself can be deleted.
           await denops.dispatch("gin", "command", "", [
             "worktree",
             "remove",
+            ...(force ? ["--force"] : []),
             x.worktree,
           ]);
-        } else {
-          await denops.dispatch("gin", "command", "", [
-            "branch",
-            force ? "-D" : "-d",
-            x.branch,
-          ]);
         }
+        await denops.dispatch("gin", "command", "", [
+          "branch",
+          force ? "-D" : "-d",
+          x.branch,
+        ]);
         break;
     }
   }
