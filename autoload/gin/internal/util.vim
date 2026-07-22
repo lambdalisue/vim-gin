@@ -11,11 +11,15 @@ endfunction
 " @param source_group The name of the source highlight group to inherit from
 " @param extra_attrs Dictionary with additional attributes (e.g., {'gui': 'strikethrough', 'cterm': 'strikethrough'})
 function! gin#internal#util#highlight_inherit(target_group, source_group, extra_attrs) abort
+  " Note that when matching a string, \S also matches a newline, and the
+  " output of execute() may contain multiple lines (e.g. "Last set from ..."
+  " lines when 'verbose' is set), so newlines must be excluded explicitly to
+  " avoid capturing values like "#80a0ff\n" that break the generated command.
   let source_hl = execute('highlight ' . a:source_group)
-  let guifg = matchstr(source_hl, 'guifg=\zs\S\+')
-  let guibg = matchstr(source_hl, 'guibg=\zs\S\+')
-  let ctermfg = matchstr(source_hl, 'ctermfg=\zs\S\+')
-  let ctermbg = matchstr(source_hl, 'ctermbg=\zs\S\+')
+  let guifg = matchstr(source_hl, 'guifg=\zs[^ \t\n]\+')
+  let guibg = matchstr(source_hl, 'guibg=\zs[^ \t\n]\+')
+  let ctermfg = matchstr(source_hl, 'ctermfg=\zs[^ \t\n]\+')
+  let ctermbg = matchstr(source_hl, 'ctermbg=\zs[^ \t\n]\+')
 
   let hl_cmd = 'highlight ' . a:target_group
   if has_key(a:extra_attrs, 'gui') | let hl_cmd .= ' gui=' . a:extra_attrs.gui | endif
