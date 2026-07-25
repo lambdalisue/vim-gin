@@ -11,6 +11,8 @@ augroup gin_plugin_internal
         \ call denops#request('gin', 'buffer:edit', [bufnr(), expand('<amatch>')])
   autocmd FileReadCmd gin://*
         \ call denops#request('gin', 'buffer:read', [bufnr(), expand('<amatch>')])
+  autocmd User DenopsPluginPost:gin
+        \ call denops#notify('gin', 'commit_split:try_cleanup', [])
 augroup END
 
 function! s:command(bang, mods, args) abort

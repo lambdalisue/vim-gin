@@ -28,6 +28,7 @@ import { init as initActionRevert } from "../../action/revert.ts";
 import { init as initActionShow } from "../../action/show.ts";
 import { init as initActionSwitch } from "../../action/switch.ts";
 import { init as initActionTag } from "../../action/tag.ts";
+import { init as initActionCommitSplit } from "../../action/commit_split.ts";
 import { init as initActionYank } from "../../action/yank.ts";
 import { Entry, parse as parseLog } from "./parser.ts";
 
@@ -98,6 +99,14 @@ export async function exec(
       await initActionBrowse(denops, bufnr, gatherCandidates);
       await initActionCherryPick(denops, bufnr, gatherCandidates);
       await initActionEcho(denops, bufnr, gatherCandidates);
+      await initActionCommitSplit(
+        denops,
+        bufnr,
+        async (denops, bufnr, range) => {
+          const xs = await gatherCandidates(denops, bufnr, range);
+          return xs.map((x) => ({ commit: x.commit }));
+        },
+      );
       await initActionFixup(denops, bufnr, async (denops, bufnr, range) => {
         const xs = await gatherCandidates(denops, bufnr, range);
         return xs.map((x) => ({ commit: x.commit }));

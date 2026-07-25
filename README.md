@@ -13,6 +13,7 @@ without announcements.**
 
 - Proxy the prompts/editor used by git commands to Vim
 - Components to show information on `statusline` and/or `tabline`
+  - Branch, traffic, worktree, and rebase progress indicators
 - `Gin` to call a raw git command and echo the result
 - `GinBuffer` to call a raw git command and open a result buffer
 - `GinBranch` to see `git branch` of a repository
@@ -23,10 +24,14 @@ without announcements.**
 - `GinDiff` to see `git diff` of a file
 - `GinEdit` to see `git show` of a file
 - `GinLog` to see `git log` of a repository/file
+  - `commit:split` action to split commits via interactive rebase
 - `GinPatch` to stage changes partially (like `git add -p`)
 - `GinReflog` to see `git reflog` of a repository
+  - `commit:split` action to split commits via interactive rebase
 - `GinStash` to see `git stash list` of a repository
 - `GinStatus` to see `git status` of a repository
+  - Shows rebase progress header when rebase is in progress
+  - `commit:split` action to split commits via interactive rebase
 - `GinTag` to see `git tag --list` of a repository
 
 See [Features](https://github.com/lambdalisue/vim-gin/wiki/Features) in Wiki for

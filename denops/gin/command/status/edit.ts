@@ -12,6 +12,8 @@ import { Flags, formatFlags, parseOpts } from "jsr:@denops/std@^7.0.0/argument";
 import { bind } from "../../command/bare/command.ts";
 import { exec as execBuffer } from "../../command/buffer/edit.ts";
 import { findWorktreeFromDenops } from "../../git/worktree.ts";
+import { getRebaseState } from "../../git/rebase.ts";
+import { tryCleanupSplitTemplate } from "../../action/commit_split.ts";
 import { init as initActionAdd } from "../../action/add.ts";
 import { init as initActionBrowse } from "../../action/browse.ts";
 import { init as initActionChaperon } from "../../action/chaperon.ts";
@@ -74,11 +76,24 @@ export async function exec(
     fileformat: options.fileformat,
   });
   await buffer.ensure(denops, bufnr, async () => {
+    const worktree = await findWorktreeFromDenops(denops);
     await buffer.modifiable(denops, bufnr, async () => {
       const saved = await fn.winsaveview(denops);
       await denops.cmd("silent! 2,$sort /.. /)");
+      // Inject rebase state as a header line (parser skips ## lines)
+      const rebaseState = await getRebaseState(worktree);
+      if (rebaseState) {
+        const prefix = rebaseState.interactive ? "REBASE-i" : "REBASE";
+        await fn.append(
+          denops,
+          1,
+          `## ${prefix} ${rebaseState.current}/${rebaseState.total} on ${rebaseState.headName}`,
+        );
+      }
       await fn.winrestview(denops, saved);
     });
+    // Clean up commit.template override if rebase has completed
+    await tryCleanupSplitTemplate(worktree);
     await batch.batch(denops, async (denops) => {
       await bind(denops, bufnr);
       await initActionCore(denops, bufnr);
